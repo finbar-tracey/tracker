@@ -1470,6 +1470,16 @@
             workoutSessions: [],
             currentSession: null,
             sessionStartTime: null,
+
+            // Universal save helper - ALWAYS uses localStorage
+            save(key, data) {
+                try {
+                    localStorage.setItem(key, JSON.stringify(data));
+                    console.log(`💾 Saved ${key}`);
+                } catch (error) {
+                    console.error(`❌ Failed to save ${key}:`, error);
+                }
+            },
             healthMetrics: [],
             dailyLogs: {},
             garminConnected: false,
@@ -1749,88 +1759,32 @@
             },
 
             async loadData() {
-                // Check if storage API is available, otherwise use localStorage
-                const useLocalStorage = !window.storage;
+                console.log('🔄 Loading data...');
                 
-                if (useLocalStorage) {
-                    console.log('Using localStorage for persistence');
-                }
-                
+                // Try localStorage FIRST (most reliable)
                 try {
-                    if (useLocalStorage) {
-                        // Use localStorage
-                        this.workouts = JSON.parse(localStorage.getItem('workouts') || '[]');
-                        this.templates = JSON.parse(localStorage.getItem('templates') || '[]');
-                        this.bodyMetrics = JSON.parse(localStorage.getItem('bodyMetrics') || '[]');
-                        this.personalRecords = JSON.parse(localStorage.getItem('personalRecords') || '{}');
-                        this.theme = localStorage.getItem('theme') || 'light';
-                        this.progressPhotos = JSON.parse(localStorage.getItem('progressPhotos') || '[]');
-                        this.settings = JSON.parse(localStorage.getItem('settings') || '{"restTimerDuration":90,"weightIncrement":2.5,"units":"kg","notificationsEnabled":true}');
-                        this.goals = JSON.parse(localStorage.getItem('goals') || '[]');
-                        this.achievements = JSON.parse(localStorage.getItem('achievements') || '[]');
-                        this.workoutNotes = JSON.parse(localStorage.getItem('workoutNotes') || '{}');
-                        this.customExercises = JSON.parse(localStorage.getItem('customExercises') || '[]');
-                        this.workoutSessions = JSON.parse(localStorage.getItem('workoutSessions') || '[]');
-                        this.healthMetrics = JSON.parse(localStorage.getItem('healthMetrics') || '[]');
-                        this.dailyLogs = JSON.parse(localStorage.getItem('dailyLogs') || '{}');
-                        
-                        console.log(`✅ Loaded from localStorage: ${this.workouts.length} workouts, ${this.workoutSessions.length} sessions`);
-                    } else {
-                        // Use storage API
-                        const workoutsResult = await window.storage.get('workouts', false);
-                        this.workouts = workoutsResult ? JSON.parse(workoutsResult.value) : [];
-                        
-                        const templatesResult = await window.storage.get('templates', false);
-                        this.templates = templatesResult ? JSON.parse(templatesResult.value) : [];
-                        
-                        const metricsResult = await window.storage.get('bodyMetrics', false);
-                        this.bodyMetrics = metricsResult ? JSON.parse(metricsResult.value) : [];
-                        
-                        const prsResult = await window.storage.get('personalRecords', false);
-                        this.personalRecords = prsResult ? JSON.parse(prsResult.value) : {};
-                        
-                        const themeResult = await window.storage.get('theme', false);
-                        this.theme = themeResult ? themeResult.value : 'light';
-                        
-                        const photosResult = await window.storage.get('progressPhotos', false);
-                        this.progressPhotos = photosResult ? JSON.parse(photosResult.value) : [];
-                        
-                        const settingsResult = await window.storage.get('settings', false);
-                        this.settings = settingsResult ? JSON.parse(settingsResult.value) : {
-                            restTimerDuration: 90,
-                            weightIncrement: 2.5,
-                            units: 'kg',
-                            notificationsEnabled: true
-                        };
-                        
-                        const goalsResult = await window.storage.get('goals', false);
-                        this.goals = goalsResult ? JSON.parse(goalsResult.value) : [];
-                        
-                        const achievementsResult = await window.storage.get('achievements', false);
-                        this.achievements = achievementsResult ? JSON.parse(achievementsResult.value) : [];
-                        
-                        const notesResult = await window.storage.get('workoutNotes', false);
-                        this.workoutNotes = notesResult ? JSON.parse(notesResult.value) : {};
-                        
-                        const customExResult = await window.storage.get('customExercises', false);
-                        this.customExercises = customExResult ? JSON.parse(customExResult.value) : [];
-                        
-                        const sessionsResult = await window.storage.get('workoutSessions', false);
-                        this.workoutSessions = sessionsResult ? JSON.parse(sessionsResult.value) : [];
-                        
-                        const healthResult = await window.storage.get('healthMetrics', false);
-                        this.healthMetrics = healthResult ? JSON.parse(healthResult.value) : [];
-                        
-                        const dailyLogsResult = await window.storage.get('dailyLogs', false);
-                        this.dailyLogs = dailyLogsResult ? JSON.parse(dailyLogsResult.value) : {};
-                        
-                        console.log(`✅ Loaded from storage API: ${this.workouts.length} workouts, ${this.workoutSessions.length} sessions`);
-                    }
+                    this.workouts = JSON.parse(localStorage.getItem('workouts') || '[]');
+                    this.templates = JSON.parse(localStorage.getItem('templates') || '[]');
+                    this.bodyMetrics = JSON.parse(localStorage.getItem('bodyMetrics') || '[]');
+                    this.personalRecords = JSON.parse(localStorage.getItem('personalRecords') || '{}');
+                    this.theme = localStorage.getItem('theme') || 'light';
+                    this.progressPhotos = JSON.parse(localStorage.getItem('progressPhotos') || '[]');
+                    this.settings = JSON.parse(localStorage.getItem('settings') || '{"restTimerDuration":90,"weightIncrement":2.5,"units":"kg","notificationsEnabled":true}');
+                    this.goals = JSON.parse(localStorage.getItem('goals') || '[]');
+                    this.achievements = JSON.parse(localStorage.getItem('achievements') || '[]');
+                    this.workoutNotes = JSON.parse(localStorage.getItem('workoutNotes') || '{}');
+                    this.customExercises = JSON.parse(localStorage.getItem('customExercises') || '[]');
+                    this.workoutSessions = JSON.parse(localStorage.getItem('workoutSessions') || '[]');
+                    this.healthMetrics = JSON.parse(localStorage.getItem('healthMetrics') || '[]');
+                    this.dailyLogs = JSON.parse(localStorage.getItem('dailyLogs') || '{}');
                     
                     // Merge custom exercises into main exercises array
                     this.allExercises = [...this.exercises, ...this.customExercises];
+                    
+                    console.log(`✅ Loaded from localStorage: ${this.workouts.length} workouts, ${this.workoutSessions.length} sessions`);
                 } catch (error) {
-                    console.error('Error loading data:', error);
+                    console.error('❌ Error loading data:', error);
+                    // Set defaults
                     this.workouts = [];
                     this.templates = [];
                     this.bodyMetrics = [];
