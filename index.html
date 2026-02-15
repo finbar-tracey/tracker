@@ -15,33 +15,35 @@
         }
 
         :root {
-            --primary: #007AFF;
-            --primary-dark: #0051D5;
-            --success: #34C759;
-            --warning: #FF9500;
-            --danger: #FF3B30;
-            --background: #F2F2F7;
+            --primary: #00D4AA;
+            --primary-dark: #00B894;
+            --success: #00D4AA;
+            --warning: #FFB800;
+            --danger: #FF3B47;
+            --background: #FAFAFA;
             --surface: #FFFFFF;
-            --text-primary: #000000;
-            --text-secondary: #8E8E93;
-            --border: #C6C6C8;
-            --shadow: rgba(0, 0, 0, 0.1);
-            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --text-primary: #1A1A1A;
+            --text-secondary: #6B6B6B;
+            --border: #E8E8E8;
+            --shadow: rgba(0, 0, 0, 0.04);
+            --gradient: linear-gradient(135deg, #00D4AA 0%, #00B894 100%);
+            --chart-bg: #F5F5F5;
         }
 
         [data-theme="dark"] {
-            --primary: #0A84FF;
-            --primary-dark: #0077ED;
-            --success: #32D74B;
-            --warning: #FF9F0A;
-            --danger: #FF453A;
-            --background: #000000;
-            --surface: #1C1C1E;
+            --primary: #00D4AA;
+            --primary-dark: #00B894;
+            --success: #00D4AA;
+            --warning: #FFB800;
+            --danger: #FF3B47;
+            --background: #0A0A0A;
+            --surface: #1A1A1A;
             --text-primary: #FFFFFF;
-            --text-secondary: #98989D;
-            --border: #38383A;
+            --text-secondary: #8F8F8F;
+            --border: #2A2A2A;
             --shadow: rgba(0, 0, 0, 0.3);
-            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient: linear-gradient(135deg, #00D4AA 0%, #00B894 100%);
+            --chart-bg: #141414;
         }
 
         body {
@@ -1021,6 +1023,163 @@
                 transform: translateX(-50%) translateY(-100px);
                 opacity: 0;
             }
+        }
+
+        /* Whoop-Style Data Visualization */
+        .readiness-ring {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+        }
+
+        .readiness-ring svg {
+            transform: rotate(-90deg);
+        }
+
+        .readiness-ring-bg {
+            fill: none;
+            stroke: var(--border);
+            stroke-width: 12;
+        }
+
+        .readiness-ring-progress {
+            fill: none;
+            stroke: var(--primary);
+            stroke-width: 12;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 1s ease;
+        }
+
+        .readiness-score-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .readiness-score-number {
+            font-size: 56px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1;
+            letter-spacing: -2px;
+        }
+
+        .readiness-score-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .metric-row:last-child {
+            border-bottom: none;
+        }
+
+        .metric-label-small {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .metric-value-large {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+        }
+
+        .metric-value-small {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .metric-change {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 6px;
+            margin-left: 8px;
+        }
+
+        .metric-change.positive {
+            background: rgba(0, 212, 170, 0.1);
+            color: var(--success);
+        }
+
+        .metric-change.negative {
+            background: rgba(255, 59, 71, 0.1);
+            color: var(--danger);
+        }
+
+        .mini-chart {
+            height: 40px;
+            display: flex;
+            align-items: flex-end;
+            gap: 2px;
+        }
+
+        .mini-chart-bar {
+            flex: 1;
+            background: var(--border);
+            border-radius: 2px;
+            min-height: 4px;
+            transition: all 0.3s;
+        }
+
+        .mini-chart-bar.active {
+            background: var(--primary);
+        }
+
+        .section-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 24px 0;
+        }
+
+        .premium-stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 12px;
+        }
+
+        .premium-stat-header {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .premium-stat-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1;
+            letter-spacing: -1px;
+            margin-bottom: 8px;
+        }
+
+        .premium-stat-subtitle {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
         }
     </style>
 </head>
@@ -4817,215 +4976,191 @@ Tracked with Gym Tracker
                 
                 let html = `
                     <div class="section-header">
-                        <div class="section-title">Health Dashboard</div>
-                        <div class="section-action" onclick="app.logDailyHealth()">+ Log Today</div>
+                        <div class="section-title">Health <span style="font-size: 10px; color: var(--text-secondary);">v3.1</span></div>
+                        <div class="section-action" onclick="app.logDailyHealth()">+ Log</div>
                     </div>
                 `;
                 
-                // Readiness Score & Today's Stats
+                // Readiness Ring (Whoop-style)
                 if (todayLog && readiness) {
+                    const circumference = 2 * Math.PI * 90;
+                    const offset = circumference - (readiness.score / 100) * circumference;
+                    
+                    let ringColor = '#00D4AA';
+                    if (readiness.score < 40) ringColor = '#FF3B47';
+                    else if (readiness.score < 70) ringColor = '#FFB800';
+                    
                     html += `
-                        <div class="card" style="background: var(--gradient); color: white; margin-bottom: 16px;">
-                            <div style="text-align: center; margin-bottom: 16px;">
-                                <div style="font-size: 64px; font-weight: 700;">${readiness.score}</div>
-                                <div style="font-size: 18px; font-weight: 600; margin-bottom: 4px;">Readiness Score</div>
-                                <div style="font-size: 14px; opacity: 0.9;">${readiness.status}</div>
+                        <div class="premium-stat-card" style="background: var(--surface); margin-bottom: 20px;">
+                            <div class="readiness-ring">
+                                <svg width="200" height="200">
+                                    <circle class="readiness-ring-bg" cx="100" cy="100" r="90"/>
+                                    <circle class="readiness-ring-progress" 
+                                        cx="100" cy="100" r="90"
+                                        stroke="${ringColor}"
+                                        stroke-dasharray="${circumference}"
+                                        stroke-dashoffset="${offset}"/>
+                                </svg>
+                                <div class="readiness-score-text">
+                                    <div class="readiness-score-number">${readiness.score}</div>
+                                    <div class="readiness-score-label">READINESS</div>
+                                </div>
                             </div>
-                            <div style="padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.2);">
-                                <div style="font-size: 13px; opacity: 0.9; margin-bottom: 8px;">${readiness.recommendation}</div>
+                            <div style="text-align: center; margin-top: 20px;">
+                                <div style="font-size: 15px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">
+                                    ${readiness.status}
+                                </div>
+                                <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">
+                                    ${readiness.recommendation}
+                                </div>
                             </div>
                         </div>
                     `;
                 } else {
                     html += `
-                        <div class="card" style="background: var(--gradient); color: white; margin-bottom: 16px; text-align: center; padding: 40px 20px;">
-                            <div style="font-size: 48px; margin-bottom: 12px;">❤️</div>
-                            <div style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">No Health Data Today</div>
-                            <div style="font-size: 14px; opacity: 0.9;">Tap "+ Log Today" to track your health</div>
+                        <div class="premium-stat-card" style="text-align: center; padding: 60px 20px;">
+                            <div style="font-size: 48px; margin-bottom: 16px;">💤</div>
+                            <div style="font-size: 16px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">
+                                No Data Today
+                            </div>
+                            <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 20px;">
+                                Log your health metrics to see your readiness score
+                            </div>
+                            <button class="btn btn-primary" onclick="app.logDailyHealth()">Log Today's Data</button>
                         </div>
                     `;
                 }
                 
-                // Today's Health Metrics
+                // Today's Metrics (Clean rows)
                 if (todayLog) {
                     html += `
-                        <div class="card">
-                            <div class="card-title" style="margin-bottom: 12px;">Today's Health</div>
-                            <div class="stats-grid">
-                                ${todayLog.sleep ? `
-                                    <div class="stat-card">
-                                        <div class="stat-value">${todayLog.sleep}h</div>
-                                        <div class="stat-label">Sleep</div>
+                        <div class="premium-stat-card">
+                            <div class="premium-stat-header">Today's Metrics</div>
+                            ${todayLog.sleep ? `
+                                <div class="metric-row">
+                                    <div>
+                                        <div class="metric-label-small">Sleep</div>
+                                        <div class="metric-value-large">${todayLog.sleep}h</div>
                                     </div>
-                                ` : ''}
-                                ${todayLog.rhr ? `
-                                    <div class="stat-card">
-                                        <div class="stat-value">${todayLog.rhr}</div>
-                                        <div class="stat-label">RHR (bpm)</div>
+                                    ${todayLog.sleepQuality ? `<div class="metric-value-small">${todayLog.sleepQuality}/10 quality</div>` : ''}
+                                </div>
+                            ` : ''}
+                            ${todayLog.rhr ? `
+                                <div class="metric-row">
+                                    <div class="metric-label-small">Resting Heart Rate</div>
+                                    <div class="metric-value-large">${todayLog.rhr} <span style="font-size: 16px; font-weight: 500;">bpm</span></div>
+                                </div>
+                            ` : ''}
+                            ${todayLog.hrv ? `
+                                <div class="metric-row">
+                                    <div class="metric-label-small">HRV</div>
+                                    <div class="metric-value-large">${todayLog.hrv} <span style="font-size: 16px; font-weight: 500;">ms</span></div>
+                                </div>
+                            ` : ''}
+                            ${todayLog.energy ? `
+                                <div class="metric-row">
+                                    <div class="metric-label-small">Energy Level</div>
+                                    <div style="display: flex; align-items: center; gap: 12px;">
+                                        <div class="metric-value-small">${todayLog.energy}/10</div>
+                                        <div class="mini-chart" style="width: 100px;">
+                                            ${Array.from({length: 10}, (_, i) => `
+                                                <div class="mini-chart-bar ${i < todayLog.energy ? 'active' : ''}" style="height: ${(i + 1) * 4}px;"></div>
+                                            `).join('')}
+                                        </div>
                                     </div>
-                                ` : ''}
-                                ${todayLog.energy ? `
-                                    <div class="stat-card">
-                                        <div class="stat-value">${todayLog.energy}/10</div>
-                                        <div class="stat-label">Energy</div>
-                                    </div>
-                                ` : ''}
-                                ${todayLog.soreness ? `
-                                    <div class="stat-card">
-                                        <div class="stat-value">${todayLog.soreness}/10</div>
-                                        <div class="stat-label">Soreness</div>
-                                    </div>
-                                ` : ''}
-                            </div>
+                                </div>
+                            ` : ''}
+                            ${todayLog.soreness ? `
+                                <div class="metric-row">
+                                    <div class="metric-label-small">Muscle Soreness</div>
+                                    <div class="metric-value-small">${todayLog.soreness}/10</div>
+                                </div>
+                            ` : ''}
                         </div>
                     `;
                 }
                 
-                // Today's Nutrition
+                // Nutrition (Premium cards)
                 if (todayLog && (todayLog.caloriesIn || todayLog.protein)) {
                     html += `
-                        <div class="card">
-                            <div class="card-title" style="margin-bottom: 12px;">🍎 Today's Nutrition</div>
-                            <div class="stats-grid">
+                        <div class="premium-stat-card">
+                            <div class="premium-stat-header">Nutrition</div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 12px;">
                                 ${todayLog.caloriesIn ? `
-                                    <div class="stat-card">
-                                        <div class="stat-value">${todayLog.caloriesIn}</div>
-                                        <div class="stat-label">Calories</div>
+                                    <div>
+                                        <div class="metric-label-small">Calories</div>
+                                        <div class="metric-value-large">${todayLog.caloriesIn}</div>
                                     </div>
                                 ` : ''}
                                 ${todayLog.protein ? `
-                                    <div class="stat-card">
-                                        <div class="stat-value">${todayLog.protein}g</div>
-                                        <div class="stat-label">Protein</div>
-                                    </div>
-                                ` : ''}
-                                ${todayLog.carbs ? `
-                                    <div class="stat-card">
-                                        <div class="stat-value">${todayLog.carbs}g</div>
-                                        <div class="stat-label">Carbs</div>
-                                    </div>
-                                ` : ''}
-                                ${todayLog.fats ? `
-                                    <div class="stat-card">
-                                        <div class="stat-value">${todayLog.fats}g</div>
-                                        <div class="stat-label">Fats</div>
+                                    <div>
+                                        <div class="metric-label-small">Protein</div>
+                                        <div class="metric-value-large">${todayLog.protein}g</div>
                                     </div>
                                 ` : ''}
                             </div>
-                            ${todayLog.eatingQuality ? `
-                                <div style="margin-top: 12px; padding: 12px; background: var(--background); border-radius: 8px;">
-                                    <div style="font-size: 13px; color: var(--text-secondary);">Eating Quality</div>
-                                    <div style="font-size: 20px; font-weight: 600;">${todayLog.eatingQuality}/10</div>
-                                </div>
-                            ` : ''}
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                                ${todayLog.carbs ? `
+                                    <div>
+                                        <div class="metric-label-small">Carbs</div>
+                                        <div class="metric-value-small">${todayLog.carbs}g</div>
+                                    </div>
+                                ` : ''}
+                                ${todayLog.fats ? `
+                                    <div>
+                                        <div class="metric-label-small">Fats</div>
+                                        <div class="metric-value-small">${todayLog.fats}g</div>
+                                    </div>
+                                ` : ''}
+                            </div>
                         </div>
                     `;
                 }
                 
                 // Weekly Trends
                 const weeklyData = this.getWeeklyHealthData();
-                if (weeklyData.length > 0) {
+                if (weeklyData.length > 1) {
                     const avgSleep = this.calculateAverage(weeklyData.map(d => d.sleep).filter(Boolean));
                     const avgRHR = this.calculateAverage(weeklyData.map(d => d.rhr).filter(Boolean));
-                    const avgEnergy = this.calculateAverage(weeklyData.map(d => d.energy).filter(Boolean));
-                    const avgCalories = this.calculateAverage(weeklyData.map(d => d.caloriesIn).filter(Boolean));
                     const avgProtein = this.calculateAverage(weeklyData.map(d => d.protein).filter(Boolean));
                     
+                    // Calculate trends
+                    const last3Days = weeklyData.slice(-3);
+                    const first3Days = weeklyData.slice(0, 3);
+                    const recentSleep = this.calculateAverage(last3Days.map(d => d.sleep).filter(Boolean));
+                    const earlierSleep = this.calculateAverage(first3Days.map(d => d.sleep).filter(Boolean));
+                    const sleepTrend = earlierSleep ? ((recentSleep - earlierSleep) / earlierSleep * 100).toFixed(0) : 0;
+                    
                     html += `
-                        <div class="card">
-                            <div class="card-title" style="margin-bottom: 12px;">📊 7-Day Averages</div>
-                            <div class="stats-grid">
-                                ${avgSleep ? `
-                                    <div class="stat-card">
-                                        <div class="stat-value">${avgSleep.toFixed(1)}h</div>
-                                        <div class="stat-label">Avg Sleep</div>
+                        <div class="premium-stat-card">
+                            <div class="premium-stat-header">7-Day Trends</div>
+                            ${avgSleep ? `
+                                <div class="metric-row">
+                                    <div>
+                                        <div class="metric-label-small">Average Sleep</div>
+                                        <div class="metric-value-large">${avgSleep.toFixed(1)}h</div>
                                     </div>
-                                ` : ''}
-                                ${avgRHR ? `
-                                    <div class="stat-card">
-                                        <div class="stat-value">${Math.round(avgRHR)}</div>
-                                        <div class="stat-label">Avg RHR</div>
-                                    </div>
-                                ` : ''}
-                                ${avgEnergy ? `
-                                    <div class="stat-card">
-                                        <div class="stat-value">${avgEnergy.toFixed(1)}/10</div>
-                                        <div class="stat-label">Avg Energy</div>
-                                    </div>
-                                ` : ''}
-                                ${avgCalories ? `
-                                    <div class="stat-card">
-                                        <div class="stat-value">${Math.round(avgCalories)}</div>
-                                        <div class="stat-label">Avg Calories</div>
-                                    </div>
-                                ` : ''}
-                            </div>
+                                    ${sleepTrend != 0 ? `<div class="metric-change ${sleepTrend > 0 ? 'positive' : 'negative'}">${sleepTrend > 0 ? '+' : ''}${sleepTrend}%</div>` : ''}
+                                </div>
+                            ` : ''}
+                            ${avgRHR ? `
+                                <div class="metric-row">
+                                    <div class="metric-label-small">Average RHR</div>
+                                    <div class="metric-value-large">${Math.round(avgRHR)} <span style="font-size: 16px; font-weight: 500;">bpm</span></div>
+                                </div>
+                            ` : ''}
                             ${avgProtein ? `
-                                <div style="margin-top: 12px; padding: 12px; background: var(--background); border-radius: 8px;">
-                                    <div style="font-size: 13px; color: var(--text-secondary);">Average Protein</div>
-                                    <div style="font-size: 20px; font-weight: 600;">${Math.round(avgProtein)}g/day</div>
+                                <div class="metric-row">
+                                    <div class="metric-label-small">Average Protein</div>
+                                    <div class="metric-value-large">${Math.round(avgProtein)}g</div>
                                 </div>
                             ` : ''}
                         </div>
                     `;
-                    
-                    // Sleep trend chart
-                    html += this.renderHealthChart(weeklyData, 'sleep', 'Sleep (hours)');
-                    
-                    // Protein chart if available
-                    if (avgProtein) {
-                        html += this.renderHealthChart(weeklyData, 'protein', 'Protein (grams)');
-                    }
-                    
-                    // Correlations
-                    html += this.renderHealthCorrelations();
                 }
                 
-                // Body Metrics Section
-                html += `
-                    <div class="section-header" style="margin-top: 24px;">
-                        <div class="section-title">Body Metrics & Photos</div>
-                        <div class="section-action" onclick="app.switchTab('more'); setTimeout(() => app.showSection('metrics'), 100)">View All</div>
-                    </div>
-                `;
-                
-                // Quick body metrics summary
-                if (this.bodyMetrics.length > 0) {
-                    const latest = this.bodyMetrics[this.bodyMetrics.length - 1];
-                    html += `
-                        <div class="card">
-                            <div class="stats-grid">
-                                ${latest.weight ? `
-                                    <div class="stat-card">
-                                        <div class="stat-value">${latest.weight}kg</div>
-                                        <div class="stat-label">Weight</div>
-                                    </div>
-                                ` : ''}
-                                ${latest.bodyFat ? `
-                                    <div class="stat-card">
-                                        <div class="stat-value">${latest.bodyFat}%</div>
-                                        <div class="stat-label">Body Fat</div>
-                                    </div>
-                                ` : ''}
-                            </div>
-                        </div>
-                    `;
-                }
-                
-                // Progress photos preview
-                if (this.progressPhotos.length > 0) {
-                    html += `
-                        <div class="card">
-                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
-                                ${this.progressPhotos.slice(-3).reverse().map((photo, i) => `
-                                    <div style="position: relative; padding-bottom: 100%; overflow: hidden; border-radius: 8px; background: var(--background);">
-                                        <img src="${photo.dataUrl}" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;" alt="Progress photo">
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                    `;
-                }
+                // Insights & Correlations
+                html += this.renderHealthCorrelations();
                 
                 document.getElementById('healthContent').innerHTML = html;
             },
