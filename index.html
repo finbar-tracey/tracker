@@ -1227,9 +1227,9 @@
             <div id="templatesContent"></div>
         </div>
 
-        <!-- Library View -->
-        <div id="library" class="content view">
-            <div id="libraryContent"></div>
+        <!-- History View -->
+        <div id="history" class="content view">
+            <div id="historyContent"></div>
         </div>
 
         <!-- Health View -->
@@ -1242,6 +1242,16 @@
             <div id="moreContent"></div>
         </div>
 
+        <!-- Templates View (accessed from More) -->
+        <div id="templates" class="content view">
+            <div id="templatesContent"></div>
+        </div>
+
+        <!-- Library View (accessed from More) -->
+        <div id="library" class="content view">
+            <div id="libraryContent"></div>
+        </div>
+
         <!-- Tab Bar -->
         <div class="tab-bar">
             <button class="tab active" onclick="app.switchTab('today')">
@@ -1252,13 +1262,13 @@
                 <span class="tab-icon">❤️</span>
                 <span>Health</span>
             </button>
+            <button class="tab" onclick="app.switchTab('history')">
+                <span class="tab-icon">📅</span>
+                <span>History</span>
+            </button>
             <button class="tab" onclick="app.switchTab('analytics')">
                 <span class="tab-icon">📊</span>
                 <span>Stats</span>
-            </button>
-            <button class="tab" onclick="app.switchTab('templates')">
-                <span class="tab-icon">📋</span>
-                <span>Programs</span>
             </button>
             <button class="tab" onclick="app.switchTab('more')">
                 <span class="tab-icon">⚙️</span>
@@ -1462,6 +1472,10 @@
             sessionStartTime: null,
             healthMetrics: [],
             dailyLogs: {},
+            garminConnected: false,
+            garminAccessToken: null,
+            garminAccessSecret: null,
+            garminData: {},
 
             exerciseDetails: {
                 'Barbell Bench Press': {
@@ -1728,65 +1742,95 @@
                 // Load theme preference
                 this.loadTheme();
                 
-                this.renderLibrary();
                 this.renderToday();
                 this.renderAnalytics();
-                this.renderTemplates();
+                this.renderHistory();
                 this.renderHealth();
             },
 
             async loadData() {
+                // Check if storage API is available, otherwise use localStorage
+                const useLocalStorage = !window.storage;
+                
+                if (useLocalStorage) {
+                    console.log('Using localStorage for persistence');
+                }
+                
                 try {
-                    const workoutsResult = await window.storage.get('workouts', false);
-                    this.workouts = workoutsResult ? JSON.parse(workoutsResult.value) : [];
-                    
-                    const templatesResult = await window.storage.get('templates', false);
-                    this.templates = templatesResult ? JSON.parse(templatesResult.value) : [];
-                    
-                    const metricsResult = await window.storage.get('bodyMetrics', false);
-                    this.bodyMetrics = metricsResult ? JSON.parse(metricsResult.value) : [];
-                    
-                    const prsResult = await window.storage.get('personalRecords', false);
-                    this.personalRecords = prsResult ? JSON.parse(prsResult.value) : {};
-                    
-                    const themeResult = await window.storage.get('theme', false);
-                    this.theme = themeResult ? themeResult.value : 'light';
-                    
-                    const photosResult = await window.storage.get('progressPhotos', false);
-                    this.progressPhotos = photosResult ? JSON.parse(photosResult.value) : [];
-                    
-                    const settingsResult = await window.storage.get('settings', false);
-                    this.settings = settingsResult ? JSON.parse(settingsResult.value) : {
-                        restTimerDuration: 90,
-                        weightIncrement: 2.5,
-                        units: 'kg',
-                        notificationsEnabled: true
-                    };
-                    
-                    const goalsResult = await window.storage.get('goals', false);
-                    this.goals = goalsResult ? JSON.parse(goalsResult.value) : [];
-                    
-                    const achievementsResult = await window.storage.get('achievements', false);
-                    this.achievements = achievementsResult ? JSON.parse(achievementsResult.value) : [];
-                    
-                    const notesResult = await window.storage.get('workoutNotes', false);
-                    this.workoutNotes = notesResult ? JSON.parse(notesResult.value) : {};
-                    
-                    const customExResult = await window.storage.get('customExercises', false);
-                    this.customExercises = customExResult ? JSON.parse(customExResult.value) : [];
-                    
-                    const sessionsResult = await window.storage.get('workoutSessions', false);
-                    this.workoutSessions = sessionsResult ? JSON.parse(sessionsResult.value) : [];
-                    
-                    const healthResult = await window.storage.get('healthMetrics', false);
-                    this.healthMetrics = healthResult ? JSON.parse(healthResult.value) : [];
-                    
-                    const dailyLogsResult = await window.storage.get('dailyLogs', false);
-                    this.dailyLogs = dailyLogsResult ? JSON.parse(dailyLogsResult.value) : {};
+                    if (useLocalStorage) {
+                        // Use localStorage
+                        this.workouts = JSON.parse(localStorage.getItem('workouts') || '[]');
+                        this.templates = JSON.parse(localStorage.getItem('templates') || '[]');
+                        this.bodyMetrics = JSON.parse(localStorage.getItem('bodyMetrics') || '[]');
+                        this.personalRecords = JSON.parse(localStorage.getItem('personalRecords') || '{}');
+                        this.theme = localStorage.getItem('theme') || 'light';
+                        this.progressPhotos = JSON.parse(localStorage.getItem('progressPhotos') || '[]');
+                        this.settings = JSON.parse(localStorage.getItem('settings') || '{"restTimerDuration":90,"weightIncrement":2.5,"units":"kg","notificationsEnabled":true}');
+                        this.goals = JSON.parse(localStorage.getItem('goals') || '[]');
+                        this.achievements = JSON.parse(localStorage.getItem('achievements') || '[]');
+                        this.workoutNotes = JSON.parse(localStorage.getItem('workoutNotes') || '{}');
+                        this.customExercises = JSON.parse(localStorage.getItem('customExercises') || '[]');
+                        this.workoutSessions = JSON.parse(localStorage.getItem('workoutSessions') || '[]');
+                        this.healthMetrics = JSON.parse(localStorage.getItem('healthMetrics') || '[]');
+                        this.dailyLogs = JSON.parse(localStorage.getItem('dailyLogs') || '{}');
+                        
+                        console.log(`✅ Loaded from localStorage: ${this.workouts.length} workouts, ${this.workoutSessions.length} sessions`);
+                    } else {
+                        // Use storage API
+                        const workoutsResult = await window.storage.get('workouts', false);
+                        this.workouts = workoutsResult ? JSON.parse(workoutsResult.value) : [];
+                        
+                        const templatesResult = await window.storage.get('templates', false);
+                        this.templates = templatesResult ? JSON.parse(templatesResult.value) : [];
+                        
+                        const metricsResult = await window.storage.get('bodyMetrics', false);
+                        this.bodyMetrics = metricsResult ? JSON.parse(metricsResult.value) : [];
+                        
+                        const prsResult = await window.storage.get('personalRecords', false);
+                        this.personalRecords = prsResult ? JSON.parse(prsResult.value) : {};
+                        
+                        const themeResult = await window.storage.get('theme', false);
+                        this.theme = themeResult ? themeResult.value : 'light';
+                        
+                        const photosResult = await window.storage.get('progressPhotos', false);
+                        this.progressPhotos = photosResult ? JSON.parse(photosResult.value) : [];
+                        
+                        const settingsResult = await window.storage.get('settings', false);
+                        this.settings = settingsResult ? JSON.parse(settingsResult.value) : {
+                            restTimerDuration: 90,
+                            weightIncrement: 2.5,
+                            units: 'kg',
+                            notificationsEnabled: true
+                        };
+                        
+                        const goalsResult = await window.storage.get('goals', false);
+                        this.goals = goalsResult ? JSON.parse(goalsResult.value) : [];
+                        
+                        const achievementsResult = await window.storage.get('achievements', false);
+                        this.achievements = achievementsResult ? JSON.parse(achievementsResult.value) : [];
+                        
+                        const notesResult = await window.storage.get('workoutNotes', false);
+                        this.workoutNotes = notesResult ? JSON.parse(notesResult.value) : {};
+                        
+                        const customExResult = await window.storage.get('customExercises', false);
+                        this.customExercises = customExResult ? JSON.parse(customExResult.value) : [];
+                        
+                        const sessionsResult = await window.storage.get('workoutSessions', false);
+                        this.workoutSessions = sessionsResult ? JSON.parse(sessionsResult.value) : [];
+                        
+                        const healthResult = await window.storage.get('healthMetrics', false);
+                        this.healthMetrics = healthResult ? JSON.parse(healthResult.value) : [];
+                        
+                        const dailyLogsResult = await window.storage.get('dailyLogs', false);
+                        this.dailyLogs = dailyLogsResult ? JSON.parse(dailyLogsResult.value) : {};
+                        
+                        console.log(`✅ Loaded from storage API: ${this.workouts.length} workouts, ${this.workoutSessions.length} sessions`);
+                    }
                     
                     // Merge custom exercises into main exercises array
                     this.allExercises = [...this.exercises, ...this.customExercises];
                 } catch (error) {
+                    console.error('Error loading data:', error);
                     this.workouts = [];
                     this.templates = [];
                     this.bodyMetrics = [];
@@ -1811,12 +1855,17 @@
             },
 
             async saveWorkouts() {
-                if (!window.storage) return;
-                try {
-                    await window.storage.set('workouts', JSON.stringify(this.workouts), false);
-                } catch (error) {
-                    console.error('Failed to save workouts:', error);
+                if (window.storage) {
+                    try {
+                        await window.storage.set('workouts', JSON.stringify(this.workouts), false);
+                    } catch (error) {
+                        console.error('Failed to save to storage API:', error);
+                        localStorage.setItem('workouts', JSON.stringify(this.workouts));
+                    }
+                } else {
+                    localStorage.setItem('workouts', JSON.stringify(this.workouts));
                 }
+                console.log(`💾 Saved ${this.workouts.length} workouts`);
             },
 
             async saveTemplates() {
@@ -1901,12 +1950,17 @@
             },
 
             async saveWorkoutSessions() {
-                if (!window.storage) return;
-                try {
-                    await window.storage.set('workoutSessions', JSON.stringify(this.workoutSessions), false);
-                } catch (error) {
-                    console.error('Failed to save sessions:', error);
+                if (window.storage) {
+                    try {
+                        await window.storage.set('workoutSessions', JSON.stringify(this.workoutSessions), false);
+                    } catch (error) {
+                        console.error('Failed to save sessions:', error);
+                        localStorage.setItem('workoutSessions', JSON.stringify(this.workoutSessions));
+                    }
+                } else {
+                    localStorage.setItem('workoutSessions', JSON.stringify(this.workoutSessions));
                 }
+                console.log(`💾 Saved ${this.workoutSessions.length} sessions`);
             },
 
             async saveHealthMetrics() {
@@ -1932,10 +1986,16 @@
                 document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
                 document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
                 document.getElementById(tab).classList.add('active');
-                document.querySelector(`[onclick="app.switchTab('${tab}')"]`).classList.add('active');
+                
+                // Only highlight tab if it's in the bottom nav
+                const tabBtn = document.querySelector(`[onclick="app.switchTab('${tab}')"]`);
+                if (tabBtn && tabBtn.closest('.tab-bar')) {
+                    tabBtn.classList.add('active');
+                }
                 
                 if (tab === 'today') this.renderToday();
                 if (tab === 'health') this.renderHealth();
+                if (tab === 'history') this.renderHistory();
                 if (tab === 'analytics') this.renderAnalytics();
                 if (tab === 'templates') this.renderTemplates();
                 if (tab === 'library') this.renderLibrary();
@@ -2009,9 +2069,9 @@
                 // Quick actions
                 html += `
                     <div class="quick-actions">
-                        <div class="quick-action-btn" onclick="app.showTemplates()">
+                        <div class="quick-action-btn" onclick="app.switchTab('templates')">
                             <div class="quick-action-icon">📋</div>
-                            <div class="quick-action-label">Start Template</div>
+                            <div class="quick-action-label">Programs</div>
                         </div>
                         <div class="quick-action-btn" onclick="app.duplicateLastWorkout()">
                             <div class="quick-action-icon">🔄</div>
@@ -2019,6 +2079,40 @@
                         </div>
                     </div>
                 `;
+
+                // Quick Stats Dashboard
+                if (this.workouts.length > 0 || this.workoutSessions.length > 0) {
+                    const weekWorkouts = this.getWorkoutsInDays(7);
+                    const weekVolume = weekWorkouts.reduce((sum, w) => 
+                        sum + w.sets.reduce((s, set) => s + (set.weight * set.reps), 0), 0
+                    );
+                    const recentPRs = this.getRecentPRs(7);
+                    const totalWorkouts = this.workoutSessions.length || this.workouts.length;
+
+                    html += `
+                        <div class="premium-stat-card" style="margin-bottom: 16px;">
+                            <div class="premium-stat-header">This Week</div>
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+                                <div>
+                                    <div class="metric-label-small">Workouts</div>
+                                    <div class="metric-value-large">${[...new Set(weekWorkouts.map(w => w.date))].length}</div>
+                                </div>
+                                <div>
+                                    <div class="metric-label-small">Volume</div>
+                                    <div class="metric-value-large">${this.formatNumber(weekVolume)}kg</div>
+                                </div>
+                            </div>
+                            ${recentPRs.length > 0 ? `
+                                <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border);">
+                                    <div class="metric-label-small">Recent PRs</div>
+                                    <div style="font-size: 14px; font-weight: 600; color: var(--primary); margin-top: 4px;">
+                                        🏆 ${recentPRs.length} new ${recentPRs.length === 1 ? 'record' : 'records'}!
+                                    </div>
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                }
                 
                 // Today's stats
                 if (todayWorkouts.length > 0) {
@@ -3860,13 +3954,17 @@ Tracked with Gym Tracker
             renderMore() {
                 let html = `
                     <div class="quick-actions" style="margin-bottom: 20px;">
-                        <div class="quick-action-btn" onclick="app.showSection('metrics')">
-                            <div class="quick-action-icon">📏</div>
-                            <div class="quick-action-label">Body Metrics</div>
+                        <div class="quick-action-btn" onclick="app.switchTab('templates')">
+                            <div class="quick-action-icon">📋</div>
+                            <div class="quick-action-label">Programs</div>
                         </div>
                         <div class="quick-action-btn" onclick="app.switchTab('library')">
                             <div class="quick-action-icon">📚</div>
                             <div class="quick-action-label">Exercise Library</div>
+                        </div>
+                        <div class="quick-action-btn" onclick="app.showSection('metrics')">
+                            <div class="quick-action-icon">📏</div>
+                            <div class="quick-action-label">Body Metrics</div>
                         </div>
                         <div class="quick-action-btn" onclick="app.showSection('goals')">
                             <div class="quick-action-icon">🎯</div>
@@ -3886,7 +3984,7 @@ Tracked with Gym Tracker
                         <div class="card-title" style="margin-bottom: 12px;">App Info</div>
                         <div class="history-item">
                             <div class="history-date">Version</div>
-                            <div class="history-sets">3.0 - Health Edition</div>
+                            <div class="history-sets">3.2 - History Edition</div>
                         </div>
                         <div class="history-item">
                             <div class="history-date">Total Workouts</div>
@@ -4979,6 +5077,36 @@ Tracked with Gym Tracker
                         <div class="section-title">Health <span style="font-size: 10px; color: var(--text-secondary);">v3.1</span></div>
                         <div class="section-action" onclick="app.logDailyHealth()">+ Log</div>
                     </div>
+
+                    ${!this.garminConnected ? `
+                        <div class="premium-stat-card" style="background: linear-gradient(135deg, #0080FF 0%, #0057B3 100%); color: white; margin-bottom: 16px;">
+                            <div style="text-align: center; padding: 20px 0;">
+                                <div style="font-size: 40px; margin-bottom: 12px;">⌚</div>
+                                <div style="font-size: 16px; font-weight: 600; margin-bottom: 8px;">Connect Garmin</div>
+                                <div style="font-size: 13px; opacity: 0.9; margin-bottom: 20px; line-height: 1.5;">
+                                    Auto-sync your sleep, heart rate, stress, and Body Battery
+                                </div>
+                                <button onclick="app.connectGarmin()" style="background: white; color: #0080FF; border: none; padding: 12px 32px; border-radius: 24px; font-size: 15px; font-weight: 600; cursor: pointer;">
+                                    Connect Garmin
+                                </button>
+                            </div>
+                        </div>
+                    ` : `
+                        <div class="premium-stat-card" style="background: var(--surface); margin-bottom: 16px; border: 1px solid var(--success);">
+                            <div style="display: flex; align-items: center; justify-content: space-between;">
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <div style="font-size: 24px;">✓</div>
+                                    <div>
+                                        <div style="font-size: 14px; font-weight: 600; color: var(--text-primary);">Garmin Connected</div>
+                                        <div style="font-size: 12px; color: var(--text-secondary);">Last synced: ${this.garminData.lastSync || 'Never'}</div>
+                                    </div>
+                                </div>
+                                <button onclick="app.syncGarmin()" style="background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 16px; font-size: 13px; font-weight: 600; cursor: pointer;">
+                                    Sync Now
+                                </button>
+                            </div>
+                        </div>
+                    `}
                 `;
                 
                 // Readiness Ring (Whoop-style)
@@ -5747,6 +5875,244 @@ Tracked with Gym Tracker
                         `).join('')}
                     </div>
                 `;
+            },
+
+            // Garmin API Integration
+            connectGarmin() {
+                alert(`
+🔧 Garmin Integration Ready!
+
+To connect Garmin, you need:
+
+1. Go to developer.garmin.com
+2. Create developer account (free)
+3. Register your app
+4. Get Consumer Key & Secret
+
+Once you have those:
+- Tap "Connect Garmin" again
+- Enter your credentials
+- Auto-sync your data!
+
+NOTE: Garmin uses OAuth 1.0a which requires
+a backend server for full security.
+
+For now: Continue manual logging
+Later: I'll build the secure backend!
+                `);
+            },
+
+            async syncGarmin() {
+                alert('Garmin sync coming soon! Need backend server for OAuth 1.0a security.');
+            },
+
+            // Workout History View
+            renderHistory() {
+                const sessions = [...this.workoutSessions].reverse();
+                const filter = this.historyFilter || 'all';
+                const searchTerm = this.historySearch || '';
+                
+                let html = `
+                    <div class="section-header">
+                        <div class="section-title">Workout History</div>
+                        <div class="section-action" onclick="app.showHistoryFilters()">Filter</div>
+                    </div>
+
+                    <input type="text" 
+                        class="search-box" 
+                        placeholder="Search workouts..." 
+                        value="${searchTerm}"
+                        oninput="app.filterHistory(this.value)"
+                        style="margin-bottom: 16px;">
+                `;
+
+                if (sessions.length === 0) {
+                    html += `
+                        <div class="empty-state">
+                            <div class="empty-icon">📅</div>
+                            <div class="empty-text">No workout history yet<br>Start your first workout to see it here!</div>
+                        </div>
+                    `;
+                } else {
+                    // Group by month
+                    const grouped = {};
+                    sessions.forEach(session => {
+                        const date = new Date(session.date);
+                        const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                        const monthName = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                        
+                        if (!grouped[monthKey]) {
+                            grouped[monthKey] = { name: monthName, sessions: [] };
+                        }
+                        
+                        // Filter by search
+                        if (searchTerm) {
+                            const searchLower = searchTerm.toLowerCase();
+                            const hasMatch = session.exercises.some(ex => 
+                                ex.name.toLowerCase().includes(searchLower)
+                            ) || session.notes?.toLowerCase().includes(searchLower);
+                            
+                            if (!hasMatch) return;
+                        }
+                        
+                        grouped[monthKey].sessions.push(session);
+                    });
+
+                    // Render groups
+                    Object.keys(grouped).sort().reverse().forEach(monthKey => {
+                        const group = grouped[monthKey];
+                        if (group.sessions.length === 0) return;
+                        
+                        html += `
+                            <div class="premium-stat-header" style="margin: 24px 0 12px 0;">${group.name}</div>
+                        `;
+                        
+                        group.sessions.forEach(session => {
+                            const duration = session.duration ? this.formatDuration(session.duration) : 'N/A';
+                            const totalVolume = session.exercises.reduce((sum, ex) => 
+                                sum + ex.sets.reduce((s, set) => s + (set.weight * set.reps), 0), 0
+                            );
+                            const totalSets = session.exercises.reduce((sum, ex) => sum + ex.sets.length, 0);
+                            const dateObj = new Date(session.date);
+                            const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric' });
+                            
+                            html += `
+                                <div class="premium-stat-card" onclick="app.viewSessionDetails('${session.id}')" style="cursor: pointer;">
+                                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+                                        <div>
+                                            <div style="font-size: 15px; font-weight: 600; color: var(--text-primary);">${dayName}</div>
+                                            <div style="font-size: 13px; color: var(--text-secondary); margin-top: 2px;">
+                                                ${session.exercises.map(e => e.name).slice(0, 3).join(', ')}${session.exercises.length > 3 ? '...' : ''}
+                                            </div>
+                                        </div>
+                                        <div style="text-align: right;">
+                                            <div style="font-size: 15px; font-weight: 600; color: var(--text-primary);">${duration}</div>
+                                            <div style="font-size: 13px; color: var(--text-secondary);">${totalSets} sets</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div style="display: flex; gap: 16px; padding-top: 12px; border-top: 1px solid var(--border);">
+                                        <div>
+                                            <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Exercises</div>
+                                            <div style="font-size: 16px; font-weight: 600; color: var(--text-primary);">${session.exercises.length}</div>
+                                        </div>
+                                        <div>
+                                            <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Volume</div>
+                                            <div style="font-size: 16px; font-weight: 600; color: var(--text-primary);">${this.formatNumber(totalVolume)}kg</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    });
+                }
+
+                // Quick stats summary
+                if (sessions.length > 0) {
+                    const totalWorkouts = sessions.length;
+                    const totalVolume = sessions.reduce((sum, s) => 
+                        sum + s.exercises.reduce((esum, ex) => 
+                            esum + ex.sets.reduce((ssum, set) => ssum + (set.weight * set.reps), 0), 0
+                        ), 0
+                    );
+                    const avgDuration = sessions
+                        .filter(s => s.duration)
+                        .reduce((sum, s) => sum + s.duration, 0) / sessions.filter(s => s.duration).length;
+
+                    html += `
+                        <div class="premium-stat-card" style="margin-top: 24px; background: var(--chart-bg);">
+                            <div class="premium-stat-header" style="margin-bottom: 12px;">All-Time Stats</div>
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+                                <div style="text-align: center;">
+                                    <div style="font-size: 24px; font-weight: 700; color: var(--text-primary);">${totalWorkouts}</div>
+                                    <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase;">Workouts</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 24px; font-weight: 700; color: var(--text-primary);">${this.formatNumber(totalVolume)}kg</div>
+                                    <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase;">Total Volume</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 24px; font-weight: 700; color: var(--text-primary);">${Math.round(avgDuration / 60)}min</div>
+                                    <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase;">Avg Duration</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                document.getElementById('historyContent').innerHTML = html;
+            },
+
+            filterHistory(searchTerm) {
+                this.historySearch = searchTerm;
+                this.renderHistory();
+            },
+
+            getRecentPRs(days) {
+                const since = new Date();
+                since.setDate(since.getDate() - days);
+                
+                return this.workouts.filter(w => {
+                    const workoutDate = new Date(w.date);
+                    return workoutDate >= since && this.checkIfPR(w);
+                });
+            },
+
+            viewSessionDetails(sessionId) {
+                const session = this.workoutSessions.find(s => s.id === sessionId);
+                if (!session) return;
+
+                const duration = session.duration ? this.formatDuration(session.duration) : 'N/A';
+                const totalVolume = session.exercises.reduce((sum, ex) => 
+                    sum + ex.sets.reduce((s, set) => s + (set.weight * set.reps), 0), 0
+                );
+                const totalSets = session.exercises.reduce((sum, ex) => sum + ex.sets.length, 0);
+
+                const html = `
+                    <div class="premium-stat-card" style="background: var(--gradient); color: white; margin-bottom: 16px;">
+                        <div style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">${this.formatDate(session.date)}</div>
+                        <div style="display: flex; gap: 24px; opacity: 0.9;">
+                            <div>⏱️ ${duration}</div>
+                            <div>💪 ${session.exercises.length} exercises</div>
+                            <div>📊 ${totalSets} sets</div>
+                        </div>
+                    </div>
+
+                    ${session.exercises.map((exercise, i) => `
+                        <div class="premium-stat-card">
+                            <div class="premium-stat-header">${exercise.name}</div>
+                            ${exercise.sets.map((set, j) => `
+                                <div class="metric-row">
+                                    <div class="metric-label-small">Set ${j + 1}</div>
+                                    <div class="metric-value-small">${set.weight}kg × ${set.reps} reps${set.rpe ? ` @ RPE ${set.rpe}` : ''}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `).join('')}
+
+                    ${session.notes ? `
+                        <div class="premium-stat-card">
+                            <div class="premium-stat-header">Notes</div>
+                            <div style="font-size: 14px; color: var(--text-secondary); line-height: 1.6;">${session.notes}</div>
+                        </div>
+                    ` : ''}
+
+                    <button class="btn btn-secondary" onclick="document.getElementById('sessionDetailsModal').remove()">Close</button>
+                `;
+
+                const modal = `
+                    <div class="modal active" id="sessionDetailsModal" style="display: flex;">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h2 class="modal-title">Workout Details</h2>
+                                <button class="close-btn" onclick="document.getElementById('sessionDetailsModal').remove()">×</button>
+                            </div>
+                            ${html}
+                        </div>
+                    </div>
+                `;
+
+                document.body.insertAdjacentHTML('beforeend', modal);
             }
 
         };
