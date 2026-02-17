@@ -2636,7 +2636,7 @@
             },
 
             renderToday() {
-                const today = new Date().toLocaleDateString();
+                const today = new Date().toISOString().split('T')[0];
                 const todayWorkouts = this.workouts.filter(w => w.date === today);
                 
                 // Calculate streak
@@ -3531,9 +3531,9 @@
                 const yesterday = new Date(today);
                 yesterday.setDate(yesterday.getDate() - 1);
 
-                if (date.toLocaleDateString() === today.toLocaleDateString()) {
+                if (date.toISOString().split('T')[0] === today.toISOString().split('T')[0]) {
                     return 'Today';
-                } else if (date.toLocaleDateString() === yesterday.toLocaleDateString()) {
+                } else if (date.toISOString().split('T')[0] === yesterday.toISOString().split('T')[0]) {
                     return 'Yesterday';
                 } else {
                     return date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
@@ -3771,7 +3771,7 @@
                                     <div onclick="app.showPhotoComparison(${this.progressPhotos.length - 1 - i})" style="cursor: pointer; position: relative; padding-bottom: 100%; overflow: hidden; border-radius: 8px; background: var(--background);">
                                         <img src="${photo.dataUrl}" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;" alt="Progress photo">
                                         <div style="position: absolute; bottom: 4px; left: 4px; background: rgba(0,0,0,0.7); color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px;">
-                                            ${new Date(photo.date).toLocaleDateString()}
+                                            ${new Date(photo.date).toISOString().split('T')[0]}
                                         </div>
                                     </div>
                                 `).join('')}
@@ -3933,7 +3933,7 @@
 
             async saveMetric() {
                 const metric = {
-                    date: new Date().toLocaleDateString(),
+                    date: new Date().toISOString().split('T')[0],
                     weight: parseFloat(document.getElementById('metricWeight').value) || null,
                     bodyFat: parseFloat(document.getElementById('metricBodyFat').value) || null,
                     chest: parseFloat(document.getElementById('metricChest').value) || null,
@@ -4171,7 +4171,7 @@
                     return;
                 }
                 
-                const today = new Date().toLocaleDateString();
+                const today = new Date().toISOString().split('T')[0];
                 const lastDate = dates.find(d => d !== today);
                 
                 if (!lastDate) {
@@ -4484,7 +4484,7 @@ Tracked with Gym Tracker
                 const workout = {
                     id: workoutId,
                     exercise: this.currentExercise,
-                    date: new Date().toLocaleDateString(),
+                    date: new Date().toISOString().split('T')[0],
                     sets: validSets,
                     superset: this.currentSuperset ? this.currentSuperset : null
                 };
@@ -4667,7 +4667,7 @@ Tracked with Gym Tracker
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
                         <div>
                             <div style="font-size: 13px; font-weight: 600; margin-bottom: 8px; color: var(--text-secondary);">
-                                START (${new Date(firstPhoto.date).toLocaleDateString()})
+                                START (${new Date(firstPhoto.date).toISOString().split('T')[0]})
                             </div>
                             <img src="${firstPhoto.dataUrl}" style="width: 100%; border-radius: 12px;" alt="Before">
                             ${firstPhoto.weight ? `<div style="text-align: center; margin-top: 4px; font-size: 12px; color: var(--text-secondary);">${firstPhoto.weight}kg</div>` : ''}
@@ -4720,7 +4720,7 @@ Tracked with Gym Tracker
                             <div onclick="app.showPhotoComparison(${i})" style="cursor: pointer; position: relative; padding-bottom: 100%; overflow: hidden; border-radius: 12px; background: var(--background);">
                                 <img src="${photo.dataUrl}" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;" alt="Progress photo">
                                 <div style="position: absolute; bottom: 8px; left: 8px; right: 8px; background: rgba(0,0,0,0.7); color: white; padding: 6px; border-radius: 6px; font-size: 11px;">
-                                    <div>${new Date(photo.date).toLocaleDateString()}</div>
+                                    <div>${new Date(photo.date).toISOString().split('T')[0]}</div>
                                     ${photo.weight ? `<div>${photo.weight}kg</div>` : ''}
                                 </div>
                             </div>
@@ -5259,7 +5259,7 @@ Tracked with Gym Tracker
                                     <div style="flex: 1;">
                                         <div class="card-title">${ach.title}</div>
                                         <div class="card-subtitle">${ach.description}</div>
-                                        ${unlocked && achievement ? `<div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">Unlocked: ${new Date(achievement.unlockedAt).toLocaleDateString()}</div>` : ''}
+                                        ${unlocked && achievement ? `<div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">Unlocked: ${new Date(achievement.unlockedAt).toISOString().split('T')[0]}</div>` : ''}
                                     </div>
                                 </div>
                             </div>
@@ -5604,7 +5604,7 @@ Tracked with Gym Tracker
                     id: Date.now().toString(),
                     exercises: [],
                     startTime: new Date().toISOString(),
-                    date: new Date().toLocaleDateString(),
+                    date: new Date().toISOString().split('T')[0],
                     notes: ''
                 };
                 this.sessionStartTime = Date.now();
@@ -6017,7 +6017,7 @@ Tracked with Gym Tracker
 
             // Health Dashboard System
             renderHealth() {
-                const today = new Date().toLocaleDateString();
+                const today = new Date().toISOString().split('T')[0];
                 const todayLog = this.dailyLogs[today] || null;
                 const readiness = todayLog ? this.calculateReadinessScore(todayLog) : null;
                 
@@ -6283,7 +6283,7 @@ Tracked with Gym Tracker
             },
 
             showHealthDashboard() {
-                const today = new Date().toLocaleDateString();
+                const today = new Date().toISOString().split('T')[0];
                 const todayLog = this.dailyLogs[today] || null;
                 const readiness = todayLog ? this.calculateReadinessScore(todayLog) : null;
                 
@@ -6482,7 +6482,7 @@ Tracked with Gym Tracker
             },
 
             logDailyHealth() {
-                const today = new Date().toLocaleDateString();
+                const today = new Date().toISOString().split('T')[0];
                 const existing = this.dailyLogs[today] || {};
                 
                 const html = `
@@ -6598,7 +6598,7 @@ Tracked with Gym Tracker
             },
 
             async saveDailyHealth() {
-                const today = new Date().toLocaleDateString();
+                const today = new Date().toISOString().split('T')[0];
                 
                 const log = {
                     date: today,
