@@ -7,6 +7,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <title>Gym Tracker</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300&family=DM+Mono:wght@400;500&display=swap');
+
         * {
             margin: 0;
             padding: 0;
@@ -15,43 +17,58 @@
         }
 
         :root {
-            --primary: #00D4AA;
-            --primary-dark: #00B894;
-            --success: #00D4AA;
-            --warning: #FFB800;
-            --danger: #FF3B47;
-            --background: #FAFAFA;
+            --primary: #141414;
+            --primary-dark: #000000;
+            --accent: #C8F55A;
+            --accent-dark: #b3e04a;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --background: #F7F7F5;
             --surface: #FFFFFF;
-            --text-primary: #1A1A1A;
-            --text-secondary: #6B6B6B;
-            --border: #E8E8E8;
-            --shadow: rgba(0, 0, 0, 0.04);
-            --gradient: linear-gradient(135deg, #00D4AA 0%, #00B894 100%);
-            --chart-bg: #F5F5F5;
+            --surface2: #F0F0ED;
+            --text-primary: #141414;
+            --text-secondary: #8C8C8A;
+            --text-tertiary: #BBBBB8;
+            --border: #E8E8E5;
+            --border-strong: #D0D0CC;
+            --shadow: rgba(0, 0, 0, 0.06);
+            --shadow-lg: rgba(0, 0, 0, 0.12);
+            --gradient: linear-gradient(135deg, #141414 0%, #2a2a2a 100%);
+            --chart-bg: #F0F0ED;
+            --mono: 'DM Mono', monospace;
         }
 
         [data-theme="dark"] {
-            --primary: #00D4AA;
-            --primary-dark: #00B894;
-            --success: #00D4AA;
-            --warning: #FFB800;
-            --danger: #FF3B47;
-            --background: #0A0A0A;
-            --surface: #1A1A1A;
-            --text-primary: #FFFFFF;
-            --text-secondary: #8F8F8F;
-            --border: #2A2A2A;
-            --shadow: rgba(0, 0, 0, 0.3);
-            --gradient: linear-gradient(135deg, #00D4AA 0%, #00B894 100%);
-            --chart-bg: #141414;
+            --primary: #F7F7F5;
+            --primary-dark: #FFFFFF;
+            --accent: #C8F55A;
+            --accent-dark: #b3e04a;
+            --success: #4ade80;
+            --warning: #fbbf24;
+            --danger: #f87171;
+            --background: #0E0E0C;
+            --surface: #1A1A18;
+            --surface2: #222220;
+            --text-primary: #F7F7F5;
+            --text-secondary: #7A7A78;
+            --text-tertiary: #444442;
+            --border: #2A2A28;
+            --border-strong: #3A3A38;
+            --shadow: rgba(0, 0, 0, 0.4);
+            --shadow-lg: rgba(0, 0, 0, 0.6);
+            --gradient: linear-gradient(135deg, #F7F7F5 0%, #d0d0ce 100%);
+            --chart-bg: #1E1E1C;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, sans-serif;
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
             background: var(--background);
             color: var(--text-primary);
             overflow-x: hidden;
             padding-bottom: env(safe-area-inset-bottom);
+            -webkit-font-smoothing: antialiased;
+            letter-spacing: -0.01em;
         }
 
         .app-container {
@@ -64,8 +81,8 @@
 
         /* Header */
         .header {
-            background: var(--surface);
-            padding: 16px 20px;
+            background: var(--background);
+            padding: 14px 20px;
             border-bottom: 1px solid var(--border);
             position: sticky;
             top: 0;
@@ -76,26 +93,29 @@
         }
 
         .header h1 {
-            font-size: 34px;
+            font-size: 22px;
             font-weight: 700;
-            letter-spacing: -0.5px;
+            letter-spacing: -0.03em;
+            color: var(--text-primary);
         }
 
         .header-btn {
-            background: var(--primary);
-            color: white;
+            background: var(--text-primary);
+            color: var(--background);
             border: none;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 15px;
+            padding: 9px 18px;
+            border-radius: 100px;
+            font-size: 13px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.15s;
+            letter-spacing: -0.01em;
+            font-family: 'DM Sans', sans-serif;
         }
 
         .header-btn:active {
-            transform: scale(0.95);
-            background: var(--primary-dark);
+            transform: scale(0.96);
+            opacity: 0.85;
         }
 
         .header-actions {
@@ -104,23 +124,160 @@
             align-items: center;
         }
 
-        .theme-toggle {
-            background: var(--background);
-            border: 1px solid var(--border);
-            color: var(--text-primary);
-            width: 40px;
-            height: 40px;
-            border-radius: 20px;
-            font-size: 20px;
+        .search-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s;
+            transition: all 0.15s;
         }
 
-        .theme-toggle:active {
-            transform: scale(0.95);
+        .search-btn:active {
+            background: var(--surface2);
+        }
+
+        /* Cardio */
+        .cardio-stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .cardio-stat {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .cardio-stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.04em;
+            color: var(--text-primary);
+            font-family: 'DM Mono', monospace;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .cardio-stat-label {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .cardio-map {
+            width: 100%;
+            height: 240px;
+            background: var(--surface2);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 12px;
+        }
+
+        .cardio-map canvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        .cardio-map-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--text-tertiary);
+            font-size: 13px;
+            gap: 8px;
+        }
+
+        .cardio-type-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .cardio-type-btn {
+            flex: 1;
+            padding: 10px 6px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--surface2);
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            transition: all 0.15s;
+        }
+
+        .cardio-type-btn.active {
+            background: var(--text-primary);
+            color: var(--background);
+            border-color: var(--text-primary);
+        }
+
+        .cardio-start-btn {
+            width: 100%;
+            padding: 18px;
+            border-radius: 16px;
+            border: none;
+            background: var(--text-primary);
+            color: var(--background);
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            letter-spacing: -0.02em;
+            transition: all 0.15s;
+        }
+
+        .cardio-start-btn.running {
+            background: var(--danger);
+            color: white;
+        }
+
+        .cardio-start-btn:active { opacity: 0.85; transform: scale(0.98); }
+
+        .splits-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .split-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 14px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 13px;
+        }
+
+        .split-km { font-weight: 700; color: var(--text-primary); font-family: 'DM Mono', monospace; }
+        .split-pace { color: var(--text-secondary); font-family: 'DM Mono', monospace; }
+        .split-bar { height: 3px; background: var(--text-primary); border-radius: 2px; margin-top: 4px; }
+
+        .cardio-history-item {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 8px;
         }
 
         /* Tab Bar */
@@ -140,25 +297,30 @@
 
         .tab {
             flex: 1;
-            padding: 8px 0;
+            padding: 10px 0 8px;
             background: none;
             border: none;
-            color: var(--text-secondary);
+            color: var(--text-tertiary);
             font-size: 10px;
+            font-weight: 500;
             cursor: pointer;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
-            transition: color 0.2s;
+            gap: 3px;
+            transition: color 0.15s;
+            font-family: 'DM Sans', sans-serif;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
         }
 
         .tab.active {
-            color: var(--primary);
+            color: var(--text-primary);
         }
 
         .tab-icon {
-            font-size: 24px;
+            font-size: 18px;
+            line-height: 1;
         }
 
         /* Content */
@@ -177,22 +339,25 @@
         /* Cards */
         .card {
             background: var(--surface);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 12px;
-            box-shadow: 0 2px 8px var(--shadow);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 10px;
+            border: 1px solid var(--border);
         }
 
         .card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
+            margin-bottom: 14px;
         }
 
         .card-title {
-            font-size: 20px;
+            font-size: 13px;
             font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
         }
 
         .card-subtitle {
@@ -219,21 +384,23 @@
             background: var(--surface);
             border-radius: 12px;
             padding: 16px;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: all 0.15s;
+            border: 1px solid var(--border);
         }
 
         .exercise-item:active {
-            transform: scale(0.98);
+            background: var(--surface2);
         }
 
         .exercise-name {
-            font-size: 17px;
+            font-size: 15px;
             font-weight: 500;
+            letter-spacing: -0.01em;
         }
 
         .exercise-muscle {
@@ -260,7 +427,7 @@
         }
 
         .last-workout {
-            background: #F8F9FA;
+            background: var(--surface2);
             border-radius: 8px;
             padding: 12px;
             margin-bottom: 16px;
@@ -293,7 +460,8 @@
             width: 40px;
             font-size: 17px;
             font-weight: 600;
-            color: var(--text-secondary);
+            color: var(--text-tertiary);
+            font-size: 13px;
         }
 
         .set-input {
@@ -320,14 +488,17 @@
             width: 100%;
             padding: 12px;
             border: 1px solid var(--border);
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 17px;
-            background: var(--surface);
+            background: var(--surface2);
+            color: var(--text-primary);
+            font-family: 'DM Sans', sans-serif;
         }
 
         input[type="number"]:focus {
             outline: none;
-            border-color: var(--primary);
+            border-color: var(--text-primary);
+            background: var(--surface);
         }
 
         .delete-set {
@@ -359,7 +530,7 @@
         }
 
         .btn-primary {
-            background: var(--primary);
+            background: var(--accent); color: #141414;
             color: white;
         }
 
@@ -426,7 +597,9 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.35);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             z-index: 1000;
             align-items: flex-end;
         }
@@ -444,14 +617,23 @@
 
         .modal-content {
             background: var(--surface);
-            border-radius: 20px 20px 0 0;
+            border-radius: 24px 24px 0 0;
             width: 100%;
             max-width: 428px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 24px 20px;
             max-height: 90vh;
             overflow-y: auto;
-            animation: slideUp 0.3s ease;
+            animation: slideUp 0.25s cubic-bezier(0.32, 0.72, 0, 1);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(1.3); }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
         @keyframes slideUp {
@@ -471,19 +653,24 @@
         }
 
         .modal-title {
-            font-size: 24px;
+            font-size: 18px;
             font-weight: 700;
+            letter-spacing: -0.02em;
         }
 
         .close-btn {
-            background: none;
-            border: none;
-            font-size: 28px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            font-size: 16px;
             color: var(--text-secondary);
             cursor: pointer;
             padding: 0;
-            width: 32px;
-            height: 32px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .search-box {
@@ -491,14 +678,16 @@
             padding: 12px 16px;
             border: 1px solid var(--border);
             border-radius: 12px;
-            font-size: 17px;
+            font-size: 15px;
             margin-bottom: 16px;
-            background: var(--background);
+            background: var(--surface2);
+            color: var(--text-primary);
+            font-family: 'DM Sans', sans-serif;
         }
 
         .search-box:focus {
             outline: none;
-            border-color: var(--primary);
+            border-color: var(--text-primary);
         }
 
         /* Stats Cards */
@@ -635,7 +824,7 @@
 
         .chart-bar {
             flex: 1;
-            background: var(--primary);
+            background: var(--accent); color: #141414;
             border-radius: 4px 4px 0 0;
             min-height: 4px;
             position: relative;
@@ -725,18 +914,30 @@
         }
 
         .metric-label {
-            font-size: 15px;
+            font-size: 11px;
             font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
             margin-bottom: 8px;
             display: block;
         }
 
         .metric-input {
             width: 100%;
-            padding: 12px;
+            padding: 13px 14px;
             border: 1px solid var(--border);
-            border-radius: 8px;
-            font-size: 17px;
+            border-radius: 12px;
+            font-size: 15px;
+            background: var(--surface2);
+            color: var(--text-primary);
+            font-family: 'DM Sans', sans-serif;
+            -webkit-appearance: none;
+        }
+
+        .metric-input:focus {
+            outline: none;
+            border-color: var(--text-primary);
             background: var(--surface);
         }
 
@@ -812,7 +1013,7 @@
 
         /* Exercise Info */
         .exercise-info {
-            background: #F8F9FA;
+            background: var(--surface2);
             border-radius: 8px;
             padding: 12px;
             margin-bottom: 16px;
@@ -840,7 +1041,7 @@
 
         /* Streak Badge */
         .streak-badge {
-            background: var(--gradient);
+            background: var(--text-primary);
             color: white;
             padding: 12px 16px;
             border-radius: 12px;
@@ -1141,7 +1342,7 @@
         }
 
         .mini-chart-bar.active {
-            background: var(--primary);
+            background: var(--accent); color: #141414;
         }
 
         .section-divider {
@@ -1229,11 +1430,11 @@
         .muscle-bar-fill {
             height: 100%;
             border-radius: 3px;
-            background: var(--primary);
+            background: var(--accent); color: #141414;
             transition: width 0.6s ease;
         }
 
-        .muscle-bar-fill.high { background: var(--primary); }
+        .muscle-bar-fill.high { background: var(--accent); color: #141414; }
         .muscle-bar-fill.medium { background: var(--warning); }
         .muscle-bar-fill.low { background: var(--border); }
 
@@ -1315,7 +1516,7 @@
         }
 
         .cal-day.worked-out {
-            background: var(--primary);
+            background: var(--accent); color: #141414;
             color: white;
             font-weight: 700;
         }
@@ -1328,7 +1529,7 @@
 
         .cal-day.today.worked-out {
             border: none;
-            background: var(--primary);
+            background: var(--accent); color: #141414;
             color: white;
         }
 
@@ -1691,11 +1892,10 @@
     <div class="app-container">
         <!-- Header -->
         <div class="header">
-            <h1>💪 Gym Tracker</h1>
+            <h1>LIFT</h1>
             <div class="header-actions">
-                <button class="theme-toggle" onclick="app.showSearch()" id="searchBtn">🔍</button>
-                <button class="theme-toggle" onclick="app.toggleTheme()" id="themeToggle">🌙</button>
-                <button class="header-btn" onclick="app.startWorkoutSession()" id="startWorkoutBtn">▶️ Start Workout</button>
+                <button class="search-btn" onclick="app.showSearch()" id="searchBtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></button>
+                <button class="header-btn" onclick="app.startWorkoutSession()" id="startWorkoutBtn">Start Workout</button>
             </div>
         </div>
 
@@ -1741,6 +1941,11 @@
             <div id="healthContent"></div>
         </div>
 
+        <!-- Cardio View -->
+        <div id="cardio" class="content view">
+            <div id="cardioContent"></div>
+        </div>
+
         <!-- More View -->
         <div id="more" class="content view">
             <div id="moreContent"></div>
@@ -1759,23 +1964,23 @@
         <!-- Tab Bar -->
         <div class="tab-bar">
             <button class="tab active" onclick="app.switchTab('today')">
-                <span class="tab-icon">🏋️</span>
+                <span class="tab-icon">◈</span>
                 <span>Today</span>
             </button>
             <button class="tab" onclick="app.switchTab('health')">
-                <span class="tab-icon">❤️</span>
+                <span class="tab-icon">◎</span>
                 <span>Health</span>
             </button>
+            <button class="tab" onclick="app.switchTab('cardio')">
+                <span class="tab-icon">◉</span>
+                <span>Cardio</span>
+            </button>
             <button class="tab" onclick="app.switchTab('history')">
-                <span class="tab-icon">📅</span>
+                <span class="tab-icon">▤</span>
                 <span>History</span>
             </button>
-            <button class="tab" onclick="app.switchTab('analytics')">
-                <span class="tab-icon">📊</span>
-                <span>Stats</span>
-            </button>
             <button class="tab" onclick="app.switchTab('more')">
-                <span class="tab-icon">⚙️</span>
+                <span class="tab-icon">⊹</span>
                 <span>More</span>
             </button>
         </div>
@@ -1844,19 +2049,19 @@
                 </div>
                 <div class="export-options">
                     <button class="export-btn" onclick="app.showImportModal(); app.closeExportModal();">
-                        <div class="export-title">📥 Import Backup</div>
+                        <div class="export-title">Import Backup</div>
                         <div class="export-desc">Restore data from a backup file</div>
                     </button>
                     <button class="export-btn" onclick="app.exportToCSV()">
-                        <div class="export-title">📊 Export to CSV</div>
+                        <div class="export-title">Export to CSV</div>
                         <div class="export-desc">Download all workout data as spreadsheet</div>
                     </button>
                     <button class="export-btn" onclick="app.shareWorkoutSummary()">
-                        <div class="export-title">📤 Share Summary</div>
+                        <div class="export-title">Share Summary</div>
                         <div class="export-desc">Share this week's workout summary</div>
                     </button>
                     <button class="export-btn" onclick="app.exportJSON()">
-                        <div class="export-title">💾 Backup Data (JSON)</div>
+                        <div class="export-title">Backup (JSON)</div>
                         <div class="export-desc">Download complete backup file</div>
                     </button>
                 </div>
@@ -1887,7 +2092,7 @@
                     </p>
                     <input type="file" id="importFile" accept=".json" style="display: none;" onchange="app.handleImportFile(event)">
                     <button class="btn btn-primary" onclick="document.getElementById('importFile').click()">
-                        📁 Choose Backup File
+                        Choose Backup File
                     </button>
                 </div>
                 <div id="importStatus"></div>
@@ -1907,7 +2112,7 @@
                     </p>
                     <input type="file" id="photoFile" accept="image/*" capture="environment" style="display: none;" onchange="app.handlePhotoUpload(event)">
                     <button class="btn btn-primary" onclick="document.getElementById('photoFile').click()">
-                        📷 Take/Upload Photo
+                        Take / Upload Photo
                     </button>
                 </div>
                 <div id="photoPreview"></div>
@@ -1995,6 +2200,19 @@
                 notificationsEnabled: true
             },
             goals: [],
+            cardioSessions: [],
+            // Live cardio tracking state
+            _cardioActive: false,
+            _cardioType: 'Run',
+            _cardioStart: null,
+            _cardioCoords: [],
+            _cardioDistance: 0,
+            _cardioPausedMs: 0,
+            _cardioPauseStart: null,
+            _cardioWatchId: null,
+            _cardioTimerInterval: null,
+            _cardioSplits: [],
+            _cardioLastSplitDist: 0,
             achievements: [],
             workoutNotes: {},
             customExercises: [],
@@ -2411,6 +2629,7 @@
                     this.loadFromLocalStorage();
                 }
 
+                this.cardioSessions = JSON.parse(localStorage.getItem('cardioSessions') || '[]');
                 this.templates = JSON.parse(localStorage.getItem('templates') || '[]');
                 this.customExercises = JSON.parse(localStorage.getItem('customExercises') || '[]');
                 this.progressPhotos = JSON.parse(localStorage.getItem('progressPhotos') || '[]');
@@ -2602,6 +2821,7 @@
                 if (tab === 'health') this.renderHealth();
                 if (tab === 'history') this.renderHistory();
                 if (tab === 'analytics') this.renderAnalytics();
+                if (tab === 'cardio') this.renderCardio();
                 if (tab === 'templates') this.renderTemplates();
                 if (tab === 'library') this.renderLibrary();
                 if (tab === 'more') this.renderMore();
@@ -2646,8 +2866,8 @@
                 const recommendations = this.getSmartRecommendations();
                 if (recommendations.length > 0 && todayWorkouts.length === 0) {
                     html += `
-                        <div class="card" style="background: var(--gradient); color: white; margin-bottom: 16px;">
-                            <div style="font-size: 16px; font-weight: 700; margin-bottom: 12px;">💡 Smart Suggestions</div>
+                        <div class="card" style="background: var(--text-primary); color: white; margin-bottom: 16px;">
+                            <div style="font-size: 16px; font-weight: 700; margin-bottom: 12px;">Suggestions</div>
                             ${recommendations.slice(0, 3).map(rec => `
                                 <div style="padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.2); last-child:border: none;">
                                     ${rec.icon} <strong>${rec.title}</strong><br>
@@ -2662,7 +2882,7 @@
                 if (streak > 0) {
                     html += `
                         <div class="streak-badge">
-                            <div class="streak-icon">🔥</div>
+                            <div class="streak-icon">↑</div>
                             <div class="streak-text">
                                 <div class="streak-number">${streak} Day${streak > 1 ? 's' : ''}</div>
                                 <div class="streak-label">Workout Streak</div>
@@ -2675,11 +2895,11 @@
                 html += `
                     <div class="quick-actions">
                         <div class="quick-action-btn" onclick="app.switchTab('templates')">
-                            <div class="quick-action-icon">📋</div>
+                            <div class="quick-action-icon">≡</div>
                             <div class="quick-action-label">Programs</div>
                         </div>
                         <div class="quick-action-btn" onclick="app.duplicateLastWorkout()">
-                            <div class="quick-action-icon">🔄</div>
+                            <div class="quick-action-icon">↺</div>
                             <div class="quick-action-label">Repeat Last</div>
                         </div>
                     </div>
@@ -2711,7 +2931,7 @@
                                 <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border);">
                                     <div class="metric-label-small">Recent PRs</div>
                                     <div style="font-size: 14px; font-weight: 600; color: var(--primary); margin-top: 4px;">
-                                        🏆 ${recentPRs.length} new ${recentPRs.length === 1 ? 'record' : 'records'}!
+                                        ${recentPRs.length} new ${recentPRs.length === 1 ? 'record' : 'records'}
                                     </div>
                                 </div>
                             ` : ''}
@@ -2742,7 +2962,7 @@
                 if (todayWorkouts.length === 0) {
                     html += `
                         <div class="empty-state">
-                            <div class="empty-icon">🏋️</div>
+                            <div class="empty-icon">+</div>
                             <div class="empty-text">No workouts logged today<br>Tap "Start Workout" to begin!</div>
                         </div>
                     `;
@@ -2763,7 +2983,7 @@
                                 <div class="card" style="margin-bottom: 16px;">
                                     <div class="card-header">
                                         <div>
-                                            <div class="card-title">💪 Workout Session</div>
+                                            <div class="card-title">Workout Session</div>
                                             <div class="card-subtitle">
                                                 ${session.exercises.length} exercises • ${totalSets} sets • ${duration}
                                             </div>
@@ -2792,7 +3012,7 @@
                                             <div style="padding: 12px 0; border-top: 1px solid var(--border);">
                                                 <div style="font-weight: 600; margin-bottom: 4px;">
                                                     ${exercise.name}
-                                                    ${isPR ? '<span class="pr-badge">🏆 PR</span>' : ''}
+                                                    ${isPR ? '<span class="pr-badge">PR</span>' : ''}
                                                     ${improvement > 0 ? `<span class="improvement-badge">+${improvement}%</span>` : ''}
                                                 </div>
                                                 ${exercise.sets.map((set, j) => `
@@ -2826,15 +3046,15 @@
                                     <div class="card-header">
                                         <div>
                                             <div class="card-title">
-                                                ${workout.superset ? '🔗 ' : ''}${workout.exercise}
-                                                ${isPR ? '<span class="pr-badge">🏆 PR</span>' : ''}
+                                                ${workout.exercise}
+                                                ${isPR ? '<span class="pr-badge">PR</span>' : ''}
                                                 ${improvement > 0 ? `<span class="improvement-badge">+${improvement}%</span>` : ''}
                                             </div>
                                             <div class="card-subtitle">
                                                 ${workout.sets.length} sets • ${workout.sets.reduce((sum, s) => sum + (s.reps || 0), 0)} total reps
                                                 ${workout.superset ? ` • Superset with ${workout.superset}` : ''}
                                             </div>
-                                            ${notes ? `<div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px; font-style: italic;">💭 ${notes}</div>` : ''}
+                                            ${notes ? `<div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px; font-style: italic;">${notes}</div>` : ''}
                                         </div>
                                     </div>
                                     ${workout.sets.map((set, i) => `
@@ -3124,7 +3344,7 @@
                         </div>
                         <div style="display: flex; gap: 16px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border);">
                             <div style="display: flex; align-items: center; gap: 6px;">
-                                <div style="width: 12px; height: 12px; border-radius: 3px; background: var(--primary);"></div>
+                                <div style="width: 12px; height: 12px; border-radius: 3px; background: var(--accent); color: #141414;"></div>
                                 <div style="font-size: 12px; color: var(--text-secondary);">Trained (${workoutDays.size} days)</div>
                             </div>
                             <div style="display: flex; align-items: center; gap: 6px;">
@@ -3155,7 +3375,7 @@
 
                 return `
                     <div class="premium-stat-card">
-                        <div class="premium-stat-header">Personal Records 🏆</div>
+                        <div class="premium-stat-header">Personal Records</div>
                         ${prList.slice(0, 10).map(([exercise, pr]) => `
                             <div class="pr-card">
                                 <div>
@@ -3351,7 +3571,7 @@
                     ${listItems}
                     ${Math.abs(remaining) > 0.001 ? `
                         <div style="color: var(--warning); font-size: 12px; margin-top: 8px;">
-                            ⚠️ Can't make exact weight. Nearest: ${(target - remaining * 2).toFixed(2)}kg
+                            Note: Can't make exact weight. Nearest: ${(target - remaining * 2).toFixed(2)}kg
                         </div>
                     ` : ''}
                 `;
@@ -3438,7 +3658,7 @@
                 
                 return `
                     <div class="card">
-                        <div class="card-title" style="margin-bottom: 12px;">💪 Volume by Muscle Group</div>
+                        <div class="card-title" style="margin-bottom: 12px;">Volume by Muscle Group</div>
                         <div style="margin-bottom: 16px;">
                             ${sortedMuscles.map(([muscle, volume]) => {
                                 const percentage = (volume / maxVolume) * 100;
@@ -3449,7 +3669,7 @@
                                             <span style="font-size: 14px; color: var(--text-secondary);">${this.formatNumber(volume)}kg</span>
                                         </div>
                                         <div style="background: var(--background); height: 8px; border-radius: 4px; overflow: hidden;">
-                                            <div style="background: var(--primary); height: 100%; width: ${percentage}%; border-radius: 4px; transition: width 0.3s;"></div>
+                                            <div style="background: var(--accent); color: #141414; height: 100%; width: ${percentage}%; border-radius: 4px; transition: width 0.3s;"></div>
                                         </div>
                                     </div>
                                 `;
@@ -3488,7 +3708,7 @@
                 
                 return `
                     <div class="card">
-                        <div class="card-title" style="margin-bottom: 12px;">🎯 Estimated 1RM (One Rep Max)</div>
+                        <div class="card-title" style="margin-bottom: 12px;">Estimated 1RM</div>
                         <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
                             Based on your best sets using Epley formula
                         </div>
@@ -3549,7 +3769,7 @@
                                     <div class="template-name">${program.name}</div>
                                 </div>
                                 <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 8px;">${program.description}</div>
-                                <div style="font-size: 12px; color: var(--text-secondary);">📅 ${program.schedule}</div>
+                                <div style="font-size: 12px; color: var(--text-secondary);">${program.schedule}</div>
                             </div>
                         `).join('')}
                     </div>
@@ -3563,7 +3783,7 @@
                 if (this.templates.length === 0) {
                     html += `
                         <div class="empty-state">
-                            <div class="empty-icon">📋</div>
+                            <div class="empty-icon">≡</div>
                             <div class="empty-text">No custom templates yet<br>Create one to save time!</div>
                         </div>
                     `;
@@ -3575,8 +3795,8 @@
                             </div>
                             <div class="template-exercises">${template.exercises.length} exercises: ${template.exercises.map(e => e.name).join(', ')}</div>
                             <div class="template-actions">
-                                <button class="icon-btn" onclick="event.stopPropagation(); app.editTemplate('${template.id}')">✏️ Edit</button>
-                                <button class="icon-btn danger" onclick="event.stopPropagation(); app.deleteTemplate('${template.id}')">🗑️ Delete</button>
+                                <button class="icon-btn" onclick="event.stopPropagation(); app.editTemplate('${template.id}')">Edit</button>
+                                <button class="icon-btn danger" onclick="event.stopPropagation(); app.deleteTemplate('${template.id}')">Delete</button>
                             </div>
                         </div>
                     `).join('');
@@ -3665,7 +3885,7 @@
                     <div class="metric-label" style="margin-bottom: 8px;">Select Exercises</div>
                     <div id="exerciseSelectionList"></div>
                     
-                    <button class="btn btn-primary" onclick="app.saveTemplate()">💾 Save Template</button>
+                    <button class="btn btn-primary" onclick="app.saveTemplate()">Save Template</button>
                 `;
                 
                 document.getElementById('createTemplateContent').innerHTML = html;
@@ -3783,7 +4003,7 @@
                 if (this.bodyMetrics.length === 0) {
                     html += `
                         <div class="empty-state">
-                            <div class="empty-icon">📏</div>
+                            <div class="empty-icon">↔</div>
                             <div class="empty-text">No metrics logged yet<br>Track your progress!</div>
                         </div>
                     `;
@@ -3822,7 +4042,7 @@
                     if (latest.chest || latest.arms || latest.waist || latest.legs) {
                         html += `
                             <div class="card">
-                                <div class="card-title" style="margin-bottom: 12px;">📐 Measurements</div>
+                                <div class="card-title" style="margin-bottom: 12px;">Measurements</div>
                                 ${latest.chest ? `<div class="history-item"><div class="history-date">Chest</div><div class="history-sets">${latest.chest}cm</div></div>` : ''}
                                 ${latest.arms ? `<div class="history-item"><div class="history-date">Arms</div><div class="history-sets">${latest.arms}cm</div></div>` : ''}
                                 ${latest.waist ? `<div class="history-item"><div class="history-date">Waist</div><div class="history-sets">${latest.waist}cm</div></div>` : ''}
@@ -3916,7 +4136,7 @@
                         <input type="number" step="0.1" class="metric-input" id="metricLegs" placeholder="${latest.legs || '60'}">
                     </div>
                     
-                    <button class="btn btn-primary" onclick="app.saveMetric()">💾 Save Metrics</button>
+                    <button class="btn btn-primary" onclick="app.saveMetric()">Save Metrics</button>
                 `;
                 
                 document.getElementById('addMetricContent').innerHTML = html;
@@ -3959,26 +4179,17 @@
             async toggleTheme() {
                 const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
                 const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-                
                 document.documentElement.setAttribute('data-theme', newTheme);
                 this.theme = newTheme;
-                this.updateThemeIcon(newTheme);
-                
-                // Save preference
-                if (window.storage) {
-                    try {
-                        await window.storage.set('theme', newTheme, false);
-                    } catch (error) {
-                        console.error('Failed to save theme:', error);
-                    }
-                }
+                localStorage.setItem('theme', newTheme);
+                await this.saveSettings();
+                // Refresh settings modal to show updated toggle
+                const modal = document.getElementById('settingsModal');
+                if (modal) { modal.remove(); this.showSettings(); }
             },
 
             updateThemeIcon(theme) {
-                const icon = document.getElementById('themeToggle');
-                if (icon) {
-                    icon.textContent = theme === 'dark' ? '☀️' : '🌙';
-                }
+                // No-op: theme toggle is now in settings only
             },
 
             // Import Functions
@@ -4383,7 +4594,7 @@ Tracked with Gym Tracker
                                     <div class="weight-adjust">
                                         <button class="adjust-btn" onclick="app.quickSetWeight(${i}, ${suggestedWeight - 5})">-5kg</button>
                                         <button class="adjust-btn" onclick="app.quickSetWeight(${i}, ${suggestedWeight - 2.5})">-2.5kg</button>
-                                        <button class="adjust-btn" onclick="app.quickSetWeight(${i}, ${suggestedWeight})" style="background: var(--primary); color: white;">↑ ${suggestedWeight}kg</button>
+                                        <button class="adjust-btn" onclick="app.quickSetWeight(${i}, ${suggestedWeight})" style="background: var(--accent); color: #141414; color: white;">↑ ${suggestedWeight}kg</button>
                                     </div>
                                 ` : ''}
                                 <input type="number" 
@@ -4674,7 +4885,7 @@ Tracked with Gym Tracker
                     </div>
 
                     ${photo.weight && firstPhoto.weight ? `
-                        <div class="card" style="background: var(--primary); color: white;">
+                        <div class="card" style="background: var(--accent); color: #141414; color: white;">
                             <div style="text-align: center;">
                                 <div style="font-size: 14px; opacity: 0.9;">Weight Change</div>
                                 <div style="font-size: 32px; font-weight: 700; margin: 8px 0;">
@@ -4685,7 +4896,7 @@ Tracked with Gym Tracker
                         </div>
                     ` : ''}
 
-                    <button class="btn btn-danger" onclick="app.deletePhoto(${index})">🗑️ Delete Photo</button>
+                    <button class="btn btn-danger" onclick="app.deletePhoto(${index})">Delete Photo</button>
                 `;
 
                 document.getElementById('photoCompareContent').innerHTML = html;
@@ -4758,27 +4969,27 @@ Tracked with Gym Tracker
 
                     <div class="quick-actions" style="margin-bottom: 20px;">
                         <div class="quick-action-btn" onclick="app.switchTab('templates')">
-                            <div class="quick-action-icon">📋</div>
+                            <div class="quick-action-icon">≡</div>
                             <div class="quick-action-label">Programs</div>
                         </div>
                         <div class="quick-action-btn" onclick="app.switchTab('library')">
-                            <div class="quick-action-icon">📚</div>
+                            <div class="quick-action-icon">▤</div>
                             <div class="quick-action-label">Exercise Library</div>
                         </div>
                         <div class="quick-action-btn" onclick="app.showSection('metrics')">
-                            <div class="quick-action-icon">📏</div>
+                            <div class="quick-action-icon">↔</div>
                             <div class="quick-action-label">Body Metrics</div>
                         </div>
                         <div class="quick-action-btn" onclick="app.showSection('goals')">
-                            <div class="quick-action-icon">🎯</div>
+                            <div class="quick-action-icon">◎</div>
                             <div class="quick-action-label">Goals</div>
                         </div>
                         <div class="quick-action-btn" onclick="app.showSection('achievements')">
-                            <div class="quick-action-icon">🏅</div>
+                            <div class="quick-action-icon">✦</div>
                             <div class="quick-action-label">Achievements</div>
                         </div>
                         <div class="quick-action-btn" onclick="app.showSection('settings')">
-                            <div class="quick-action-icon">⚙️</div>
+                            <div class="quick-action-icon">○</div>
                             <div class="quick-action-label">Settings</div>
                         </div>
                     </div>
@@ -4925,6 +5136,396 @@ Tracked with Gym Tracker
                 this.renderMore();
             },
 
+            renderCardio() {
+                const el = document.getElementById('cardioContent');
+                if (!el) return;
+
+                const isActive = this._cardioActive;
+                const types = ['Run', 'Cycle', 'Walk'];
+
+                // Build history
+                const historyHtml = this.cardioSessions.length === 0 ? '' : `
+                    <div class="premium-stat-card" style="margin-top: 16px;">
+                        <div class="premium-stat-header">Recent Sessions</div>
+                        ${this.cardioSessions.slice(-10).reverse().map(s => {
+                            const dist = (s.distance / 1000).toFixed(2);
+                            const pace = s.distance > 0 ? this.formatPace((s.duration / 60) / (s.distance / 1000)) : '--';
+                            const mins = Math.floor(s.duration / 60);
+                            const secs = String(s.duration % 60).padStart(2, '0');
+                            return `
+                                <div class="cardio-history-item">
+                                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                                        <div style="font-size:15px; font-weight:600; letter-spacing:-0.01em;">${s.type} · ${s.date}</div>
+                                        <div style="font-size:12px; color:var(--text-secondary);">${mins}:${secs}</div>
+                                    </div>
+                                    <div style="display:flex; gap:16px;">
+                                        <div><div class="cardio-stat-label">Distance</div><div style="font-size:17px;font-weight:700;font-family:'DM Mono',monospace;">${dist} km</div></div>
+                                        <div><div class="cardio-stat-label">Avg Pace</div><div style="font-size:17px;font-weight:700;font-family:'DM Mono',monospace;">${pace}</div></div>
+                                        ${s.splits?.length ? `<div><div class="cardio-stat-label">Splits</div><div style="font-size:17px;font-weight:700;font-family:'DM Mono',monospace;">${s.splits.length}</div></div>` : ''}
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                `;
+
+                if (isActive) {
+                    // ACTIVE TRACKING UI
+                    const elapsed = this.getCardioElapsed();
+                    const mins = Math.floor(elapsed / 60);
+                    const secs = String(elapsed % 60).padStart(2, '0');
+                    const dist = (this._cardioDistance / 1000).toFixed(2);
+                    const pace = this._cardioDistance > 50
+                        ? this.formatPace((elapsed / 60) / (this._cardioDistance / 1000))
+                        : '--:--';
+                    const isPaused = !!this._cardioPauseStart;
+
+                    el.innerHTML = `
+                        <div class="content" style="padding-bottom: 100px;">
+                            <div style="padding: 20px 20px 12px; display:flex; align-items:center; justify-content:space-between;">
+                                <div style="font-size:13px; font-weight:600; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.06em;">${this._cardioType} in progress</div>
+                                ${isPaused ? '<div style="font-size:12px; color:var(--warning); font-weight:600;">PAUSED</div>' : '<div style="width:8px;height:8px;border-radius:50%;background:var(--danger);animation:pulse 1.2s infinite;"></div>'}
+                            </div>
+
+                            <!-- Live stats -->
+                            <div style="padding: 0 20px 12px;">
+                                <div class="cardio-stat-grid">
+                                    <div class="cardio-stat" style="grid-column:1/-1; padding: 24px;">
+                                        <div class="cardio-stat-value" style="font-size:52px;" id="liveTimer">${mins}:${secs}</div>
+                                        <div class="cardio-stat-label">Elapsed</div>
+                                    </div>
+                                    <div class="cardio-stat">
+                                        <div class="cardio-stat-value" id="liveDist">${dist}</div>
+                                        <div class="cardio-stat-label">km</div>
+                                    </div>
+                                    <div class="cardio-stat">
+                                        <div class="cardio-stat-value" id="livePace">${pace}</div>
+                                        <div class="cardio-stat-label">min/km</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Map -->
+                            <div style="padding: 0 20px 12px;">
+                                <div class="cardio-map" id="cardioMapContainer">
+                                    <canvas id="cardioMapCanvas"></canvas>
+                                    <div id="cardioMapPlaceholder" class="cardio-map-placeholder" style="${this._cardioCoords.length > 0 ? 'display:none;' : ''}">
+                                        <div style="font-size:32px; opacity:0.3;">◉</div>
+                                        <div>Waiting for GPS signal...</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Splits -->
+                            ${this._cardioSplits.length > 0 ? `
+                                <div style="padding: 0 20px 12px;">
+                                    <div class="card">
+                                        <div class="card-title" style="margin-bottom:12px;">Splits</div>
+                                        <div class="splits-list">
+                                            ${this._cardioSplits.map((s, i) => {
+                                                const fastest = Math.min(...this._cardioSplits.map(x => x.pace));
+                                                const pct = fastest / s.pace * 100;
+                                                return `
+                                                    <div class="split-row">
+                                                        <span class="split-km">km ${i + 1}</span>
+                                                        <div style="flex:1; margin: 0 12px;">
+                                                            <div class="split-bar" style="width:${pct}%;"></div>
+                                                        </div>
+                                                        <span class="split-pace">${this.formatPace(s.pace)}</span>
+                                                    </div>
+                                                `;
+                                            }).join('')}
+                                        </div>
+                                    </div>
+                                </div>
+                            ` : ''}
+
+                            <!-- Controls -->
+                            <div style="padding: 0 20px; display:flex; gap:10px;">
+                                <button onclick="app.toggleCardioPause()" 
+                                    style="flex:1; padding:16px; border-radius:14px; border:1px solid var(--border); 
+                                    background:var(--surface2); color:var(--text-primary); font-size:15px; font-weight:600; 
+                                    cursor:pointer; font-family:'DM Sans',sans-serif;">
+                                    ${isPaused ? 'Resume' : 'Pause'}
+                                </button>
+                                <button onclick="app.stopCardio()" 
+                                    style="flex:1; padding:16px; border-radius:14px; border:none; 
+                                    background:var(--danger); color:white; font-size:15px; font-weight:600; 
+                                    cursor:pointer; font-family:'DM Sans',sans-serif;">
+                                    Finish
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    this.startCardioTimer();
+                    this.drawCardioMap();
+                } else {
+                    // IDLE UI
+                    el.innerHTML = `
+                        <div class="content" style="padding-bottom: 100px;">
+                            <div class="section-header">
+                                <div class="section-title">Cardio</div>
+                            </div>
+
+                            <div style="padding: 0 20px;">
+                                <div class="cardio-type-selector">
+                                    ${types.map(t => `
+                                        <button class="cardio-type-btn ${this._cardioType === t ? 'active' : ''}" 
+                                            onclick="app.setCardioType('${t}')">
+                                            ${t === 'Run' ? '↑ Run' : t === 'Cycle' ? '◎ Cycle' : '→ Walk'}
+                                        </button>
+                                    `).join('')}
+                                </div>
+
+                                <!-- Map preview -->
+                                <div class="cardio-map" style="margin-bottom: 16px;">
+                                    <div class="cardio-map-placeholder">
+                                        <div style="font-size:40px; opacity:0.2;">◉</div>
+                                        <div>Route map will appear here</div>
+                                        <div style="font-size:11px; opacity:0.6;">GPS tracking requires location permission</div>
+                                    </div>
+                                </div>
+
+                                <button class="cardio-start-btn" onclick="app.startCardio()">
+                                    Start ${this._cardioType}
+                                </button>
+
+                                ${this.cardioSessions.length > 0 ? `
+                                    <div style="margin-top:8px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; text-align:center; padding: 16px 0;">
+                                        <div>
+                                            <div style="font-size:20px; font-weight:700; font-family:'DM Mono',monospace; letter-spacing:-0.03em;">${(this.cardioSessions.reduce((s,x) => s + x.distance, 0) / 1000).toFixed(1)}</div>
+                                            <div style="font-size:10px; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.06em;">Total km</div>
+                                        </div>
+                                        <div>
+                                            <div style="font-size:20px; font-weight:700; font-family:'DM Mono',monospace; letter-spacing:-0.03em;">${this.cardioSessions.length}</div>
+                                            <div style="font-size:10px; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.06em;">Sessions</div>
+                                        </div>
+                                        <div>
+                                            <div style="font-size:20px; font-weight:700; font-family:'DM Mono',monospace; letter-spacing:-0.03em;">${Math.round(this.cardioSessions.reduce((s,x) => s + x.duration, 0) / 60)}</div>
+                                            <div style="font-size:10px; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.06em;">Total mins</div>
+                                        </div>
+                                    </div>
+                                ` : ''}
+                            </div>
+                            ${historyHtml}
+                        </div>
+                    `;
+                }
+            },
+
+            setCardioType(type) {
+                this._cardioType = type;
+                this.renderCardio();
+            },
+
+            startCardio() {
+                if (!navigator.geolocation) {
+                    this.showNotification('GPS not available on this device');
+                    return;
+                }
+                this._cardioActive = true;
+                this._cardioStart = Date.now();
+                this._cardioCoords = [];
+                this._cardioDistance = 0;
+                this._cardioPausedMs = 0;
+                this._cardioPauseStart = null;
+                this._cardioSplits = [];
+                this._cardioLastSplitDist = 0;
+
+                this.renderCardio();
+
+                this._cardioWatchId = navigator.geolocation.watchPosition(
+                    pos => this.onCardioPosition(pos),
+                    err => console.warn('GPS error:', err),
+                    { enableHighAccuracy: true, maximumAge: 2000, timeout: 10000 }
+                );
+            },
+
+            onCardioPosition(pos) {
+                if (this._cardioPauseStart) return; // paused
+
+                const { latitude, longitude, accuracy } = pos.coords;
+                if (accuracy > 50) return; // ignore poor accuracy
+
+                const pt = { lat: latitude, lng: longitude, t: Date.now() };
+
+                if (this._cardioCoords.length > 0) {
+                    const last = this._cardioCoords[this._cardioCoords.length - 1];
+                    const d = this.haversineDistance(last.lat, last.lng, latitude, longitude);
+                    if (d < 3) return; // filter jitter < 3m
+                    this._cardioDistance += d;
+
+                    // Log 1km splits
+                    const kmDone = Math.floor(this._cardioDistance / 1000);
+                    const kmLast = Math.floor(this._cardioLastSplitDist / 1000);
+                    if (kmDone > kmLast) {
+                        const elapsed = this.getCardioElapsed();
+                        const splitPace = (elapsed / 60) / (this._cardioDistance / 1000) -
+                            (this._cardioSplits.reduce((s, x) => s + x.pace, 0));
+                        this._cardioSplits.push({ km: kmDone, pace: Math.max(0.5, splitPace) });
+                        this._cardioLastSplitDist = this._cardioDistance;
+                    }
+                }
+
+                this._cardioCoords.push(pt);
+                this.updateCardioLiveStats();
+                this.drawCardioMap();
+            },
+
+            updateCardioLiveStats() {
+                const elapsed = this.getCardioElapsed();
+                const mins = Math.floor(elapsed / 60);
+                const secs = String(elapsed % 60).padStart(2, '0');
+                const dist = (this._cardioDistance / 1000).toFixed(2);
+                const pace = this._cardioDistance > 50
+                    ? this.formatPace((elapsed / 60) / (this._cardioDistance / 1000))
+                    : '--:--';
+
+                const t = document.getElementById('liveTimer');
+                const d = document.getElementById('liveDist');
+                const p = document.getElementById('livePace');
+                if (t) t.textContent = `${mins}:${secs}`;
+                if (d) d.textContent = dist;
+                if (p) p.textContent = pace;
+            },
+
+            startCardioTimer() {
+                clearInterval(this._cardioTimerInterval);
+                this._cardioTimerInterval = setInterval(() => {
+                    if (this._cardioActive && !this._cardioPauseStart) {
+                        this.updateCardioLiveStats();
+                    }
+                }, 1000);
+            },
+
+            getCardioElapsed() {
+                if (!this._cardioStart) return 0;
+                const now = Date.now();
+                const paused = this._cardioPauseStart ? (now - this._cardioPauseStart) : 0;
+                return Math.floor((now - this._cardioStart - this._cardioPausedMs - paused) / 1000);
+            },
+
+            toggleCardioPause() {
+                if (this._cardioPauseStart) {
+                    // Resume
+                    this._cardioPausedMs += Date.now() - this._cardioPauseStart;
+                    this._cardioPauseStart = null;
+                } else {
+                    // Pause
+                    this._cardioPauseStart = Date.now();
+                }
+                this.renderCardio();
+            },
+
+            stopCardio() {
+                if (!confirm('Finish this session?')) return;
+
+                clearInterval(this._cardioTimerInterval);
+                if (this._cardioWatchId !== null) {
+                    navigator.geolocation.clearWatch(this._cardioWatchId);
+                    this._cardioWatchId = null;
+                }
+
+                const duration = this.getCardioElapsed();
+                const session = {
+                    id: Date.now().toString(),
+                    date: new Date().toISOString().split('T')[0],
+                    type: this._cardioType,
+                    distance: Math.round(this._cardioDistance),
+                    duration,
+                    coords: this._cardioCoords.map(c => [c.lat, c.lng]),
+                    splits: this._cardioSplits,
+                };
+
+                this.cardioSessions.push(session);
+                localStorage.setItem('cardioSessions', JSON.stringify(this.cardioSessions));
+
+                this._cardioActive = false;
+                this._cardioCoords = [];
+                this._cardioDistance = 0;
+
+                this.renderCardio();
+                this.showNotification(`${session.type} saved — ${(session.distance/1000).toFixed(2)} km`);
+            },
+
+            drawCardioMap() {
+                const canvas = document.getElementById('cardioMapCanvas');
+                if (!canvas || this._cardioCoords.length < 2) return;
+
+                const container = canvas.parentElement;
+                canvas.width = container.clientWidth;
+                canvas.height = container.clientHeight;
+                const ctx = canvas.getContext('2d');
+                const pts = this._cardioCoords;
+
+                // Find bounds
+                const lats = pts.map(p => p.lat);
+                const lngs = pts.map(p => p.lng);
+                const minLat = Math.min(...lats), maxLat = Math.max(...lats);
+                const minLng = Math.min(...lngs), maxLng = Math.max(...lngs);
+
+                const pad = 24;
+                const w = canvas.width - pad * 2;
+                const h = canvas.height - pad * 2;
+
+                const toX = lng => pad + ((lng - minLng) / (maxLng - minLng || 0.0001)) * w;
+                const toY = lat => pad + (1 - (lat - minLat) / (maxLat - minLat || 0.0001)) * h;
+
+                // Dark background
+                const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+                ctx.fillStyle = isDark ? '#1A1A18' : '#F0F0ED';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Draw route
+                ctx.beginPath();
+                ctx.moveTo(toX(pts[0].lng), toY(pts[0].lat));
+                for (let i = 1; i < pts.length; i++) {
+                    ctx.lineTo(toX(pts[i].lng), toY(pts[i].lat));
+                }
+                ctx.strokeStyle = isDark ? '#F7F7F5' : '#141414';
+                ctx.lineWidth = 3;
+                ctx.lineJoin = 'round';
+                ctx.lineCap = 'round';
+                ctx.stroke();
+
+                // Start dot (green)
+                ctx.beginPath();
+                ctx.arc(toX(pts[0].lng), toY(pts[0].lat), 6, 0, Math.PI * 2);
+                ctx.fillStyle = '#22c55e';
+                ctx.fill();
+
+                // Current position (accent)
+                const last = pts[pts.length - 1];
+                ctx.beginPath();
+                ctx.arc(toX(last.lng), toY(last.lat), 7, 0, Math.PI * 2);
+                ctx.fillStyle = isDark ? '#F7F7F5' : '#141414';
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(toX(last.lng), toY(last.lat), 4, 0, Math.PI * 2);
+                ctx.fillStyle = '#C8F55A';
+                ctx.fill();
+
+                // Hide placeholder
+                const ph = document.getElementById('cardioMapPlaceholder');
+                if (ph) ph.style.display = 'none';
+            },
+
+            haversineDistance(lat1, lng1, lat2, lng2) {
+                const R = 6371000;
+                const dLat = (lat2 - lat1) * Math.PI / 180;
+                const dLng = (lng2 - lng1) * Math.PI / 180;
+                const a = Math.sin(dLat/2)**2 +
+                    Math.cos(lat1 * Math.PI/180) * Math.cos(lat2 * Math.PI/180) * Math.sin(dLng/2)**2;
+                return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            },
+
+            formatPace(minPerKm) {
+                if (!minPerKm || !isFinite(minPerKm) || minPerKm > 60) return '--:--';
+                const m = Math.floor(minPerKm);
+                const s = String(Math.round((minPerKm - m) * 60)).padStart(2, '0');
+                return `${m}:${s}`;
+            },
+
             showSection(section) {
                 if (section === 'achievements') {
                     document.body.insertAdjacentHTML('beforeend', `
@@ -4951,14 +5552,27 @@ Tracked with Gym Tracker
                 }
             },
 
-            // Settings
             showSettings() {
+                const isDark = this.theme === 'dark';
                 const html = `
+                    <div class="metric-input-group">
+                        <label class="metric-label">Appearance</label>
+                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; background: var(--surface2); border-radius: 12px; border: 1px solid var(--border);">
+                            <div>
+                                <div style="font-size: 15px; font-weight: 500; color: var(--text-primary);">Dark Mode</div>
+                                <div style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">Easy on the eyes at night</div>
+                            </div>
+                            <div onclick="app.toggleTheme()" style="width: 48px; height: 28px; background: ${isDark ? 'var(--accent)' : 'var(--border)'}; border-radius: 100px; position: relative; cursor: pointer; transition: background 0.2s;">
+                                <div style="position: absolute; top: 3px; left: ${isDark ? '23px' : '3px'}; width: 22px; height: 22px; background: ${isDark ? '#141414' : 'white'}; border-radius: 50%; transition: left 0.2s; box-shadow: 0 1px 4px rgba(0,0,0,0.2);"></div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="metric-input-group">
                         <label class="metric-label">Rest Timer Duration</label>
                         <select id="restDuration" class="metric-input" onchange="app.updateSetting('restTimerDuration', parseInt(this.value))">
                             <option value="60" ${this.settings.restTimerDuration === 60 ? 'selected' : ''}>60 seconds</option>
-                            <option value="90" ${this.settings.restTimerDuration === 90 ? 'selected' : ''}>90 seconds (default)</option>
+                            <option value="90" ${this.settings.restTimerDuration === 90 ? 'selected' : ''}>90 seconds</option>
                             <option value="120" ${this.settings.restTimerDuration === 120 ? 'selected' : ''}>2 minutes</option>
                             <option value="180" ${this.settings.restTimerDuration === 180 ? 'selected' : ''}>3 minutes</option>
                             <option value="240" ${this.settings.restTimerDuration === 240 ? 'selected' : ''}>4 minutes</option>
@@ -4966,10 +5580,10 @@ Tracked with Gym Tracker
                     </div>
 
                     <div class="metric-input-group">
-                        <label class="metric-label">Default Weight Increment</label>
+                        <label class="metric-label">Weight Increment</label>
                         <select id="weightInc" class="metric-input" onchange="app.updateSetting('weightIncrement', parseFloat(this.value))">
                             <option value="1.25" ${this.settings.weightIncrement === 1.25 ? 'selected' : ''}>1.25 kg</option>
-                            <option value="2.5" ${this.settings.weightIncrement === 2.5 ? 'selected' : ''}>2.5 kg (default)</option>
+                            <option value="2.5" ${this.settings.weightIncrement === 2.5 ? 'selected' : ''}>2.5 kg</option>
                             <option value="5" ${this.settings.weightIncrement === 5 ? 'selected' : ''}>5 kg</option>
                             <option value="10" ${this.settings.weightIncrement === 10 ? 'selected' : ''}>10 kg</option>
                         </select>
@@ -4981,15 +5595,14 @@ Tracked with Gym Tracker
                             <option value="kg" ${this.settings.units === 'kg' ? 'selected' : ''}>Kilograms (kg)</option>
                             <option value="lbs" ${this.settings.units === 'lbs' ? 'selected' : ''}>Pounds (lbs)</option>
                         </select>
-                        <div class="metric-history">Note: Unit conversion coming soon!</div>
                     </div>
 
                     <button class="btn btn-danger" onclick="app.clearAllData()" style="margin-top: 20px;">
-                        🗑️ Clear All Data
+                        Clear All Data
                     </button>
                 `;
 
-                const modalContent = `
+                document.body.insertAdjacentHTML('beforeend', `
                     <div class="modal active" id="settingsModal" style="display: flex;">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -4999,9 +5612,7 @@ Tracked with Gym Tracker
                             ${html}
                         </div>
                     </div>
-                `;
-
-                document.body.insertAdjacentHTML('beforeend', modalContent);
+                `);
             },
 
             async updateSetting(key, value) {
@@ -5058,7 +5669,7 @@ Tracked with Gym Tracker
                                     ${goal.type === 'strength' ? goal.exercise : 'Body Weight'} • Target: ${goal.target}${goal.type === 'strength' ? 'kg' : 'kg'}
                                 </div>
                                 <div style="background: var(--background); height: 12px; border-radius: 6px; overflow: hidden; margin-bottom: 8px;">
-                                    <div style="background: var(--primary); height: 100%; width: ${Math.min(progress, 100)}%; transition: width 0.3s;"></div>
+                                    <div style="background: var(--accent); color: #141414; height: 100%; width: ${Math.min(progress, 100)}%; transition: width 0.3s;"></div>
                                 </div>
                                 <div style="display: flex; justify-content: space-between; font-size: 13px;">
                                     <span>${goal.current || 0}${goal.type === 'strength' ? 'kg' : 'kg'} / ${goal.target}${goal.type === 'strength' ? 'kg' : 'kg'}</span>
@@ -5363,7 +5974,7 @@ Tracked with Gym Tracker
                     top: 80px;
                     left: 50%;
                     transform: translateX(-50%);
-                    background: var(--gradient);
+                    background: var(--text-primary);
                     color: white;
                     padding: 20px 24px;
                     border-radius: 16px;
@@ -5444,7 +6055,7 @@ Tracked with Gym Tracker
                             <div class="card" onclick="app.closeSearch()">
                                 <div class="card-title">${workout.exercise}</div>
                                 <div class="card-subtitle">${this.formatDate(workout.date)} • ${workout.sets.length} sets</div>
-                                ${notes ? `<div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px; font-style: italic;">💭 ${notes}</div>` : ''}
+                                ${notes ? `<div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px; font-style: italic;">${notes}</div>` : ''}
                                 <div style="margin-top: 8px;">
                                     ${workout.sets.map((s, i) => `<span style="font-size: 13px; color: var(--text-secondary); margin-right: 8px;">Set ${i+1}: ${s.weight}kg × ${s.reps}</span>`).join('')}
                                 </div>
@@ -5619,7 +6230,7 @@ Tracked with Gym Tracker
                 );
                 
                 let html = `
-                    <div class="card" style="background: var(--gradient); color: white; margin-bottom: 16px;">
+                    <div class="card" style="background: var(--text-primary); color: white; margin-bottom: 16px;">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
                             <div>
                                 <div style="font-size: 13px; opacity: 0.9;">Duration</div>
@@ -6045,7 +6656,7 @@ Tracked with Gym Tracker
                                         <div style="font-size: 12px; color: var(--text-secondary);">Last synced: ${this.garminData.lastSync || 'Never'}</div>
                                     </div>
                                 </div>
-                                <button onclick="app.syncGarmin()" style="background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 16px; font-size: 13px; font-weight: 600; cursor: pointer;">
+                                <button onclick="app.syncGarmin()" style="background: var(--accent); color: #141414; color: white; border: none; padding: 8px 16px; border-radius: 16px; font-size: 13px; font-weight: 600; cursor: pointer;">
                                     Sync Now
                                 </button>
                             </div>
@@ -6058,12 +6669,12 @@ Tracked with Gym Tracker
                     const circumference = 2 * Math.PI * 90;
                     const offset = circumference - (readiness.score / 100) * circumference;
                     
-                    let ringColor = '#00D4AA';
-                    if (readiness.score < 40) ringColor = '#FF3B47';
-                    else if (readiness.score < 70) ringColor = '#FFB800';
+                    let ringColor = 'var(--accent)';
+                    if (readiness.score < 40) ringColor = 'var(--danger)';
+                    else if (readiness.score < 70) ringColor = 'var(--warning)';
                     
                     html += `
-                        <div class="premium-stat-card" style="background: var(--surface); margin-bottom: 20px;">
+                        <div class="premium-stat-card" style="background: var(--surface); margin-bottom: 12px;">
                             <div class="readiness-ring">
                                 <svg width="200" height="200">
                                     <circle class="readiness-ring-bg" cx="100" cy="100" r="90"/>
@@ -6078,22 +6689,31 @@ Tracked with Gym Tracker
                                     <div class="readiness-score-label">READINESS</div>
                                 </div>
                             </div>
-                            <div style="text-align: center; margin-top: 20px;">
-                                <div style="font-size: 15px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">
+                            <div style="text-align: center; margin-top: 16px; margin-bottom: 20px;">
+                                <div style="font-size: 17px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; letter-spacing: -0.02em;">
                                     ${readiness.status}
                                 </div>
                                 <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">
                                     ${readiness.recommendation}
                                 </div>
                             </div>
+
+                            <!-- AI Insight -->
+                            <div id="aiInsightArea">
+                                <button onclick="app.getAIReadinessInsight()" 
+                                    style="width:100%; padding: 12px; border: 1px solid var(--border); border-radius: 12px; 
+                                    background: var(--surface2); cursor: pointer; font-size: 13px; font-weight: 600; 
+                                    color: var(--text-primary); font-family: 'DM Sans', sans-serif; letter-spacing: -0.01em;">
+                                    Get AI Coaching Insight
+                                </button>
+                            </div>
                         </div>
                     `;
                 } else {
                     html += `
-                        <div class="premium-stat-card" style="text-align: center; padding: 60px 20px;">
-                            <div style="font-size: 48px; margin-bottom: 16px;">💤</div>
-                            <div style="font-size: 16px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">
-                                No Data Today
+                        <div class="premium-stat-card" style="text-align: center; padding: 48px 20px;">
+                            <div style="font-size: 15px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">
+                                No data logged today
                             </div>
                             <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 20px;">
                                 Log your health metrics to see your readiness score
@@ -6289,7 +6909,7 @@ Tracked with Gym Tracker
                 // Today's Stats
                 if (todayLog) {
                     html += `
-                        <div class="card" style="background: var(--gradient); color: white; margin-bottom: 16px;">
+                        <div class="card" style="background: var(--text-primary); color: white; margin-bottom: 16px;">
                             <div style="text-align: center; margin-bottom: 16px;">
                                 <div style="font-size: 64px; font-weight: 700;">${readiness.score}</div>
                                 <div style="font-size: 18px; font-weight: 600; margin-bottom: 4px;">Readiness Score</div>
@@ -6476,117 +7096,386 @@ Tracked with Gym Tracker
             logDailyHealth() {
                 const today = new Date().toISOString().split('T')[0];
                 const existing = this.dailyLogs[today] || {};
-                
-                const html = `
-                    <div style="margin-bottom: 16px; padding: 12px; background: var(--background); border-radius: 8px;">
-                        <div style="font-size: 14px; font-weight: 600; margin-bottom: 4px;">Morning Check-In</div>
-                        <div style="font-size: 13px; color: var(--text-secondary);">Log your daily health metrics</div>
-                    </div>
 
-                    <div class="metric-input-group">
-                        <label class="metric-label">💤 Hours Slept</label>
-                        <input type="number" step="0.5" id="healthSleep" class="metric-input" placeholder="7.5" value="${existing.sleep || ''}">
-                    </div>
-
-                    <div class="metric-input-group">
-                        <label class="metric-label">😴 Sleep Quality (1-10)</label>
-                        <input type="number" min="1" max="10" id="healthSleepQuality" class="metric-input" placeholder="8" value="${existing.sleepQuality || ''}">
-                    </div>
-
-                    <div class="metric-input-group">
-                        <label class="metric-label">❤️ Resting Heart Rate (bpm)</label>
-                        <input type="number" id="healthRHR" class="metric-input" placeholder="55" value="${existing.rhr || ''}">
-                    </div>
-
-                    <div class="metric-input-group">
-                        <label class="metric-label">📊 HRV (ms)</label>
-                        <input type="number" id="healthHRV" class="metric-input" placeholder="85" value="${existing.hrv || ''}">
-                        <div class="metric-history">Optional - if you track it</div>
-                    </div>
-
-                    <div class="metric-input-group">
-                        <label class="metric-label">⚡ Energy Level (1-10)</label>
-                        <input type="number" min="1" max="10" id="healthEnergy" class="metric-input" placeholder="7" value="${existing.energy || ''}">
-                    </div>
-
-                    <div class="metric-input-group">
-                        <label class="metric-label">😰 Stress Level (1-10)</label>
-                        <input type="number" min="1" max="10" id="healthStress" class="metric-input" placeholder="4" value="${existing.stress || ''}">
-                    </div>
-
-                    <div class="metric-input-group">
-                        <label class="metric-label">💪 Muscle Soreness (1-10)</label>
-                        <input type="number" min="1" max="10" id="healthSoreness" class="metric-input" placeholder="3" value="${existing.soreness || ''}">
-                    </div>
-
-                    <div class="metric-input-group">
-                        <label class="metric-label">🚶 Steps</label>
-                        <input type="number" id="healthSteps" class="metric-input" placeholder="10000" value="${existing.steps || ''}">
-                    </div>
-
-                    <div class="metric-input-group">
-                        <label class="metric-label">🔥 Calories Burned</label>
-                        <input type="number" id="healthCalories" class="metric-input" placeholder="2500" value="${existing.calories || ''}">
-                    </div>
-
-                    <div class="metric-input-group">
-                        <label class="metric-label">💧 Water Intake (glasses)</label>
-                        <input type="number" id="healthWater" class="metric-input" placeholder="8" value="${existing.water || ''}">
-                    </div>
-
-                    <div style="margin: 20px 0; padding: 12px; background: var(--background); border-radius: 8px;">
-                        <div style="font-size: 14px; font-weight: 600; margin-bottom: 4px;">🍎 Nutrition</div>
-                        <div style="font-size: 13px; color: var(--text-secondary);">Track your daily intake</div>
-                    </div>
-
-                    <div class="metric-input-group">
-                        <label class="metric-label">🔥 Calories Consumed</label>
-                        <input type="number" id="healthCaloriesIn" class="metric-input" placeholder="2500" value="${existing.caloriesIn || ''}">
-                    </div>
-
-                    <div class="metric-input-group">
-                        <label class="metric-label">🥩 Protein (grams)</label>
-                        <input type="number" id="healthProtein" class="metric-input" placeholder="150" value="${existing.protein || ''}">
-                        <div class="metric-history">Target: ~0.8-1g per lb body weight</div>
-                    </div>
-
-                    <div class="metric-input-group">
-                        <label class="metric-label">🍚 Carbs (grams)</label>
-                        <input type="number" id="healthCarbs" class="metric-input" placeholder="250" value="${existing.carbs || ''}">
-                    </div>
-
-                    <div class="metric-input-group">
-                        <label class="metric-label">🥑 Fats (grams)</label>
-                        <input type="number" id="healthFats" class="metric-input" placeholder="70" value="${existing.fats || ''}">
-                    </div>
-
-                    <div class="metric-input-group">
-                        <label class="metric-label">🌟 Eating Quality (1-10)</label>
-                        <input type="number" min="1" max="10" id="healthEatingQuality" class="metric-input" placeholder="7" value="${existing.eatingQuality || ''}">
-                        <div class="metric-history">How clean/healthy was your eating?</div>
-                    </div>
-
-                    <div class="metric-input-group">
-                        <label class="metric-label">📝 Notes</label>
-                        <textarea id="healthNotes" class="metric-input" rows="2" placeholder="Any observations...">${existing.notes || ''}</textarea>
-                    </div>
-
-                    <button class="btn btn-primary" onclick="app.saveDailyHealth()">💾 Save Health Log</button>
-                `;
-
-                const modalContent = `
+                document.body.insertAdjacentHTML('beforeend', `
                     <div class="modal active" id="logHealthModal" style="display: flex;">
-                        <div class="modal-content">
+                        <div class="modal-content" style="padding-bottom: 32px;">
                             <div class="modal-header">
-                                <h2 class="modal-title">Daily Health Log</h2>
+                                <h2 class="modal-title">Daily Log</h2>
                                 <button class="close-btn" onclick="document.getElementById('logHealthModal').remove()">×</button>
                             </div>
-                            ${html}
+
+                            <!-- Tab switcher -->
+                            <div style="display: flex; gap: 4px; background: var(--surface2); border-radius: 12px; padding: 4px; margin-bottom: 24px;">
+                                <button onclick="app.switchLogTab('recovery')" id="logTab-recovery" style="flex:1; padding: 8px; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; background: var(--surface); color: var(--text-primary); font-family: 'DM Sans', sans-serif;">Recovery</button>
+                                <button onclick="app.switchLogTab('nutrition')" id="logTab-nutrition" style="flex:1; padding: 8px; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; background: transparent; color: var(--text-secondary); font-family: 'DM Sans', sans-serif;">Nutrition</button>
+                                <button onclick="app.switchLogTab('body')" id="logTab-body" style="flex:1; padding: 8px; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; background: transparent; color: var(--text-secondary); font-family: 'DM Sans', sans-serif;">Body</button>
+                            </div>
+
+                            <!-- RECOVERY TAB -->
+                            <div id="logSection-recovery">
+                                <div class="metric-input-group">
+                                    <label class="metric-label">Hours Slept</label>
+                                    <div style="display: flex; align-items: center; gap: 12px;">
+                                        <input type="range" min="3" max="12" step="0.5" id="healthSleep" 
+                                            value="${existing.sleep || 7}" oninput="document.getElementById('sleepVal').textContent = this.value + 'h'"
+                                            style="flex:1; accent-color: var(--text-primary);">
+                                        <span id="sleepVal" style="font-size: 18px; font-weight: 700; min-width: 40px; text-align: right; font-family: 'DM Mono', monospace;">${existing.sleep || 7}h</span>
+                                    </div>
+                                </div>
+
+                                <div class="metric-input-group">
+                                    <label class="metric-label">Sleep Quality</label>
+                                    <div style="display: flex; gap: 6px;">
+                                        ${[1,2,3,4,5,6,7,8,9,10].map(n => `
+                                            <button onclick="app.selectRating('sleepQuality', ${n}, this)" 
+                                                style="flex:1; aspect-ratio:1; border-radius: 8px; border: 1px solid var(--border); 
+                                                background: ${existing.sleepQuality === n ? 'var(--text-primary)' : 'var(--surface2)'}; 
+                                                color: ${existing.sleepQuality === n ? 'var(--background)' : 'var(--text-secondary)'}; 
+                                                font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif;">${n}</button>
+                                        `).join('')}
+                                    </div>
+                                    <input type="hidden" id="healthSleepQuality" value="${existing.sleepQuality || ''}">
+                                </div>
+
+                                <div class="metric-input-group">
+                                    <label class="metric-label">Energy Level</label>
+                                    <div style="display: flex; gap: 6px;">
+                                        ${[1,2,3,4,5,6,7,8,9,10].map(n => `
+                                            <button onclick="app.selectRating('energy', ${n}, this)" 
+                                                style="flex:1; aspect-ratio:1; border-radius: 8px; border: 1px solid var(--border); 
+                                                background: ${existing.energy === n ? 'var(--text-primary)' : 'var(--surface2)'}; 
+                                                color: ${existing.energy === n ? 'var(--background)' : 'var(--text-secondary)'}; 
+                                                font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif;">${n}</button>
+                                        `).join('')}
+                                    </div>
+                                    <input type="hidden" id="healthEnergy" value="${existing.energy || ''}">
+                                </div>
+
+                                <div class="metric-input-group">
+                                    <label class="metric-label">Stress Level</label>
+                                    <div style="display: flex; gap: 6px;">
+                                        ${[1,2,3,4,5,6,7,8,9,10].map(n => `
+                                            <button onclick="app.selectRating('stress', ${n}, this)" 
+                                                style="flex:1; aspect-ratio:1; border-radius: 8px; border: 1px solid var(--border); 
+                                                background: ${existing.stress === n ? 'var(--text-primary)' : 'var(--surface2)'}; 
+                                                color: ${existing.stress === n ? 'var(--background)' : 'var(--text-secondary)'}; 
+                                                font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif;">${n}</button>
+                                        `).join('')}
+                                    </div>
+                                    <input type="hidden" id="healthStress" value="${existing.stress || ''}">
+                                </div>
+
+                                <div class="metric-input-group">
+                                    <label class="metric-label">Muscle Soreness</label>
+                                    <div style="display: flex; gap: 6px;">
+                                        ${[1,2,3,4,5,6,7,8,9,10].map(n => `
+                                            <button onclick="app.selectRating('soreness', ${n}, this)" 
+                                                style="flex:1; aspect-ratio:1; border-radius: 8px; border: 1px solid var(--border); 
+                                                background: ${existing.soreness === n ? 'var(--text-primary)' : 'var(--surface2)'}; 
+                                                color: ${existing.soreness === n ? 'var(--background)' : 'var(--text-secondary)'}; 
+                                                font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif;">${n}</button>
+                                        `).join('')}
+                                    </div>
+                                    <input type="hidden" id="healthSoreness" value="${existing.soreness || ''}">
+                                </div>
+
+                                <div class="metric-input-group">
+                                    <label class="metric-label">Resting Heart Rate (bpm)</label>
+                                    <input type="number" id="healthRHR" class="metric-input" placeholder="55" value="${existing.rhr || ''}">
+                                </div>
+
+                                <div class="metric-input-group">
+                                    <label class="metric-label">HRV (ms) — optional</label>
+                                    <input type="number" id="healthHRV" class="metric-input" placeholder="85" value="${existing.hrv || ''}">
+                                </div>
+
+                                <div class="metric-input-group">
+                                    <label class="metric-label">Notes</label>
+                                    <textarea id="healthNotes" class="metric-input" rows="2" placeholder="How are you feeling?">${existing.notes || ''}</textarea>
+                                </div>
+                            </div>
+
+                            <!-- NUTRITION TAB -->
+                            <div id="logSection-nutrition" style="display:none;">
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+                                    <div>
+                                        <label class="metric-label">Calories</label>
+                                        <input type="number" id="healthCaloriesIn" class="metric-input" 
+                                            placeholder="${this.settings.calTarget || 2500}" 
+                                            value="${existing.caloriesIn || ''}"
+                                            oninput="app.updateCalRemaining()">
+                                        ${this.settings.calTarget ? `<div style="font-size: 11px; color: var(--text-secondary); margin-top: 4px;" id="calRemaining">Target: ${this.settings.calTarget} kcal</div>` : ''}
+                                    </div>
+                                    <div>
+                                        <label class="metric-label">Water (glasses)</label>
+                                        <div style="display: flex; align-items: center; gap: 8px; padding: 8px 0;">
+                                            <button onclick="app.adjustWater(-1)" style="width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:var(--surface2);font-size:18px;cursor:pointer;">−</button>
+                                            <span id="waterDisplay" style="font-size:22px;font-weight:700;font-family:'DM Mono',monospace;min-width:24px;text-align:center;">${existing.water || 0}</span>
+                                            <button onclick="app.adjustWater(1)" style="width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:var(--surface2);font-size:18px;cursor:pointer;">+</button>
+                                        </div>
+                                        <input type="hidden" id="healthWater" value="${existing.water || 0}">
+                                    </div>
+                                </div>
+
+                                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 16px;">
+                                    <div>
+                                        <label class="metric-label">Protein (g)</label>
+                                        <input type="number" id="healthProtein" class="metric-input" 
+                                            placeholder="${this.settings.proteinTarget || 160}" 
+                                            value="${existing.protein || ''}">
+                                    </div>
+                                    <div>
+                                        <label class="metric-label">Carbs (g)</label>
+                                        <input type="number" id="healthCarbs" class="metric-input" 
+                                            placeholder="${this.settings.carbTarget || 250}" 
+                                            value="${existing.carbs || ''}">
+                                    </div>
+                                    <div>
+                                        <label class="metric-label">Fats (g)</label>
+                                        <input type="number" id="healthFats" class="metric-input" 
+                                            placeholder="${this.settings.fatTarget || 80}" 
+                                            value="${existing.fats || ''}">
+                                    </div>
+                                </div>
+
+                                <!-- Quick add common foods -->
+                                <div class="metric-input-group">
+                                    <label class="metric-label">Quick Add Food</label>
+                                    <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                                        <input type="text" id="foodSearch" class="metric-input" placeholder="e.g. chicken breast, rice..." 
+                                            oninput="app.searchFood(this.value)" style="flex:1;">
+                                    </div>
+                                    <div id="foodResults" style="display: flex; flex-wrap: wrap; gap: 6px;"></div>
+                                </div>
+
+                                <div class="metric-input-group">
+                                    <label class="metric-label">Steps</label>
+                                    <input type="number" id="healthSteps" class="metric-input" placeholder="10000" value="${existing.steps || ''}">
+                                </div>
+
+                                <div class="metric-input-group">
+                                    <label class="metric-label">Calories Burned</label>
+                                    <input type="number" id="healthCalories" class="metric-input" placeholder="2500" value="${existing.calories || ''}">
+                                </div>
+                            </div>
+
+                            <!-- BODY TAB -->
+                            <div id="logSection-body" style="display:none;">
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                                    <div>
+                                        <label class="metric-label">Weight (kg)</label>
+                                        <input type="number" step="0.1" id="bodyWeight" class="metric-input" 
+                                            placeholder="75.0" value="${this.bodyMetrics[this.bodyMetrics.length-1]?.weight || ''}">
+                                    </div>
+                                    <div>
+                                        <label class="metric-label">Body Fat %</label>
+                                        <input type="number" step="0.1" id="bodyFat" class="metric-input" 
+                                            placeholder="15.0" value="${this.bodyMetrics[this.bodyMetrics.length-1]?.bodyFat || ''}">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 12px;">
+                                    <label class="metric-label">Eating Quality (1-10)</label>
+                                    <div style="display: flex; gap: 6px; margin-top: 4px;">
+                                        ${[1,2,3,4,5,6,7,8,9,10].map(n => `
+                                            <button onclick="app.selectRating('eatingQuality', ${n}, this)" 
+                                                style="flex:1; aspect-ratio:1; border-radius: 8px; border: 1px solid var(--border); 
+                                                background: ${existing.eatingQuality === n ? 'var(--text-primary)' : 'var(--surface2)'}; 
+                                                color: ${existing.eatingQuality === n ? 'var(--background)' : 'var(--text-secondary)'}; 
+                                                font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif;">${n}</button>
+                                        `).join('')}
+                                    </div>
+                                    <input type="hidden" id="healthEatingQuality" value="${existing.eatingQuality || ''}">
+                                </div>
+
+                                ${this.bodyMetrics.length > 0 ? `
+                                    <div style="margin-top: 20px;">
+                                        <label class="metric-label">Weight History</label>
+                                        <div style="display: flex; align-items: flex-end; gap: 4px; height: 60px; margin-top: 8px;">
+                                            ${this.bodyMetrics.slice(-14).map(m => {
+                                                const vals = this.bodyMetrics.slice(-14).map(x => x.weight).filter(Boolean);
+                                                const min = Math.min(...vals), max = Math.max(...vals);
+                                                const range = max - min || 1;
+                                                const pct = ((m.weight - min) / range * 70 + 20);
+                                                return `<div style="flex:1; background: var(--text-primary); border-radius: 3px 3px 0 0; height: ${pct}%; opacity: 0.7;" title="${m.weight}kg"></div>`;
+                                            }).join('')}
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-secondary); margin-top: 4px;">
+                                            <span>${this.bodyMetrics.slice(-14)[0]?.date?.slice(5)}</span>
+                                            <span>${this.bodyMetrics[this.bodyMetrics.length-1]?.weight}kg</span>
+                                        </div>
+                                    </div>
+                                ` : ''}
+                            </div>
+
+                            <button class="btn btn-primary" onclick="app.saveDailyHealth()" style="margin-top: 20px;">Save</button>
                         </div>
                     </div>
-                `;
+                `);
+            },
 
-                document.body.insertAdjacentHTML('beforeend', modalContent);
+            switchLogTab(tab) {
+                ['recovery', 'nutrition', 'body'].forEach(t => {
+                    document.getElementById(`logSection-${t}`).style.display = t === tab ? 'block' : 'none';
+                    const btn = document.getElementById(`logTab-${t}`);
+                    btn.style.background = t === tab ? 'var(--surface)' : 'transparent';
+                    btn.style.color = t === tab ? 'var(--text-primary)' : 'var(--text-secondary)';
+                });
+            },
+
+            selectRating(field, value, btn) {
+                // Update hidden input
+                document.getElementById(`health${field.charAt(0).toUpperCase() + field.slice(1)}`).value = value;
+                // Update button styles
+                const parent = btn.parentElement;
+                parent.querySelectorAll('button').forEach((b, i) => {
+                    b.style.background = (i + 1) === value ? 'var(--text-primary)' : 'var(--surface2)';
+                    b.style.color = (i + 1) === value ? 'var(--background)' : 'var(--text-secondary)';
+                });
+            },
+
+            adjustWater(delta) {
+                const input = document.getElementById('healthWater');
+                const display = document.getElementById('waterDisplay');
+                const val = Math.max(0, Math.min(20, parseInt(input.value || 0) + delta));
+                input.value = val;
+                display.textContent = val;
+            },
+
+            updateCalRemaining() {
+                const el = document.getElementById('calRemaining');
+                if (!el) return;
+                const target = this.settings.calTarget || 2500;
+                const consumed = parseInt(document.getElementById('healthCaloriesIn').value) || 0;
+                const remaining = target - consumed;
+                el.textContent = remaining >= 0 
+                    ? `${remaining} kcal remaining` 
+                    : `${Math.abs(remaining)} kcal over target`;
+                el.style.color = remaining >= 0 ? 'var(--success)' : 'var(--danger)';
+            },
+
+            searchFood(query) {
+                const results = document.getElementById('foodResults');
+                if (!query || query.length < 2) { results.innerHTML = ''; return; }
+                
+                // Local database for instant results
+                const foods = [
+                    { name: 'Chicken Breast', cal: 165, p: 31, c: 0, f: 4, per: '100g' },
+                    { name: 'Chicken Thigh', cal: 209, p: 26, c: 0, f: 11, per: '100g' },
+                    { name: 'Salmon', cal: 208, p: 20, c: 0, f: 13, per: '100g' },
+                    { name: 'Tuna (canned)', cal: 128, p: 28, c: 0, f: 1, per: '100g' },
+                    { name: 'Eggs (2 large)', cal: 140, p: 12, c: 1, f: 10, per: '2 eggs' },
+                    { name: 'Greek Yogurt', cal: 100, p: 17, c: 6, f: 0, per: '170g' },
+                    { name: 'Cottage Cheese', cal: 98, p: 11, c: 4, f: 4, per: '100g' },
+                    { name: 'Whey Protein', cal: 120, p: 24, c: 3, f: 2, per: '1 scoop' },
+                    { name: 'White Rice', cal: 206, p: 4, c: 45, f: 0, per: '1 cup cooked' },
+                    { name: 'Brown Rice', cal: 216, p: 5, c: 45, f: 2, per: '1 cup cooked' },
+                    { name: 'Oats', cal: 154, p: 5, c: 28, f: 3, per: '40g dry' },
+                    { name: 'Sweet Potato', cal: 103, p: 2, c: 24, f: 0, per: '1 medium' },
+                    { name: 'Pasta', cal: 220, p: 8, c: 43, f: 1, per: '80g dry' },
+                    { name: 'Bread (slice)', cal: 79, p: 3, c: 15, f: 1, per: '1 slice' },
+                    { name: 'Banana', cal: 105, p: 1, c: 27, f: 0, per: '1 medium' },
+                    { name: 'Apple', cal: 95, p: 0, c: 25, f: 0, per: '1 medium' },
+                    { name: 'Avocado', cal: 234, p: 3, c: 12, f: 21, per: '1 medium' },
+                    { name: 'Olive Oil', cal: 119, p: 0, c: 0, f: 14, per: '1 tbsp' },
+                    { name: 'Almonds', cal: 164, p: 6, c: 6, f: 14, per: '28g' },
+                    { name: 'Peanut Butter', cal: 190, p: 8, c: 6, f: 16, per: '2 tbsp' },
+                    { name: 'Milk (whole)', cal: 149, p: 8, c: 12, f: 8, per: '1 cup' },
+                    { name: 'Beef (lean mince)', cal: 215, p: 26, c: 0, f: 12, per: '100g' },
+                    { name: 'Steak (sirloin)', cal: 207, p: 26, c: 0, f: 11, per: '100g' },
+                    { name: 'Broccoli', cal: 55, p: 4, c: 11, f: 1, per: '1 cup' },
+                ];
+                
+                const matches = foods.filter(f => f.name.toLowerCase().includes(query.toLowerCase())).slice(0, 4);
+                
+                // Show local matches instantly
+                results.innerHTML = matches.map(f => `
+                    <button onclick="app.addFood(${f.cal}, ${f.p}, ${f.c}, ${f.f})"
+                        style="padding: 8px 10px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface2); 
+                        cursor: pointer; text-align: left; font-family: 'DM Sans', sans-serif; width: 100%;">
+                        <div style="font-size: 13px; font-weight: 600; color: var(--text-primary);">${f.name} <span style="font-weight:400;color:var(--text-secondary);">${f.per}</span></div>
+                        <div style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">${f.cal} kcal &nbsp;·&nbsp; ${f.p}g protein &nbsp;·&nbsp; ${f.c}g carbs &nbsp;·&nbsp; ${f.f}g fat</div>
+                    </button>
+                `).join('');
+
+                // Always add AI lookup button
+                clearTimeout(this._foodSearchTimer);
+                this._foodSearchTimer = setTimeout(() => this.aiLookupFood(query), 600);
+            },
+
+            async aiLookupFood(query) {
+                const results = document.getElementById('foodResults');
+                if (!results || !query) return;
+
+                // Show AI loading state
+                const loaderId = 'aiLoader';
+                const existing = results.querySelector('#' + loaderId);
+                if (!existing) {
+                    results.insertAdjacentHTML('beforeend', `
+                        <div id="${loaderId}" style="width:100%; padding: 10px 12px; border: 1px dashed var(--border); border-radius: 10px; 
+                            color: var(--text-secondary); font-size: 13px; display: flex; align-items: center; gap: 8px;">
+                            <div style="width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--text-primary);border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+                            Asking AI about "${query}"...
+                        </div>
+                    `);
+                }
+
+                try {
+                    const response = await fetch('https://api.anthropic.com/v1/messages', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            model: 'claude-haiku-4-5-20251001',
+                            max_tokens: 200,
+                            messages: [{
+                                role: 'user',
+                                content: `Give me the nutrition facts for: "${query}". Reply with ONLY a JSON object, no other text:
+{"name": "food name", "per": "serving size", "cal": number, "p": number, "c": number, "f": number}
+All numbers are integers. p=protein grams, c=carb grams, f=fat grams. Use a typical/common serving size.`
+                            }]
+                        })
+                    });
+
+                    const data = await response.json();
+                    const text = data.content?.[0]?.text?.trim();
+                    const food = JSON.parse(text.replace(/```json|```/g, '').trim());
+
+                    // Remove loader
+                    document.getElementById(loaderId)?.remove();
+
+                    if (!results) return;
+
+                    // Add AI result with special styling
+                    results.insertAdjacentHTML('beforeend', `
+                        <button onclick="app.addFood(${food.cal}, ${food.p}, ${food.c}, ${food.f})"
+                            style="width:100%; padding: 10px 12px; border: 1px solid var(--text-primary); border-radius: 10px; 
+                            background: var(--surface2); cursor: pointer; text-align: left; font-family: 'DM Sans', sans-serif;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:3px;">
+                                <div style="font-size: 13px; font-weight: 600; color: var(--text-primary);">${food.name} <span style="font-weight:400;color:var(--text-secondary);">${food.per}</span></div>
+                                <div style="font-size: 10px; font-weight: 600; color: var(--text-secondary); letter-spacing: 0.05em;">AI</div>
+                            </div>
+                            <div style="font-size: 12px; color: var(--text-secondary);">${food.cal} kcal &nbsp;·&nbsp; ${food.p}g protein &nbsp;·&nbsp; ${food.c}g carbs &nbsp;·&nbsp; ${food.f}g fat</div>
+                        </button>
+                    `);
+                } catch (e) {
+                    document.getElementById(loaderId)?.remove();
+                    console.error('AI food lookup failed:', e);
+                }
+            },
+
+            addFood(cal, protein, carbs, fats) {
+                const add = (id, val) => {
+                    const el = document.getElementById(id);
+                    el.value = (parseInt(el.value) || 0) + val;
+                };
+                add('healthCaloriesIn', cal);
+                add('healthProtein', protein);
+                add('healthCarbs', carbs);
+                add('healthFats', fats);
+                document.getElementById('foodSearch').value = '';
+                document.getElementById('foodResults').innerHTML = '';
+                this.updateCalRemaining();
+                this.showNotification(`+${cal} kcal added`);
             },
 
             async saveDailyHealth() {
@@ -6594,18 +7483,17 @@ Tracked with Gym Tracker
                 
                 const log = {
                     date: today,
-                    sleep: parseFloat(document.getElementById('healthSleep').value) || null,
-                    sleepQuality: parseInt(document.getElementById('healthSleepQuality').value) || null,
-                    rhr: parseInt(document.getElementById('healthRHR').value) || null,
-                    hrv: parseInt(document.getElementById('healthHRV').value) || null,
-                    energy: parseInt(document.getElementById('healthEnergy').value) || null,
-                    stress: parseInt(document.getElementById('healthStress').value) || null,
-                    soreness: parseInt(document.getElementById('healthSoreness').value) || null,
-                    steps: parseInt(document.getElementById('healthSteps').value) || null,
-                    calories: parseInt(document.getElementById('healthCalories').value) || null,
-                    water: parseInt(document.getElementById('healthWater').value) || null,
-                    notes: document.getElementById('healthNotes').value || '',
-                    // Nutrition
+                    sleep: parseFloat(document.getElementById('healthSleep')?.value) || null,
+                    sleepQuality: parseInt(document.getElementById('healthSleepQuality')?.value) || null,
+                    rhr: parseInt(document.getElementById('healthRHR')?.value) || null,
+                    hrv: parseInt(document.getElementById('healthHRV')?.value) || null,
+                    energy: parseInt(document.getElementById('healthEnergy')?.value) || null,
+                    stress: parseInt(document.getElementById('healthStress')?.value) || null,
+                    soreness: parseInt(document.getElementById('healthSoreness')?.value) || null,
+                    steps: parseInt(document.getElementById('healthSteps')?.value) || null,
+                    calories: parseInt(document.getElementById('healthCalories')?.value) || null,
+                    water: parseInt(document.getElementById('healthWater')?.value) || null,
+                    notes: document.getElementById('healthNotes')?.value || '',
                     caloriesIn: parseInt(document.getElementById('healthCaloriesIn')?.value) || null,
                     protein: parseInt(document.getElementById('healthProtein')?.value) || null,
                     carbs: parseInt(document.getElementById('healthCarbs')?.value) || null,
@@ -6615,13 +7503,108 @@ Tracked with Gym Tracker
                 
                 this.dailyLogs[today] = log;
                 await this.saveDailyLogs();
+
+                // Save body metrics if entered
+                const bw = parseFloat(document.getElementById('bodyWeight')?.value);
+                const bf = parseFloat(document.getElementById('bodyFat')?.value);
+                if (bw || bf) {
+                    const existing = this.bodyMetrics.findIndex(m => m.date === today);
+                    const metric = { date: today, weight: bw || null, bodyFat: bf || null };
+                    if (existing >= 0) this.bodyMetrics[existing] = metric;
+                    else this.bodyMetrics.push(metric);
+                    this.bodyMetrics.sort((a, b) => a.date.localeCompare(b.date));
+                    await this.saveBodyMetrics();
+                }
                 
                 document.getElementById('logHealthModal').remove();
-                document.getElementById('healthModal')?.remove();
-                
-                // Re-render health tab immediately so data shows
                 this.renderHealth();
-                this.showNotification('✅ Health data saved!');
+                this.showNotification('Health data saved!');
+            },
+
+            async getAIReadinessInsight() {
+                const area = document.getElementById('aiInsightArea');
+                if (!area) return;
+
+                // Build context from today's data + recent training
+                const today = new Date().toISOString().split('T')[0];
+                const todayLog = this.dailyLogs[today] || {};
+                const readiness = this.calculateReadinessScore(todayLog);
+
+                // Last 7 days of training
+                const recentWorkouts = this.getWorkoutsInDays(7);
+                const trainingDays = [...new Set(recentWorkouts.map(w => w.date))].length;
+                const weekVolume = recentWorkouts.reduce((sum, w) =>
+                    sum + w.sets.reduce((s, set) => s + (set.weight * set.reps), 0), 0
+                );
+
+                // Last 7 days of health logs
+                const recentLogs = Object.entries(this.dailyLogs)
+                    .filter(([d]) => d >= new Date(Date.now() - 7*24*60*60*1000).toISOString().split('T')[0])
+                    .map(([, l]) => l);
+                const avgSleep = recentLogs.filter(l => l.sleep).reduce((s, l, _, a) => s + l.sleep/a.length, 0);
+                const avgHRV = recentLogs.filter(l => l.hrv).reduce((s, l, _, a) => s + l.hrv/a.length, 0);
+
+                // Show loading
+                area.innerHTML = `
+                    <div style="padding: 14px; background: var(--surface2); border-radius: 12px; border: 1px solid var(--border);">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                            <div style="width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--text-primary);border-radius:50%;animation:spin 0.8s linear infinite; flex-shrink:0;"></div>
+                            <div style="font-size: 13px; font-weight: 600; color: var(--text-primary);">Analysing your data...</div>
+                        </div>
+                    </div>
+                `;
+
+                try {
+                    const prompt = `You are a personal trainer and performance coach. Analyse this athlete's data and give a short, direct readiness insight.
+
+TODAY'S METRICS:
+- Readiness score: ${readiness.score}/100
+- Sleep: ${todayLog.sleep || 'not logged'}h ${todayLog.sleepQuality ? `(quality: ${todayLog.sleepQuality}/10)` : ''}
+- Energy: ${todayLog.energy || 'not logged'}/10
+- Stress: ${todayLog.stress || 'not logged'}/10
+- Muscle soreness: ${todayLog.soreness || 'not logged'}/10
+- Resting HR: ${todayLog.rhr || 'not logged'} bpm
+- HRV: ${todayLog.hrv || 'not logged'} ms
+
+LAST 7 DAYS:
+- Training days: ${trainingDays}/7
+- Total volume: ${Math.round(weekVolume)}kg
+- Avg sleep: ${avgSleep ? avgSleep.toFixed(1) + 'h' : 'not enough data'}
+- Avg HRV: ${avgHRV ? Math.round(avgHRV) + 'ms' : 'not enough data'}
+
+Give a 2-3 sentence coaching insight. Be direct and specific — tell them exactly what to do today (train heavy / train light / active recovery / rest) and the single most important thing to focus on. No emojis. No fluff.`;
+
+                    const response = await fetch('https://api.anthropic.com/v1/messages', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            model: 'claude-haiku-4-5-20251001',
+                            max_tokens: 150,
+                            messages: [{ role: 'user', content: prompt }]
+                        })
+                    });
+
+                    const data = await response.json();
+                    const insight = data.content?.[0]?.text?.trim();
+
+                    area.innerHTML = `
+                        <div style="padding: 16px; background: var(--surface2); border-radius: 12px; border: 1px solid var(--border);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <div style="font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em;">AI Coach</div>
+                                <button onclick="app.getAIReadinessInsight()" style="font-size: 11px; color: var(--text-secondary); background: none; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif;">Refresh</button>
+                            </div>
+                            <div style="font-size: 14px; color: var(--text-primary); line-height: 1.6;">${insight}</div>
+                        </div>
+                    `;
+                } catch(e) {
+                    area.innerHTML = `
+                        <div style="padding: 14px; background: var(--surface2); border-radius: 12px; border: 1px solid var(--border); font-size: 13px; color: var(--text-secondary);">
+                            Couldn't load insight. Check your connection and try again.
+                            <button onclick="app.getAIReadinessInsight()" style="display:block; margin-top: 8px; font-size: 13px; color: var(--text-primary); background: none; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; font-weight: 600;">Try again</button>
+                        </div>
+                    `;
+                    console.error('AI insight failed:', e);
+                }
             },
 
             calculateReadinessScore(log) {
@@ -7137,7 +8120,7 @@ Later: I'll build the secure backend!
                             <div style="font-size: 48px; font-weight: 800; color: var(--primary);">${unlocked}</div>
                             <div style="font-size: 14px; color: var(--text-secondary);">of ${all.length} unlocked</div>
                             <div style="background: var(--border); border-radius: 8px; height: 8px; margin: 12px 0; overflow: hidden;">
-                                <div style="background: var(--primary); width: ${Math.round(unlocked/all.length*100)}%; height: 100%; border-radius: 8px;"></div>
+                                <div style="background: var(--accent); color: #141414; width: ${Math.round(unlocked/all.length*100)}%; height: 100%; border-radius: 8px;"></div>
                             </div>
                         </div>
                         <div class="achievement-grid">
@@ -7320,7 +8303,7 @@ Later: I'll build the secure backend!
                 const totalSets = session.exercises.reduce((sum, ex) => sum + ex.sets.length, 0);
 
                 const html = `
-                    <div class="premium-stat-card" style="background: var(--gradient); color: white; margin-bottom: 16px;">
+                    <div class="premium-stat-card" style="background: var(--text-primary); color: white; margin-bottom: 16px;">
                         <div style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">${this.formatDate(session.date)}</div>
                         <div style="display: flex; gap: 24px; opacity: 0.9;">
                             <div>⏱️ ${duration}</div>
