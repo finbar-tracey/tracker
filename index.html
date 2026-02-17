@@ -2323,10 +2323,14 @@
             },
 
             async loadData() {
-                console.log('🔄 Loading data...');
+                console.log('🔄 Loading data... window.db =', !!window.db);
                 
                 if (window.db) {
                     try {
+                        // Test connection first with a simple query
+                        const testResult = await window.db.from('workout_sessions').select('count').limit(1);
+                        console.log('🔌 Connection test:', testResult);
+
                         // Load from Supabase
                         const [sessions, workouts, prs, logs, metrics, settings, achievements, goals] = await Promise.all([
                             this.dbLoad('workout_sessions', { user_id: 'default_user' }),
@@ -2338,6 +2342,15 @@
                             this.dbLoad('achievements', { user_id: 'default_user' }),
                             this.dbLoad('goals', { user_id: 'default_user' }),
                         ]);
+
+                        console.log('📦 Raw Supabase data:', { 
+                            sessions: sessions?.length, 
+                            workouts: workouts?.length,
+                            logs: logs?.length,
+                            settings: settings?.length
+                        });
+                        console.log('📦 Sessions raw:', JSON.stringify(sessions?.slice(0,2)));
+                        console.log('📦 Workouts raw:', JSON.stringify(workouts?.slice(0,2)));
 
                         this.workoutSessions = (sessions || []).map(s => ({
                             id: s.id, date: s.date, startTime: s.start_time,
@@ -2462,8 +2475,17 @@
                         user_id: 'default_user', exercise,
                         weight: pr.weight, reps: pr.reps, date: pr.date
                     }));
-                    if (rows.length > 0) await window.db.from('personal_records').upsert(rows, { onConflict: 'user_id,exercise' });
-                } catch(e) { console.error('savePersonalRecords:', e); }
+                    if (rows.length > 0) {
+                        const exercises = rows.map(r => r.exercise);
+                        await window.db.from('personal_records')
+                            .delete()
+                            .eq('user_id', 'default_user')
+                            .in('exercise', exercises);
+                        const { error } = await window.db.from('personal_records').insert(rows);
+                        if (error) throw error;
+                        console.log(`✅ Saved ${rows.length} PRs to Supabase`);
+                    }
+                } catch(e) { console.error('❌ savePersonalRecords failed:', e); }
             },
 
             async saveProgressPhotos() {
@@ -2515,7 +2537,8 @@
 
             async saveWorkoutSessions() {
                 localStorage.setItem('workoutSessions', JSON.stringify(this.workoutSessions));
-                if (!window.db) return;
+                console.log('💾 Saving sessions, window.db =', !!window.db, 'count =', this.workoutSessions.length);
+                if (!window.db) { console.warn('⚠️ No DB connection - saved to localStorage only'); return; }
                 try {
                     const rows = this.workoutSessions.map(s => ({
                         id: s.id?.toString(),
@@ -2524,11 +2547,13 @@
                         end_time: s.endTime, duration: s.duration,
                         notes: s.notes || null, exercises: s.exercises
                     }));
+                    console.log('💾 Upserting rows to Supabase:', JSON.stringify(rows[0]));
                     if (rows.length > 0) {
-                        await window.db.from('workout_sessions').upsert(rows);
-                        console.log(`💾 Saved ${rows.length} sessions to Supabase`);
+                        const { data, error } = await window.db.from('workout_sessions').upsert(rows).select();
+                        if (error) throw error;
+                        console.log(`✅ Saved ${rows.length} sessions to Supabase`, data);
                     }
-                } catch(e) { console.error('saveWorkoutSessions:', e); }
+                } catch(e) { console.error('❌ saveWorkoutSessions failed:', e); }
             },
 
             async saveHealthMetrics() {
@@ -2550,8 +2575,18 @@
                         fats: log.fats, eating_quality: log.eatingQuality,
                         notes: log.notes || null
                     }));
-                    if (rows.length > 0) await window.db.from('daily_logs').upsert(rows, { onConflict: 'user_id,date' });
-                } catch(e) { console.error('saveDailyLogs:', e); }
+                    if (rows.length > 0) {
+                        // Delete existing rows for these dates, then insert fresh
+                        const dates = rows.map(r => r.date);
+                        await window.db.from('daily_logs')
+                            .delete()
+                            .eq('user_id', 'default_user')
+                            .in('date', dates);
+                        const { error } = await window.db.from('daily_logs').insert(rows);
+                        if (error) throw error;
+                        console.log(`✅ Saved ${rows.length} daily logs to Supabase`);
+                    }
+                } catch(e) { console.error('❌ saveDailyLogs failed:', e); }
             },
 
             switchTab(tab) {
@@ -6587,7 +6622,9 @@ Tracked with Gym Tracker
                 document.getElementById('logHealthModal').remove();
                 document.getElementById('healthModal')?.remove();
                 
-                this.showHealthDashboard();
+                // Re-render health tab immediately so data shows
+                this.renderHealth();
+                this.showNotification('✅ Health data saved!');
             },
 
             calculateReadinessScore(log) {
