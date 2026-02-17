@@ -2307,16 +2307,8 @@
             ],
 
             async init() {
-                // Check if storage is available
-                if (!window.storage) {
-                    console.warn('Storage API not available - data will not persist');
-                    this.workouts = [];
-                    this.templates = [];
-                    this.bodyMetrics = [];
-                    this.personalRecords = {};
-                } else {
-                    await this.loadData();
-                }
+                // Always load data from Supabase/localStorage
+                await this.loadData();
                 
                 // Load theme preference
                 this.loadTheme();
