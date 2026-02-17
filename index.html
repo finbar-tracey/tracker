@@ -1181,6 +1181,510 @@
             color: var(--text-secondary);
             font-weight: 500;
         }
+        /* Muscle Heatmap */
+        .muscle-heatmap {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin: 16px 0;
+        }
+
+        .muscle-body {
+            position: relative;
+            width: 100%;
+        }
+
+        .muscle-body svg {
+            width: 100%;
+            height: auto;
+        }
+
+        .muscle-group-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .muscle-group-bar:last-child {
+            border-bottom: none;
+        }
+
+        .muscle-bar-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            width: 80px;
+            flex-shrink: 0;
+        }
+
+        .muscle-bar-track {
+            flex: 1;
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .muscle-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            background: var(--primary);
+            transition: width 0.6s ease;
+        }
+
+        .muscle-bar-fill.high { background: var(--primary); }
+        .muscle-bar-fill.medium { background: var(--warning); }
+        .muscle-bar-fill.low { background: var(--border); }
+
+        .muscle-bar-value {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            width: 40px;
+            text-align: right;
+        }
+
+        /* Plate Calculator */
+        .plate-calculator {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .plate-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            margin: 20px 0;
+            min-height: 60px;
+            flex-wrap: wrap;
+        }
+
+        .plate {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 11px;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .plate-25 { width: 20px; height: 56px; background: #FF3B47; }
+        .plate-20 { width: 18px; height: 50px; background: #0080FF; }
+        .plate-15 { width: 16px; height: 44px; background: #FFB800; }
+        .plate-10 { width: 14px; height: 38px; background: #2ecc71; }
+        .plate-5  { width: 12px; height: 32px; background: #fff; color: #333; border: 1px solid #ccc; }
+        .plate-2  { width: 10px; height: 26px; background: #888; }
+        .plate-1  { width: 8px; height: 20px; background: #aaa; }
+        .barbell  { width: 40px; height: 8px; background: var(--text-secondary); border-radius: 2px; }
+        .collar   { width: 6px; height: 16px; background: var(--text-secondary); border-radius: 2px; }
+
+        /* Calendar */
+        .workout-calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            margin: 12px 0;
+        }
+
+        .cal-header {
+            text-align: center;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            padding: 4px 0;
+            text-transform: uppercase;
+        }
+
+        .cal-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .cal-day.worked-out {
+            background: var(--primary);
+            color: white;
+            font-weight: 700;
+        }
+
+        .cal-day.today {
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .cal-day.today.worked-out {
+            border: none;
+            background: var(--primary);
+            color: white;
+        }
+
+        .cal-day.empty {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* PR Cards */
+        .pr-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .pr-card:last-child {
+            border-bottom: none;
+        }
+
+        .pr-exercise {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .pr-date {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .pr-weight {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+        }
+
+        .pr-unit {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        /* Active Workout Improvements */
+        .active-exercise-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            margin-bottom: 12px;
+            overflow: hidden;
+        }
+
+        .active-exercise-header {
+            padding: 14px 16px;
+            background: var(--chart-bg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .active-exercise-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .active-exercise-muscle {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .set-row {
+            display: grid;
+            grid-template-columns: 32px 1fr 1fr 1fr 32px;
+            gap: 8px;
+            align-items: center;
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .set-row:last-child {
+            border-bottom: none;
+        }
+
+        .set-number {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        .set-input {
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            text-align: center;
+            color: var(--text-primary);
+            width: 100%;
+        }
+
+        .set-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .set-label {
+            font-size: 10px;
+            color: var(--text-secondary);
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .set-delete {
+            background: none;
+            border: none;
+            color: var(--danger);
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px;
+            opacity: 0.6;
+        }
+
+        /* Nutrition Progress Bars */
+        .macro-ring-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin: 16px 0;
+        }
+
+        .macro-ring {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .macro-ring svg {
+            transform: rotate(-90deg);
+        }
+
+        .macro-ring-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .macro-ring-value {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .nutrition-bar-row {
+            margin-bottom: 14px;
+        }
+
+        .nutrition-bar-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .nutrition-bar-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .nutrition-bar-amounts {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .nutrition-bar-track {
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .nutrition-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.6s ease;
+        }
+
+        /* Warmup Sets */
+        .warmup-card {
+            background: linear-gradient(135deg, rgba(0,212,170,0.1), rgba(0,184,148,0.05));
+            border: 1px solid rgba(0,212,170,0.3);
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 12px;
+        }
+
+        .warmup-header {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+
+        .warmup-set-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(0,212,170,0.15);
+            font-size: 14px;
+        }
+
+        .warmup-set-row:last-child {
+            border-bottom: none;
+        }
+
+        .warmup-pct {
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+
+        .warmup-weight {
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* Weekly Report */
+        .report-stat {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .report-stat:last-child {
+            border-bottom: none;
+        }
+
+        .report-stat-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .report-stat-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .report-grade {
+            font-size: 48px;
+            font-weight: 800;
+            text-align: center;
+            margin: 16px 0 8px;
+            letter-spacing: -2px;
+        }
+
+        .report-grade-label {
+            text-align: center;
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        /* Achievement badges */
+        .achievement-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .achievement-badge {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            padding: 14px 8px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .achievement-badge.unlocked {
+            border-color: var(--primary);
+            background: rgba(0,212,170,0.05);
+        }
+
+        .achievement-badge.locked {
+            opacity: 0.4;
+        }
+
+        .achievement-icon {
+            font-size: 28px;
+        }
+
+        .achievement-name {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1.3;
+        }
+
+        .achievement-desc {
+            font-size: 10px;
+            color: var(--text-secondary);
+            line-height: 1.3;
+        }
+
+        /* Rest Timer improvements */
+        .rest-timer-overlay {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+            z-index: 500;
+            min-width: 240px;
+        }
+
+        .rest-timer-time {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: -1px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .rest-timer-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
     </style>
 </head>
 <body>
@@ -1444,6 +1948,33 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://jcsviqflqfltyvgrrykx.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_tQoKPW_bZx5p7-4kRaYXfA_GgW5Lmom';
+        
+        // Use window.db to avoid conflict with supabase library on window.supabase
+        window.db = null;
+        
+        function initSupabase(url, key) {
+            try {
+                // The CDN exposes createClient directly
+                const { createClient } = window.supabase;
+                window.db = createClient(url, key);
+                console.log('✅ Supabase connected!', window.db);
+                return true;
+            } catch (error) {
+                console.error('❌ Supabase init failed:', error);
+                return false;
+            }
+        }
+        
+        // Always connect - credentials are baked in
+        initSupabase(SUPABASE_URL, SUPABASE_KEY);
+        localStorage.setItem('supabaseUrl', SUPABASE_URL);
+        localStorage.setItem('supabaseKey', SUPABASE_KEY);
+    </script>
     <script>
         const app = {
             currentTab: 'today',
@@ -1471,13 +2002,46 @@
             currentSession: null,
             sessionStartTime: null,
 
-            // Universal save helper - ALWAYS uses localStorage
+            // Universal save helper - Supabase first, localStorage fallback
             save(key, data) {
                 try {
                     localStorage.setItem(key, JSON.stringify(data));
-                    console.log(`💾 Saved ${key}`);
                 } catch (error) {
                     console.error(`❌ Failed to save ${key}:`, error);
+                }
+            },
+
+            // Supabase Database Operations
+            async dbSave(table, data, conflict = null) {
+                if (!window.db) {
+                    this.save(table, data);
+                    return;
+                }
+                try {
+                    const { error } = conflict
+                        ? await window.db.from(table).upsert(data, { onConflict: conflict })
+                        : await window.db.from(table).upsert(data);
+                    if (error) throw error;
+                    console.log(`💾 Saved to Supabase: ${table}`);
+                } catch (error) {
+                    console.error(`❌ Supabase save failed for ${table}:`, error);
+                    this.save(table, data);
+                }
+            },
+
+            async dbLoad(table, filters = {}) {
+                if (!window.db) return null;
+                try {
+                    let query = window.db.from(table).select('*');
+                    Object.entries(filters).forEach(([key, val]) => {
+                        query = query.eq(key, val);
+                    });
+                    const { data, error } = await query;
+                    if (error) throw error;
+                    return data;
+                } catch (error) {
+                    console.error(`❌ Supabase load failed for ${table}:`, error);
+                    return null;
                 }
             },
             healthMetrics: [],
@@ -1761,178 +2325,233 @@
             async loadData() {
                 console.log('🔄 Loading data...');
                 
-                // Try localStorage FIRST (most reliable)
-                try {
-                    this.workouts = JSON.parse(localStorage.getItem('workouts') || '[]');
-                    this.templates = JSON.parse(localStorage.getItem('templates') || '[]');
-                    this.bodyMetrics = JSON.parse(localStorage.getItem('bodyMetrics') || '[]');
-                    this.personalRecords = JSON.parse(localStorage.getItem('personalRecords') || '{}');
-                    this.theme = localStorage.getItem('theme') || 'light';
-                    this.progressPhotos = JSON.parse(localStorage.getItem('progressPhotos') || '[]');
-                    this.settings = JSON.parse(localStorage.getItem('settings') || '{"restTimerDuration":90,"weightIncrement":2.5,"units":"kg","notificationsEnabled":true}');
-                    this.goals = JSON.parse(localStorage.getItem('goals') || '[]');
-                    this.achievements = JSON.parse(localStorage.getItem('achievements') || '[]');
-                    this.workoutNotes = JSON.parse(localStorage.getItem('workoutNotes') || '{}');
-                    this.customExercises = JSON.parse(localStorage.getItem('customExercises') || '[]');
-                    this.workoutSessions = JSON.parse(localStorage.getItem('workoutSessions') || '[]');
-                    this.healthMetrics = JSON.parse(localStorage.getItem('healthMetrics') || '[]');
-                    this.dailyLogs = JSON.parse(localStorage.getItem('dailyLogs') || '{}');
-                    
-                    // Merge custom exercises into main exercises array
-                    this.allExercises = [...this.exercises, ...this.customExercises];
-                    
-                    console.log(`✅ Loaded from localStorage: ${this.workouts.length} workouts, ${this.workoutSessions.length} sessions`);
-                } catch (error) {
-                    console.error('❌ Error loading data:', error);
-                    // Set defaults
-                    this.workouts = [];
-                    this.templates = [];
-                    this.bodyMetrics = [];
-                    this.personalRecords = {};
-                    this.theme = 'light';
-                    this.progressPhotos = [];
-                    this.settings = {
-                        restTimerDuration: 90,
-                        weightIncrement: 2.5,
-                        units: 'kg',
-                        notificationsEnabled: true
-                    };
-                    this.goals = [];
-                    this.achievements = [];
-                    this.workoutNotes = {};
-                    this.customExercises = [];
-                    this.workoutSessions = [];
-                    this.allExercises = this.exercises;
-                    this.healthMetrics = [];
-                    this.dailyLogs = {};
+                if (window.db) {
+                    try {
+                        // Load from Supabase
+                        const [sessions, workouts, prs, logs, metrics, settings, achievements, goals] = await Promise.all([
+                            this.dbLoad('workout_sessions', { user_id: 'default_user' }),
+                            this.dbLoad('workouts', { user_id: 'default_user' }),
+                            this.dbLoad('personal_records', { user_id: 'default_user' }),
+                            this.dbLoad('daily_logs', { user_id: 'default_user' }),
+                            this.dbLoad('body_metrics', { user_id: 'default_user' }),
+                            this.dbLoad('settings', { user_id: 'default_user' }),
+                            this.dbLoad('achievements', { user_id: 'default_user' }),
+                            this.dbLoad('goals', { user_id: 'default_user' }),
+                        ]);
+
+                        this.workoutSessions = (sessions || []).map(s => ({
+                            id: s.id, date: s.date, startTime: s.start_time,
+                            endTime: s.end_time, duration: s.duration,
+                            notes: s.notes, exercises: s.exercises || []
+                        }));
+
+                        this.workouts = (workouts || []).map(w => ({
+                            id: w.id, exercise: w.exercise, date: w.date,
+                            sets: w.sets || [], notes: w.notes
+                        }));
+
+                        this.personalRecords = {};
+                        (prs || []).forEach(pr => {
+                            this.personalRecords[pr.exercise] = {
+                                weight: pr.weight, reps: pr.reps, date: pr.date
+                            };
+                        });
+
+                        this.dailyLogs = {};
+                        (logs || []).forEach(log => {
+                            this.dailyLogs[log.date] = {
+                                sleep: log.sleep, sleepQuality: log.sleep_quality,
+                                rhr: log.rhr, hrv: log.hrv, energy: log.energy,
+                                stress: log.stress, soreness: log.soreness,
+                                steps: log.steps, calories: log.calories_burned,
+                                water: log.water, caloriesIn: log.calories_in,
+                                protein: log.protein, carbs: log.carbs,
+                                fats: log.fats, eatingQuality: log.eating_quality,
+                                notes: log.notes
+                            };
+                        });
+
+                        this.bodyMetrics = (metrics || []).map(m => ({
+                            date: m.date, weight: m.weight,
+                            bodyFat: m.body_fat, muscleMass: m.muscle_mass, notes: m.notes
+                        }));
+
+                        const s = settings?.[0];
+                        this.settings = s ? {
+                            restTimerDuration: s.rest_timer_duration || 90,
+                            weightIncrement: s.weight_increment || 2.5,
+                            units: s.units || 'kg',
+                            calTarget: s.cal_target || 2500,
+                            proteinTarget: s.protein_target || 160,
+                            carbTarget: s.carb_target || 250,
+                            fatTarget: s.fat_target || 80,
+                            theme: s.theme || 'light'
+                        } : this.settings;
+
+                        this.achievements = (achievements || []).map(a => a.achievement_id);
+                        this.goals = (goals || []);
+                        this.theme = this.settings.theme || 'light';
+
+                        console.log(`✅ Loaded from Supabase: ${this.workoutSessions.length} sessions, ${this.workouts.length} workouts`);
+                    } catch (error) {
+                        console.error('❌ Supabase load failed, using localStorage:', error);
+                        this.loadFromLocalStorage();
+                    }
+                } else {
+                    this.loadFromLocalStorage();
                 }
+
+                this.templates = JSON.parse(localStorage.getItem('templates') || '[]');
+                this.customExercises = JSON.parse(localStorage.getItem('customExercises') || '[]');
+                this.progressPhotos = JSON.parse(localStorage.getItem('progressPhotos') || '[]');
+                this.allExercises = [...this.exercises, ...this.customExercises];
+            },
+
+            loadFromLocalStorage() {
+                console.log('📦 Loading from localStorage...');
+                this.workouts = JSON.parse(localStorage.getItem('workouts') || '[]');
+                this.workoutSessions = JSON.parse(localStorage.getItem('workoutSessions') || '[]');
+                this.personalRecords = JSON.parse(localStorage.getItem('personalRecords') || '{}');
+                this.bodyMetrics = JSON.parse(localStorage.getItem('bodyMetrics') || '[]');
+                this.settings = JSON.parse(localStorage.getItem('settings') || '{"restTimerDuration":90,"weightIncrement":2.5,"units":"kg","calTarget":2500,"proteinTarget":160,"carbTarget":250,"fatTarget":80}');
+                this.goals = JSON.parse(localStorage.getItem('goals') || '[]');
+                this.achievements = JSON.parse(localStorage.getItem('achievements') || '[]');
+                this.workoutNotes = JSON.parse(localStorage.getItem('workoutNotes') || '{}');
+                this.dailyLogs = JSON.parse(localStorage.getItem('dailyLogs') || '{}');
+                this.healthMetrics = JSON.parse(localStorage.getItem('healthMetrics') || '[]');
+                this.theme = localStorage.getItem('theme') || 'light';
+                console.log(`✅ Loaded from localStorage: ${this.workouts.length} workouts`);
             },
 
             async saveWorkouts() {
-                if (window.storage) {
-                    try {
-                        await window.storage.set('workouts', JSON.stringify(this.workouts), false);
-                    } catch (error) {
-                        console.error('Failed to save to storage API:', error);
-                        localStorage.setItem('workouts', JSON.stringify(this.workouts));
-                    }
-                } else {
-                    localStorage.setItem('workouts', JSON.stringify(this.workouts));
-                }
-                console.log(`💾 Saved ${this.workouts.length} workouts`);
+                localStorage.setItem('workouts', JSON.stringify(this.workouts));
+                if (!window.db) return;
+                try {
+                    const rows = this.workouts.map(w => ({
+                        id: w.id || w.exercise + '_' + w.date,
+                        user_id: 'default_user',
+                        exercise: w.exercise, date: w.date,
+                        sets: w.sets, notes: w.notes || null
+                    }));
+                    if (rows.length > 0) await window.db.from('workouts').upsert(rows);
+                } catch(e) { console.error('saveWorkouts:', e); }
             },
 
             async saveTemplates() {
-                if (!window.storage) return;
-                try {
-                    await window.storage.set('templates', JSON.stringify(this.templates), false);
-                } catch (error) {
-                    console.error('Failed to save templates:', error);
-                }
+                localStorage.setItem('templates', JSON.stringify(this.templates));
             },
 
             async saveBodyMetrics() {
-                if (!window.storage) return;
+                localStorage.setItem('bodyMetrics', JSON.stringify(this.bodyMetrics));
+                if (!window.db) return;
                 try {
-                    await window.storage.set('bodyMetrics', JSON.stringify(this.bodyMetrics), false);
-                } catch (error) {
-                    console.error('Failed to save metrics:', error);
-                }
+                    const rows = this.bodyMetrics.map(m => ({
+                        user_id: 'default_user', date: m.date,
+                        weight: m.weight, body_fat: m.bodyFat,
+                        muscle_mass: m.muscleMass, notes: m.notes || null
+                    }));
+                    if (rows.length > 0) await window.db.from('body_metrics').upsert(rows);
+                } catch(e) { console.error('saveBodyMetrics:', e); }
             },
 
             async savePersonalRecords() {
-                if (!window.storage) return;
+                localStorage.setItem('personalRecords', JSON.stringify(this.personalRecords));
+                if (!window.db) return;
                 try {
-                    await window.storage.set('personalRecords', JSON.stringify(this.personalRecords), false);
-                } catch (error) {
-                    console.error('Failed to save PRs:', error);
-                }
+                    const rows = Object.entries(this.personalRecords).map(([exercise, pr]) => ({
+                        user_id: 'default_user', exercise,
+                        weight: pr.weight, reps: pr.reps, date: pr.date
+                    }));
+                    if (rows.length > 0) await window.db.from('personal_records').upsert(rows, { onConflict: 'user_id,exercise' });
+                } catch(e) { console.error('savePersonalRecords:', e); }
             },
 
             async saveProgressPhotos() {
-                if (!window.storage) return;
-                try {
-                    await window.storage.set('progressPhotos', JSON.stringify(this.progressPhotos), false);
-                } catch (error) {
-                    console.error('Failed to save photos:', error);
-                }
+                localStorage.setItem('progressPhotos', JSON.stringify(this.progressPhotos));
+            },
+
+            async saveTheme() {
+                localStorage.setItem('theme', this.theme);
             },
 
             async saveSettings() {
-                if (!window.storage) return;
+                localStorage.setItem('settings', JSON.stringify(this.settings));
+                if (!window.db) return;
                 try {
-                    await window.storage.set('settings', JSON.stringify(this.settings), false);
-                } catch (error) {
-                    console.error('Failed to save settings:', error);
-                }
+                    await window.db.from('settings').upsert({
+                        user_id: 'default_user',
+                        rest_timer_duration: this.settings.restTimerDuration,
+                        weight_increment: this.settings.weightIncrement,
+                        units: this.settings.units,
+                        cal_target: this.settings.calTarget,
+                        protein_target: this.settings.proteinTarget,
+                        carb_target: this.settings.carbTarget,
+                        fat_target: this.settings.fatTarget,
+                        theme: this.theme
+                    });
+                } catch(e) { console.error('saveSettings:', e); }
             },
 
             async saveGoals() {
-                if (!window.storage) return;
-                try {
-                    await window.storage.set('goals', JSON.stringify(this.goals), false);
-                } catch (error) {
-                    console.error('Failed to save goals:', error);
-                }
+                localStorage.setItem('goals', JSON.stringify(this.goals));
             },
 
             async saveAchievements() {
-                if (!window.storage) return;
+                localStorage.setItem('achievements', JSON.stringify(this.achievements));
+                if (!window.db) return;
                 try {
-                    await window.storage.set('achievements', JSON.stringify(this.achievements), false);
-                } catch (error) {
-                    console.error('Failed to save achievements:', error);
-                }
+                    const rows = this.achievements.map(id => ({ user_id: 'default_user', achievement_id: id }));
+                    if (rows.length > 0) await window.db.from('achievements').upsert(rows, { onConflict: 'user_id,achievement_id' });
+                } catch(e) { console.error('saveAchievements:', e); }
             },
 
             async saveWorkoutNotes() {
-                if (!window.storage) return;
-                try {
-                    await window.storage.set('workoutNotes', JSON.stringify(this.workoutNotes), false);
-                } catch (error) {
-                    console.error('Failed to save notes:', error);
-                }
+                localStorage.setItem('workoutNotes', JSON.stringify(this.workoutNotes));
             },
 
             async saveCustomExercises() {
-                if (!window.storage) return;
-                try {
-                    await window.storage.set('customExercises', JSON.stringify(this.customExercises), false);
-                } catch (error) {
-                    console.error('Failed to save custom exercises:', error);
-                }
+                localStorage.setItem('customExercises', JSON.stringify(this.customExercises));
             },
 
             async saveWorkoutSessions() {
-                if (window.storage) {
-                    try {
-                        await window.storage.set('workoutSessions', JSON.stringify(this.workoutSessions), false);
-                    } catch (error) {
-                        console.error('Failed to save sessions:', error);
-                        localStorage.setItem('workoutSessions', JSON.stringify(this.workoutSessions));
+                localStorage.setItem('workoutSessions', JSON.stringify(this.workoutSessions));
+                if (!window.db) return;
+                try {
+                    const rows = this.workoutSessions.map(s => ({
+                        id: s.id?.toString(),
+                        user_id: 'default_user',
+                        date: s.date, start_time: s.startTime,
+                        end_time: s.endTime, duration: s.duration,
+                        notes: s.notes || null, exercises: s.exercises
+                    }));
+                    if (rows.length > 0) {
+                        await window.db.from('workout_sessions').upsert(rows);
+                        console.log(`💾 Saved ${rows.length} sessions to Supabase`);
                     }
-                } else {
-                    localStorage.setItem('workoutSessions', JSON.stringify(this.workoutSessions));
-                }
-                console.log(`💾 Saved ${this.workoutSessions.length} sessions`);
+                } catch(e) { console.error('saveWorkoutSessions:', e); }
             },
 
             async saveHealthMetrics() {
-                if (!window.storage) return;
-                try {
-                    await window.storage.set('healthMetrics', JSON.stringify(this.healthMetrics), false);
-                } catch (error) {
-                    console.error('Failed to save health metrics:', error);
-                }
+                localStorage.setItem('healthMetrics', JSON.stringify(this.healthMetrics));
             },
 
             async saveDailyLogs() {
-                if (!window.storage) return;
+                localStorage.setItem('dailyLogs', JSON.stringify(this.dailyLogs));
+                if (!window.db) return;
                 try {
-                    await window.storage.set('dailyLogs', JSON.stringify(this.dailyLogs), false);
-                } catch (error) {
-                    console.error('Failed to save daily logs:', error);
-                }
+                    const rows = Object.entries(this.dailyLogs).map(([date, log]) => ({
+                        user_id: 'default_user', date,
+                        sleep: log.sleep, sleep_quality: log.sleepQuality,
+                        rhr: log.rhr, hrv: log.hrv, energy: log.energy,
+                        stress: log.stress, soreness: log.soreness,
+                        steps: log.steps, calories_burned: log.calories,
+                        water: log.water, calories_in: log.caloriesIn,
+                        protein: log.protein, carbs: log.carbs,
+                        fats: log.fats, eating_quality: log.eatingQuality,
+                        notes: log.notes || null
+                    }));
+                    if (rows.length > 0) await window.db.from('daily_logs').upsert(rows, { onConflict: 'user_id,date' });
+                } catch(e) { console.error('saveDailyLogs:', e); }
             },
 
             switchTab(tab) {
@@ -2410,121 +3029,301 @@
             },
 
             renderAnalytics() {
-                const workouts = this.getWorkoutsInRange();
-                
-                if (workouts.length === 0) {
-                    document.getElementById('analyticsContent').innerHTML = `
-                        <div class="empty-state">
-                            <div class="empty-icon">📊</div>
-                            <div class="empty-text">No workout data yet</div>
-                        </div>
-                    `;
-                    return;
-                }
-                
-                // Time range selector
                 let html = `
-                    <div class="time-range-selector">
-                        <button class="time-range-btn ${this.timeRange === '7days' ? 'active' : ''}" onclick="app.setTimeRange('7days')">7 Days</button>
-                        <button class="time-range-btn ${this.timeRange === '30days' ? 'active' : ''}" onclick="app.setTimeRange('30days')">30 Days</button>
-                        <button class="time-range-btn ${this.timeRange === '90days' ? 'active' : ''}" onclick="app.setTimeRange('90days')">90 Days</button>
-                        <button class="time-range-btn ${this.timeRange === 'all' ? 'active' : ''}" onclick="app.setTimeRange('all')">All Time</button>
+                    <div class="section-header">
+                        <div class="section-title">Stats & Analytics</div>
                     </div>
                 `;
-                
-                // Summary stats
-                const totalWorkouts = [...new Set(workouts.map(w => w.date))].length;
-                const totalSets = workouts.reduce((sum, w) => sum + w.sets.length, 0);
-                const totalVolume = workouts.reduce((sum, w) => 
-                    sum + w.sets.reduce((s, set) => s + ((set.weight || 0) * (set.reps || 0)), 0), 0
-                );
-                const avgVolume = totalWorkouts > 0 ? Math.round(totalVolume / totalWorkouts) : 0;
-                
-                // Get previous period for comparison
-                const prevWorkouts = this.getWorkoutsInRange(true);
-                const prevVolume = prevWorkouts.reduce((sum, w) => 
-                    sum + w.sets.reduce((s, set) => s + ((set.weight || 0) * (set.reps || 0)), 0), 0
-                );
-                const volumeChange = prevVolume > 0 ? Math.round(((totalVolume - prevVolume) / prevVolume) * 100) : 0;
-                
-                html += `
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-value">${totalWorkouts}</div>
-                            <div class="stat-label">Workouts</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value">${totalSets}</div>
-                            <div class="stat-label">Total Sets</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value">${this.formatNumber(totalVolume)}kg</div>
-                            <div class="stat-label">Total Volume</div>
-                            ${volumeChange !== 0 ? `<div class="stat-change ${volumeChange > 0 ? 'positive' : 'negative'}">${volumeChange > 0 ? '+' : ''}${volumeChange}% vs previous</div>` : ''}
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value">${this.formatNumber(avgVolume)}kg</div>
-                            <div class="stat-label">Avg per Workout</div>
-                        </div>
-                    </div>
-                `;
-                
-                // Muscle Group Volume Distribution
-                html += this.renderMuscleGroupVolume(workouts);
-                
-                // Trends & Insights
-                html += this.addTrendAnalysis();
-                
-                // Volume chart
-                html += this.renderVolumeChart(workouts);
-                
-                // 1RM Predictions
-                html += this.render1RMPredictions();
-                
-                // Top exercises
-                const exerciseCounts = {};
-                workouts.forEach(w => {
-                    exerciseCounts[w.exercise] = (exerciseCounts[w.exercise] || 0) + 1;
-                });
-                
-                const topExercises = Object.entries(exerciseCounts)
-                    .sort((a, b) => b[1] - a[1])
-                    .slice(0, 5);
-                
-                html += `
-                    <div class="card">
-                        <div class="card-title" style="margin-bottom: 12px;">Most Performed Exercises</div>
-                        ${topExercises.map(([exercise, count]) => `
-                            <div class="history-item" onclick="app.showExerciseProgress('${exercise}')">
-                                <div class="history-date">${exercise}</div>
-                                <div class="history-sets">${count} workouts</div>
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
-                
+
+                // Workout Calendar
+                html += this.renderWorkoutCalendar();
+
                 // Personal Records
-                html += `
-                    <div class="card">
-                        <div class="card-title" style="margin-bottom: 12px;">🏆 Personal Records</div>
-                        ${Object.entries(this.personalRecords).slice(0, 5).map(([exercise, weight]) => `
-                            <div class="history-item">
-                                <div class="history-date">${exercise}</div>
-                                <div class="history-sets">${weight}kg</div>
-                            </div>
-                        `).join('')}
-                        ${Object.keys(this.personalRecords).length === 0 ? '<div class="empty-text">No PRs yet - keep training!</div>' : ''}
-                    </div>
-                `;
-                
-                // Export button
-                html += `
-                    <button class="btn btn-secondary" onclick="app.showExportModal()">📤 Export Data</button>
-                `;
-                
+                html += this.renderPersonalRecords();
+
+                // Muscle Volume Heatmap
+                html += this.renderMuscleHeatmap();
+
+                // Plate Calculator
+                html += this.renderPlateCalculator();
+
+                // Trend Analysis
+                this.addTrendAnalysis();
+
                 document.getElementById('analyticsContent').innerHTML = html;
+                this.addTrendAnalysis();
             },
 
+            renderWorkoutCalendar() {
+                const today = new Date();
+                const year = today.getFullYear();
+                const month = today.getMonth();
+                
+                const firstDay = new Date(year, month, 1).getDay();
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                const monthName = today.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+                // Get workout days this month
+                const workoutDays = new Set();
+                const allSessions = [...this.workoutSessions, ...this.workouts.map(w => ({ date: w.date }))];
+                allSessions.forEach(s => {
+                    const d = new Date(s.date);
+                    if (d.getMonth() === month && d.getFullYear() === year) {
+                        workoutDays.add(d.getDate());
+                    }
+                });
+
+                const days = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+                
+                let calHtml = `
+                    <div class="premium-stat-card">
+                        <div class="premium-stat-header">${monthName}</div>
+                        <div class="workout-calendar">
+                            ${days.map(d => `<div class="cal-header">${d}</div>`).join('')}
+                            ${Array(firstDay).fill(0).map(() => `<div class="cal-day empty"></div>`).join('')}
+                            ${Array.from({length: daysInMonth}, (_, i) => i + 1).map(day => {
+                                const isToday = day === today.getDate();
+                                const hasWorkout = workoutDays.has(day);
+                                let cls = 'cal-day';
+                                if (hasWorkout) cls += ' worked-out';
+                                if (isToday) cls += ' today';
+                                return `<div class="${cls}">${day}</div>`;
+                            }).join('')}
+                        </div>
+                        <div style="display: flex; gap: 16px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border);">
+                            <div style="display: flex; align-items: center; gap: 6px;">
+                                <div style="width: 12px; height: 12px; border-radius: 3px; background: var(--primary);"></div>
+                                <div style="font-size: 12px; color: var(--text-secondary);">Trained (${workoutDays.size} days)</div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 6px;">
+                                <div style="width: 12px; height: 12px; border-radius: 3px; border: 2px solid var(--primary);"></div>
+                                <div style="font-size: 12px; color: var(--text-secondary);">Today</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                return calHtml;
+            },
+
+            renderPersonalRecords() {
+                const prs = this.personalRecords;
+                const prList = Object.entries(prs).sort((a, b) => b[1].weight - a[1].weight);
+
+                if (prList.length === 0) {
+                    return `
+                        <div class="premium-stat-card">
+                            <div class="premium-stat-header">Personal Records</div>
+                            <div style="text-align: center; padding: 20px; color: var(--text-secondary); font-size: 14px;">
+                                Complete workouts to see your PRs here!
+                            </div>
+                        </div>
+                    `;
+                }
+
+                return `
+                    <div class="premium-stat-card">
+                        <div class="premium-stat-header">Personal Records 🏆</div>
+                        ${prList.slice(0, 10).map(([exercise, pr]) => `
+                            <div class="pr-card">
+                                <div>
+                                    <div class="pr-exercise">${exercise}</div>
+                                    <div class="pr-date">${pr.date || 'All time'} · ${pr.reps} reps</div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <span class="pr-weight">${pr.weight}</span>
+                                    <span class="pr-unit">kg</span>
+                                </div>
+                            </div>
+                        `).join('')}
+                        ${prList.length > 10 ? `
+                            <div style="text-align: center; padding: 12px; font-size: 13px; color: var(--text-secondary);">
+                                + ${prList.length - 10} more records
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            },
+
+            renderMuscleHeatmap() {
+                const muscleGroups = [
+                    'Chest', 'Back', 'Shoulders', 'Biceps', 'Triceps',
+                    'Quads', 'Hamstrings', 'Glutes', 'Abs', 'Calves'
+                ];
+
+                // Calculate volume per muscle group this week
+                const weekWorkouts = this.getWorkoutsInDays(7);
+                const muscleVolume = {};
+                
+                muscleGroups.forEach(m => muscleVolume[m] = 0);
+
+                weekWorkouts.forEach(w => {
+                    const exercise = this.allExercises?.find(e => e.name === w.exercise);
+                    if (exercise?.muscleGroups) {
+                        const volume = w.sets.reduce((sum, set) => sum + (set.weight * set.reps), 0);
+                        exercise.muscleGroups.forEach(mg => {
+                            if (muscleVolume[mg] !== undefined) {
+                                muscleVolume[mg] += volume;
+                            }
+                        });
+                    }
+                });
+
+                const maxVolume = Math.max(...Object.values(muscleVolume), 1);
+
+                return `
+                    <div class="premium-stat-card">
+                        <div class="premium-stat-header">Muscle Volume - This Week</div>
+                        ${muscleGroups.map(muscle => {
+                            const vol = muscleVolume[muscle] || 0;
+                            const pct = Math.round((vol / maxVolume) * 100);
+                            const level = pct > 60 ? 'high' : pct > 20 ? 'medium' : 'low';
+                            return `
+                                <div class="muscle-group-bar">
+                                    <div class="muscle-bar-label">${muscle}</div>
+                                    <div class="muscle-bar-track">
+                                        <div class="muscle-bar-fill ${level}" style="width: ${pct}%"></div>
+                                    </div>
+                                    <div class="muscle-bar-value">${vol > 0 ? this.formatNumber(vol) + 'kg' : '—'}</div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                `;
+            },
+
+            renderPlateCalculator() {
+                return `
+                    <div class="premium-stat-card">
+                        <div class="premium-stat-header">Plate Calculator</div>
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                            <div style="flex: 1;">
+                                <div class="metric-label-small">Target Weight (kg)</div>
+                                <input type="number" id="plateCalcInput" class="set-input" 
+                                    style="width: 100%; margin-top: 6px; font-size: 24px; padding: 12px;"
+                                    placeholder="100" min="20" step="2.5"
+                                    oninput="app.updatePlateCalc()">
+                            </div>
+                            <div style="flex: 1;">
+                                <div class="metric-label-small">Bar Weight (kg)</div>
+                                <select id="barWeight" class="set-input" style="width: 100%; margin-top: 6px;"
+                                    onchange="app.updatePlateCalc()">
+                                    <option value="20">20kg (Standard)</option>
+                                    <option value="15">15kg (Women's)</option>
+                                    <option value="10">10kg (Technique)</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div id="plateDisplay" class="plate-display">
+                            <div style="color: var(--text-secondary); font-size: 14px;">Enter a weight above</div>
+                        </div>
+                        
+                        <div id="plateList" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border);">
+                        </div>
+                    </div>
+                `;
+            },
+
+            updatePlateCalc() {
+                const target = parseFloat(document.getElementById('plateCalcInput')?.value) || 0;
+                const barWeight = parseFloat(document.getElementById('barWeight')?.value) || 20;
+                
+                const plateDisplay = document.getElementById('plateDisplay');
+                const plateList = document.getElementById('plateList');
+                
+                if (!plateDisplay || !plateList) return;
+                
+                if (target <= barWeight) {
+                    plateDisplay.innerHTML = `
+                        <div style="color: var(--text-secondary); font-size: 14px; text-align: center;">
+                            ${target > 0 ? 'Just the bar!' : 'Enter a weight above'}
+                        </div>
+                    `;
+                    plateList.innerHTML = '';
+                    return;
+                }
+
+                const weightPerSide = (target - barWeight) / 2;
+                const availablePlates = [25, 20, 15, 10, 5, 2.5, 1.25];
+                const platesNeeded = [];
+                let remaining = weightPerSide;
+
+                availablePlates.forEach(plate => {
+                    while (remaining >= plate - 0.001) {
+                        platesNeeded.push(plate);
+                        remaining -= plate;
+                    }
+                });
+
+                // Visual plate display
+                const plateColors = {
+                    25: '#FF3B47', 20: '#0080FF', 15: '#FFB800',
+                    10: '#2ecc71', 5: '#fff', 2.5: '#888', 1.25: '#aaa'
+                };
+                
+                const plateHeights = {
+                    25: 56, 20: 50, 15: 44, 10: 38, 5: 32, 2.5: 26, 1.25: 20
+                };
+
+                // Build visual
+                let visualHtml = `<div class="collar"></div>`;
+                
+                // Plates left side (reversed)
+                [...platesNeeded].reverse().forEach(plate => {
+                    const h = plateHeights[plate] || 30;
+                    const bg = plateColors[plate] || '#888';
+                    const textColor = plate === 5 ? '#333' : 'white';
+                    visualHtml += `
+                        <div class="plate" style="width: 16px; height: ${h}px; background: ${bg}; color: ${textColor}; writing-mode: vertical-rl; font-size: 9px;">
+                            ${plate}
+                        </div>
+                    `;
+                });
+
+                visualHtml += `<div class="barbell"></div>`;
+                
+                // Plates right side
+                platesNeeded.forEach(plate => {
+                    const h = plateHeights[plate] || 30;
+                    const bg = plateColors[plate] || '#888';
+                    const textColor = plate === 5 ? '#333' : 'white';
+                    visualHtml += `
+                        <div class="plate" style="width: 16px; height: ${h}px; background: ${bg}; color: ${textColor}; writing-mode: vertical-rl; font-size: 9px;">
+                            ${plate}
+                        </div>
+                    `;
+                });
+                
+                visualHtml += `<div class="collar"></div>`;
+
+                plateDisplay.innerHTML = visualHtml;
+
+                // Plate count list
+                const plateCounts = {};
+                platesNeeded.forEach(p => plateCounts[p] = (plateCounts[p] || 0) + 1);
+                
+                const listItems = Object.entries(plateCounts)
+                    .sort((a, b) => b[0] - a[0])
+                    .map(([plate, count]) => `
+                        <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--border);">
+                            <div style="font-size: 14px; color: var(--text-primary);">${plate}kg plates</div>
+                            <div style="font-size: 14px; font-weight: 700; color: var(--primary);">× ${count * 2} (${count} each side)</div>
+                        </div>
+                    `).join('');
+
+                plateList.innerHTML = `
+                    <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">
+                        ${target}kg total · ${barWeight}kg bar · ${weightPerSide}kg per side
+                    </div>
+                    ${listItems}
+                    ${Math.abs(remaining) > 0.001 ? `
+                        <div style="color: var(--warning); font-size: 12px; margin-top: 8px;">
+                            ⚠️ Can't make exact weight. Nearest: ${(target - remaining * 2).toFixed(2)}kg
+                        </div>
+                    ` : ''}
+                `;
+            },
             getWorkoutsInRange(previous = false) {
                 const now = new Date();
                 let startDate = new Date();
@@ -3906,7 +4705,25 @@ Tracked with Gym Tracker
 
             // More Tab - Settings, Goals, Achievements, Metrics
             renderMore() {
+                const isConnected = !!window.db;
                 let html = `
+                    <!-- Database Connection Status -->
+                    <div class="premium-stat-card" style="margin-bottom: 16px; border-color: ${isConnected ? 'var(--primary)' : 'var(--warning)'};">
+                        <div style="display: flex; align-items: center; justify-content: space-between;">
+                            <div>
+                                <div style="font-size: 15px; font-weight: 700; color: var(--text-primary);">
+                                    ${isConnected ? '🟢 Database Connected' : '🟡 No Database'}
+                                </div>
+                                <div style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">
+                                    ${isConnected ? 'Data syncing to Supabase' : 'Data only saved locally'}
+                                </div>
+                            </div>
+                            <button onclick="app.showSupabaseSetup()" style="background: ${isConnected ? 'var(--border)' : 'var(--primary)'}; color: ${isConnected ? 'var(--text-primary)' : 'white'}; border: none; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">
+                                ${isConnected ? 'Change' : 'Connect'}
+                            </button>
+                        </div>
+                    </div>
+
                     <div class="quick-actions" style="margin-bottom: 20px;">
                         <div class="quick-action-btn" onclick="app.switchTab('templates')">
                             <div class="quick-action-icon">📋</div>
@@ -3938,7 +4755,7 @@ Tracked with Gym Tracker
                         <div class="card-title" style="margin-bottom: 12px;">App Info</div>
                         <div class="history-item">
                             <div class="history-date">Version</div>
-                            <div class="history-sets">3.2 - History Edition</div>
+                            <div class="history-sets">3.2 - Supabase Edition</div>
                         </div>
                         <div class="history-item">
                             <div class="history-date">Total Workouts</div>
@@ -3952,13 +4769,145 @@ Tracked with Gym Tracker
                             <div class="history-date">Achievements Unlocked</div>
                             <div class="history-sets">${this.achievements.length}</div>
                         </div>
+                        <div class="history-item">
+                            <div class="history-date">Storage</div>
+                            <div class="history-sets">${isConnected ? '☁️ Supabase' : '📱 Local only'}</div>
+                        </div>
                     </div>
                 `;
 
                 document.getElementById('moreContent').innerHTML = html;
             },
 
+            showSupabaseSetup() {
+                const savedUrl = localStorage.getItem('supabaseUrl') || '';
+                const savedKey = localStorage.getItem('supabaseKey') || '';
+
+                document.body.insertAdjacentHTML('beforeend', `
+                    <div class="modal active" id="supabaseModal" style="display: flex;">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h2 class="modal-title">Connect Database</h2>
+                                <button class="close-btn" onclick="document.getElementById('supabaseModal').remove()">×</button>
+                            </div>
+
+                            <div style="background: rgba(0,212,170,0.1); border: 1px solid rgba(0,212,170,0.3); border-radius: 12px; padding: 14px; margin-bottom: 20px; font-size: 13px; line-height: 1.6; color: var(--text-secondary);">
+                                <strong style="color: var(--primary);">How to get your credentials:</strong><br>
+                                1. Go to <strong>window.db.com</strong> → Your project<br>
+                                2. Click <strong>Settings → API</strong><br>
+                                3. Copy <strong>Project URL</strong> and <strong>anon/public key</strong>
+                            </div>
+
+                            <div class="metric-input-group">
+                                <label class="metric-label">Project URL</label>
+                                <input type="text" id="sbUrl" class="metric-input"
+                                    value="${savedUrl}"
+                                    placeholder="https://xxxxxxxxxxxx.window.db.co"
+                                    style="font-size: 13px;">
+                            </div>
+
+                            <div class="metric-input-group">
+                                <label class="metric-label">Anon / Public Key</label>
+                                <input type="text" id="sbKey" class="metric-input"
+                                    value="${savedKey}"
+                                    placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                                    style="font-size: 13px;">
+                            </div>
+
+                            <div id="sbStatus" style="margin: 12px 0; font-size: 13px; min-height: 20px;"></div>
+
+                            <button class="btn btn-primary" onclick="app.testAndSaveSupabase()">
+                                🔌 Test & Connect
+                            </button>
+                            ${window.db ? `
+                                <button class="btn btn-secondary" onclick="app.disconnectSupabase()" style="margin-top: 8px; color: var(--danger); border-color: var(--danger);">
+                                    Disconnect
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `);
+            },
+
+            async testAndSaveSupabase() {
+                const url = document.getElementById('sbUrl').value.trim();
+                const key = document.getElementById('sbKey').value.trim();
+                const status = document.getElementById('sbStatus');
+
+                if (!url || !key) {
+                    status.innerHTML = '<span style="color: var(--danger);">❌ Please enter both URL and key</span>';
+                    return;
+                }
+
+                status.innerHTML = '<span style="color: var(--text-secondary);">🔄 Testing connection...</span>';
+
+                try {
+                    const { createClient } = window.supabase;
+                    const testClient = createClient(url, key);
+                    const { error } = await testClient.from('settings').select('user_id').limit(1);
+
+                    if (error && error.code !== 'PGRST116') {
+                        // PGRST116 = table not found, which means we connected but need to run schema
+                        if (error.message.includes('relation') || error.code === '42P01') {
+                            status.innerHTML = '<span style="color: var(--warning);">⚠️ Connected! But tables not found. Run the SQL schema first (see below).</span>';
+                            document.getElementById('sbStatus').insertAdjacentHTML('afterend', `
+                                <div style="background: var(--chart-bg); border-radius: 8px; padding: 12px; margin: 12px 0; font-size: 12px;">
+                                    <strong>Run this in Supabase SQL Editor:</strong><br><br>
+                                    <a href="https://window.db.com/dashboard/project/_/sql" target="_blank" style="color: var(--primary);">Open SQL Editor →</a><br><br>
+                                    Then paste the schema from the file I'll provide.
+                                </div>
+                            `);
+                            return;
+                        }
+                        throw error;
+                    }
+
+                    // Success!
+                    localStorage.setItem('supabaseUrl', url);
+                    localStorage.setItem('supabaseKey', key);
+                    window.db = testClient;
+
+                    status.innerHTML = '<span style="color: var(--success);">✅ Connected successfully!</span>';
+
+                    setTimeout(async () => {
+                        document.getElementById('supabaseModal').remove();
+                        this.showNotification('🟢 Database connected! Syncing data...');
+                        // Reload data from Supabase
+                        await this.loadData();
+                        this.renderToday();
+                        this.renderMore();
+                    }, 1000);
+
+                } catch (error) {
+                    console.error('Supabase test failed:', error);
+                    status.innerHTML = `<span style="color: var(--danger);">❌ Failed: ${error.message}</span>`;
+                }
+            },
+
+            disconnectSupabase() {
+                localStorage.removeItem('supabaseUrl');
+                localStorage.removeItem('supabaseKey');
+                window.db = null;
+                document.getElementById('supabaseModal').remove();
+                this.showNotification('🔌 Database disconnected');
+                this.renderMore();
+            },
+
             showSection(section) {
+                if (section === 'achievements') {
+                    document.body.insertAdjacentHTML('beforeend', `
+                        <div class="modal active" id="achievementsModal" style="display: flex;">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h2 class="modal-title">Achievements</h2>
+                                    <button class="close-btn" onclick="document.getElementById('achievementsModal').remove()">×</button>
+                                </div>
+                                ${this.renderAchievementsPage()}
+                            </div>
+                        </div>
+                    `);
+                    return;
+                }
                 if (section === 'metrics') {
                     this.switchTab('metrics');
                 } else if (section === 'goals') {
@@ -4719,6 +5668,11 @@ Tracked with Gym Tracker
                                 <button class="btn btn-secondary" onclick="app.addSetToSessionExercise(${exIndex})" style="margin-top: 8px;">
                                     + Add Set
                                 </button>
+                                ${exercise.sets[0]?.weight ? `
+                                    <button class="btn btn-secondary" onclick="app.showWarmupSets('${exercise.name}', ${exercise.sets[0].weight})" style="margin-top: 8px; background: rgba(0,212,170,0.1); border-color: var(--primary); color: var(--primary);">
+                                        🔥 Warm-up Sets
+                                    </button>
+                                ` : ''}
                             </div>
                         `;
                     }).join('')}
@@ -4891,6 +5845,7 @@ Tracked with Gym Tracker
                 
                 // Check achievements
                 this.checkAchievements();
+                this.checkAndUnlockAchievements();
                 
                 // Clear session
                 clearInterval(this.sessionTimerInterval);
@@ -5029,7 +5984,10 @@ Tracked with Gym Tracker
                 let html = `
                     <div class="section-header">
                         <div class="section-title">Health <span style="font-size: 10px; color: var(--text-secondary);">v3.1</span></div>
-                        <div class="section-action" onclick="app.logDailyHealth()">+ Log</div>
+                        <div style="display: flex; gap: 12px;">
+                            <div class="section-action" onclick="app.showWeeklyReport()">Weekly Report</div>
+                            <div class="section-action" onclick="app.logDailyHealth()">+ Log</div>
+                        </div>
                     </div>
 
                     ${!this.garminConnected ? `
@@ -5162,39 +6120,76 @@ Tracked with Gym Tracker
                     `;
                 }
                 
-                // Nutrition (Premium cards)
+                // Nutrition (Premium cards with progress bars)
                 if (todayLog && (todayLog.caloriesIn || todayLog.protein)) {
+                    const calTarget = this.settings.calTarget || 2500;
+                    const proteinTarget = this.settings.proteinTarget || 160;
+                    const carbTarget = this.settings.carbTarget || 250;
+                    const fatTarget = this.settings.fatTarget || 80;
+
+                    const calPct = Math.min(100, Math.round((todayLog.caloriesIn / calTarget) * 100));
+                    const proteinPct = Math.min(100, Math.round((todayLog.protein / proteinTarget) * 100));
+                    const carbPct = Math.min(100, Math.round((todayLog.carbs / carbTarget) * 100));
+                    const fatPct = Math.min(100, Math.round((todayLog.fats / fatTarget) * 100));
+
                     html += `
                         <div class="premium-stat-card">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                                <div class="premium-stat-header" style="margin: 0;">Nutrition</div>
+                                <div style="font-size: 12px; color: var(--text-secondary);" onclick="app.showNutritionTargets()" style="cursor: pointer;">Set Targets ›</div>
+                            </div>
+
+                            ${todayLog.caloriesIn ? `
+                                <div class="nutrition-bar-row">
+                                    <div class="nutrition-bar-header">
+                                        <div class="nutrition-bar-name">Calories</div>
+                                        <div class="nutrition-bar-amounts">${todayLog.caloriesIn} / ${calTarget} kcal</div>
+                                    </div>
+                                    <div class="nutrition-bar-track">
+                                        <div class="nutrition-bar-fill" style="width: ${calPct}%; background: ${calPct > 110 ? 'var(--danger)' : calPct > 90 ? 'var(--success)' : 'var(--primary)'};"></div>
+                                    </div>
+                                </div>
+                            ` : ''}
+                            ${todayLog.protein ? `
+                                <div class="nutrition-bar-row">
+                                    <div class="nutrition-bar-header">
+                                        <div class="nutrition-bar-name">Protein</div>
+                                        <div class="nutrition-bar-amounts">${todayLog.protein}g / ${proteinTarget}g</div>
+                                    </div>
+                                    <div class="nutrition-bar-track">
+                                        <div class="nutrition-bar-fill" style="width: ${proteinPct}%; background: #FF6B35;"></div>
+                                    </div>
+                                </div>
+                            ` : ''}
+                            ${todayLog.carbs ? `
+                                <div class="nutrition-bar-row">
+                                    <div class="nutrition-bar-header">
+                                        <div class="nutrition-bar-name">Carbs</div>
+                                        <div class="nutrition-bar-amounts">${todayLog.carbs}g / ${carbTarget}g</div>
+                                    </div>
+                                    <div class="nutrition-bar-track">
+                                        <div class="nutrition-bar-fill" style="width: ${carbPct}%; background: #FFB800;"></div>
+                                    </div>
+                                </div>
+                            ` : ''}
+                            ${todayLog.fats ? `
+                                <div class="nutrition-bar-row">
+                                    <div class="nutrition-bar-header">
+                                        <div class="nutrition-bar-name">Fats</div>
+                                        <div class="nutrition-bar-amounts">${todayLog.fats}g / ${fatTarget}g</div>
+                                    </div>
+                                    <div class="nutrition-bar-track">
+                                        <div class="nutrition-bar-fill" style="width: ${fatPct}%; background: #9B59B6;"></div>
+                                    </div>
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                } else if (!todayLog) {
+                    html += `
+                        <div class="premium-stat-card" style="opacity: 0.6;">
                             <div class="premium-stat-header">Nutrition</div>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 12px;">
-                                ${todayLog.caloriesIn ? `
-                                    <div>
-                                        <div class="metric-label-small">Calories</div>
-                                        <div class="metric-value-large">${todayLog.caloriesIn}</div>
-                                    </div>
-                                ` : ''}
-                                ${todayLog.protein ? `
-                                    <div>
-                                        <div class="metric-label-small">Protein</div>
-                                        <div class="metric-value-large">${todayLog.protein}g</div>
-                                    </div>
-                                ` : ''}
-                            </div>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                                ${todayLog.carbs ? `
-                                    <div>
-                                        <div class="metric-label-small">Carbs</div>
-                                        <div class="metric-value-small">${todayLog.carbs}g</div>
-                                    </div>
-                                ` : ''}
-                                ${todayLog.fats ? `
-                                    <div>
-                                        <div class="metric-label-small">Fats</div>
-                                        <div class="metric-value-small">${todayLog.fats}g</div>
-                                    </div>
-                                ` : ''}
-                            </div>
+                            <div style="font-size: 13px; color: var(--text-secondary);">Log today's data to track nutrition</div>
                         </div>
                     `;
                 }
@@ -5854,6 +6849,274 @@ a backend server for full security.
 For now: Continue manual logging
 Later: I'll build the secure backend!
                 `);
+            },
+
+            // Weekly Health Report
+            showWeeklyReport() {
+                const weekWorkouts = this.getWorkoutsInDays(7);
+                const weekSessions = this.workoutSessions.filter(s => {
+                    const d = new Date(s.startTime);
+                    return (Date.now() - d.getTime()) < 7 * 24 * 60 * 60 * 1000;
+                });
+                const weekLogs = this.getWeeklyHealthData();
+
+                const totalVolume = weekWorkouts.reduce((sum, w) =>
+                    sum + w.sets.reduce((s, set) => s + (set.weight * set.reps), 0), 0
+                );
+                const avgSleep = this.calculateAverage(weekLogs.map(d => d.sleep).filter(Boolean));
+                const avgEnergy = this.calculateAverage(weekLogs.map(d => d.energy).filter(Boolean));
+                const avgProtein = this.calculateAverage(weekLogs.map(d => d.protein).filter(Boolean));
+                const workoutDays = weekSessions.length || [...new Set(weekWorkouts.map(w => w.date))].length;
+
+                // Grade calculation
+                let score = 0;
+                if (workoutDays >= 4) score += 30;
+                else if (workoutDays >= 3) score += 20;
+                else if (workoutDays >= 2) score += 10;
+                if (avgSleep >= 7.5) score += 25;
+                else if (avgSleep >= 6.5) score += 15;
+                if (avgProtein >= 150) score += 25;
+                else if (avgProtein >= 100) score += 15;
+                if (avgEnergy >= 7) score += 20;
+                else if (avgEnergy >= 5) score += 10;
+
+                const grade = score >= 85 ? 'A' : score >= 70 ? 'B' : score >= 55 ? 'C' : score >= 40 ? 'D' : 'F';
+                const gradeColor = grade === 'A' ? 'var(--success)' : grade === 'B' ? '#0080FF' : grade === 'C' ? 'var(--warning)' : 'var(--danger)';
+                const gradeMsg = {
+                    'A': 'Exceptional week! 🔥',
+                    'B': 'Solid performance 💪',
+                    'C': 'Room to improve 📈',
+                    'D': 'Tough week, keep going 🙏',
+                    'F': 'Let\'s reset and go again 🔄'
+                }[grade];
+
+                const html = `
+                    <div class="report-grade" style="color: ${gradeColor};">${grade}</div>
+                    <div class="report-grade-label">${gradeMsg}</div>
+
+                    <div class="premium-stat-card" style="margin-bottom: 12px;">
+                        <div class="premium-stat-header">Training</div>
+                        <div class="report-stat">
+                            <div class="report-stat-label">Workout Days</div>
+                            <div class="report-stat-value">${workoutDays} / 7</div>
+                        </div>
+                        <div class="report-stat">
+                            <div class="report-stat-label">Total Volume</div>
+                            <div class="report-stat-value">${this.formatNumber(totalVolume)}kg</div>
+                        </div>
+                    </div>
+
+                    <div class="premium-stat-card" style="margin-bottom: 12px;">
+                        <div class="premium-stat-header">Recovery</div>
+                        <div class="report-stat">
+                            <div class="report-stat-label">Avg Sleep</div>
+                            <div class="report-stat-value">${avgSleep ? avgSleep.toFixed(1) + 'h' : '—'}</div>
+                        </div>
+                        <div class="report-stat">
+                            <div class="report-stat-label">Avg Energy</div>
+                            <div class="report-stat-value">${avgEnergy ? avgEnergy.toFixed(1) + '/10' : '—'}</div>
+                        </div>
+                    </div>
+
+                    <div class="premium-stat-card" style="margin-bottom: 12px;">
+                        <div class="premium-stat-header">Nutrition</div>
+                        <div class="report-stat">
+                            <div class="report-stat-label">Avg Protein</div>
+                            <div class="report-stat-value">${avgProtein ? Math.round(avgProtein) + 'g/day' : '—'}</div>
+                        </div>
+                        <div class="report-stat">
+                            <div class="report-stat-label">Days Logged</div>
+                            <div class="report-stat-value">${weekLogs.length} / 7</div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-secondary" onclick="document.getElementById('weeklyReportModal').remove()">Close</button>
+                `;
+
+                document.body.insertAdjacentHTML('beforeend', `
+                    <div class="modal active" id="weeklyReportModal" style="display: flex;">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h2 class="modal-title">Weekly Report</h2>
+                                <button class="close-btn" onclick="document.getElementById('weeklyReportModal').remove()">×</button>
+                            </div>
+                            ${html}
+                        </div>
+                    </div>
+                `);
+            },
+
+            // Warmup Set Calculator
+            getWarmupSets(workingWeight) {
+                if (!workingWeight || workingWeight < 20) return [];
+                const barWeight = 20;
+                return [
+                    { pct: '50%', weight: Math.round((workingWeight * 0.5) / 2.5) * 2.5, reps: 10 },
+                    { pct: '65%', weight: Math.round((workingWeight * 0.65) / 2.5) * 2.5, reps: 5 },
+                    { pct: '80%', weight: Math.round((workingWeight * 0.8) / 2.5) * 2.5, reps: 3 },
+                    { pct: '90%', weight: Math.round((workingWeight * 0.9) / 2.5) * 2.5, reps: 1 },
+                ];
+            },
+
+            showWarmupSets(exerciseName, workingWeight) {
+                const sets = this.getWarmupSets(workingWeight);
+                if (sets.length === 0) return;
+
+                document.body.insertAdjacentHTML('beforeend', `
+                    <div class="modal active" id="warmupModal" style="display: flex;">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h2 class="modal-title">Warm-up Sets</h2>
+                                <button class="close-btn" onclick="document.getElementById('warmupModal').remove()">×</button>
+                            </div>
+                            <div class="warmup-card">
+                                <div class="warmup-header">🔥 ${exerciseName} — Working: ${workingWeight}kg</div>
+                                ${sets.map((s, i) => `
+                                    <div class="warmup-set-row">
+                                        <div>Set ${i + 1} <span class="warmup-pct">(${s.pct})</span></div>
+                                        <div>${s.reps} reps</div>
+                                        <div class="warmup-weight">${s.weight}kg</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px;">
+                                Rest 60-90s between warm-up sets. Take full rest before your working sets.
+                            </div>
+                            <button class="btn btn-primary" onclick="document.getElementById('warmupModal').remove()">Got it!</button>
+                        </div>
+                    </div>
+                `);
+            },
+
+            // Nutrition Targets Settings
+            showNutritionTargets() {
+                document.body.insertAdjacentHTML('beforeend', `
+                    <div class="modal active" id="nutritionTargetsModal" style="display: flex;">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h2 class="modal-title">Nutrition Targets</h2>
+                                <button class="close-btn" onclick="document.getElementById('nutritionTargetsModal').remove()">×</button>
+                            </div>
+                            <div class="metric-input-group">
+                                <label class="metric-label">Daily Calories (kcal)</label>
+                                <input type="number" id="calTarget" class="metric-input" 
+                                    value="${this.settings.calTarget || 2500}" placeholder="2500">
+                            </div>
+                            <div class="metric-input-group">
+                                <label class="metric-label">Protein Target (g)</label>
+                                <input type="number" id="proteinTarget" class="metric-input"
+                                    value="${this.settings.proteinTarget || 160}" placeholder="160">
+                            </div>
+                            <div class="metric-input-group">
+                                <label class="metric-label">Carbs Target (g)</label>
+                                <input type="number" id="carbTarget" class="metric-input"
+                                    value="${this.settings.carbTarget || 250}" placeholder="250">
+                            </div>
+                            <div class="metric-input-group">
+                                <label class="metric-label">Fats Target (g)</label>
+                                <input type="number" id="fatTarget" class="metric-input"
+                                    value="${this.settings.fatTarget || 80}" placeholder="80">
+                            </div>
+                            <button class="btn btn-primary" onclick="app.saveNutritionTargets()">Save Targets</button>
+                            <button class="btn btn-secondary" onclick="document.getElementById('nutritionTargetsModal').remove()">Cancel</button>
+                        </div>
+                    </div>
+                `);
+            },
+
+            saveNutritionTargets() {
+                this.settings.calTarget = parseFloat(document.getElementById('calTarget').value) || 2500;
+                this.settings.proteinTarget = parseFloat(document.getElementById('proteinTarget').value) || 160;
+                this.settings.carbTarget = parseFloat(document.getElementById('carbTarget').value) || 250;
+                this.settings.fatTarget = parseFloat(document.getElementById('fatTarget').value) || 80;
+                this.saveSettings();
+                document.getElementById('nutritionTargetsModal').remove();
+                this.renderHealth();
+                this.showNotification('✅ Nutrition targets saved!');
+            },
+
+            // Enhanced Achievements
+            getAllAchievements() {
+                const workouts = this.workouts;
+                const sessions = this.workoutSessions;
+                const totalWorkouts = sessions.length || workouts.length;
+                const totalVolume = workouts.reduce((sum, w) =>
+                    sum + w.sets.reduce((s, set) => s + (set.weight * set.reps), 0), 0
+                );
+                const streak = this.calculateStreak();
+                const prs = Object.keys(this.personalRecords).length;
+
+                return [
+                    // Workout count
+                    { id: 'first_workout', icon: '🏋️', name: 'First Step', desc: 'Complete 1 workout', unlocked: totalWorkouts >= 1 },
+                    { id: 'ten_workouts', icon: '💪', name: 'Getting Started', desc: '10 workouts', unlocked: totalWorkouts >= 10 },
+                    { id: 'fifty_workouts', icon: '🔥', name: 'Dedicated', desc: '50 workouts', unlocked: totalWorkouts >= 50 },
+                    { id: 'century', icon: '💯', name: 'Century Club', desc: '100 workouts', unlocked: totalWorkouts >= 100 },
+                    // Streaks
+                    { id: 'streak_3', icon: '📅', name: '3 Day Streak', desc: '3 days in a row', unlocked: streak >= 3 },
+                    { id: 'streak_7', icon: '🗓️', name: 'Week Warrior', desc: '7 days in a row', unlocked: streak >= 7 },
+                    { id: 'streak_30', icon: '📆', name: 'Monthly Master', desc: '30 days in a row', unlocked: streak >= 30 },
+                    // Volume
+                    { id: 'vol_10k', icon: '⚡', name: '10K Club', desc: 'Lift 10,000kg total', unlocked: totalVolume >= 10000 },
+                    { id: 'vol_100k', icon: '🚀', name: '100K Club', desc: 'Lift 100,000kg total', unlocked: totalVolume >= 100000 },
+                    { id: 'vol_1m', icon: '🌍', name: 'Million Kg', desc: 'Lift 1,000,000kg total', unlocked: totalVolume >= 1000000 },
+                    // PRs
+                    { id: 'first_pr', icon: '🏆', name: 'Personal Best', desc: 'Set your first PR', unlocked: prs >= 1 },
+                    { id: 'pr_5', icon: '🥇', name: 'Record Breaker', desc: 'Set 5 PRs', unlocked: prs >= 5 },
+                    { id: 'pr_20', icon: '👑', name: 'PR Machine', desc: 'Set 20 PRs', unlocked: prs >= 20 },
+                    // Special
+                    { id: 'early_bird', icon: '🌅', name: 'Early Bird', desc: 'Log a workout before 7am', unlocked: this.achievements.includes('early_bird') },
+                    { id: 'night_owl', icon: '🦉', name: 'Night Owl', desc: 'Log a workout after 9pm', unlocked: this.achievements.includes('night_owl') },
+                    { id: 'big_session', icon: '💥', name: 'Beast Mode', desc: 'Log 10+ exercises in one session', unlocked: sessions.some(s => s.exercises?.length >= 10) },
+                    { id: 'heavy_day', icon: '🏗️', name: 'Heavy Day', desc: '10,000kg in one session', unlocked: sessions.some(s => s.exercises?.reduce((sum, ex) => sum + ex.sets.reduce((s, set) => s + (set.weight * set.reps), 0), 0) >= 10000) },
+                    { id: 'consistent', icon: '📊', name: 'Consistent', desc: 'Work out 4+ days this week', unlocked: [...new Set(this.getWorkoutsInDays(7).map(w => w.date))].length >= 4 },
+                    { id: 'health_logger', icon: '❤️', name: 'Health Tracker', desc: 'Log health 7 days in a row', unlocked: Object.keys(this.dailyLogs).length >= 7 },
+                    { id: 'nutrition_pro', icon: '🥗', name: 'Nutrition Pro', desc: 'Hit protein target 5 days', unlocked: this.achievements.includes('nutrition_pro') },
+                ];
+            },
+
+            checkAndUnlockAchievements() {
+                const all = this.getAllAchievements();
+                let newUnlocks = [];
+                all.forEach(a => {
+                    if (a.unlocked && !this.achievements.includes(a.id)) {
+                        this.achievements.push(a.id);
+                        newUnlocks.push(a);
+                    }
+                });
+                if (newUnlocks.length > 0) {
+                    this.saveAchievements();
+                    newUnlocks.forEach(a => {
+                        setTimeout(() => this.showNotification(`🏆 Achievement: ${a.name}!`), 500);
+                    });
+                }
+            },
+
+            renderAchievementsPage() {
+                const all = this.getAllAchievements();
+                const unlocked = all.filter(a => a.unlocked).length;
+
+                return `
+                    <div class="premium-stat-card">
+                        <div class="premium-stat-header">Achievements</div>
+                        <div style="text-align: center; padding: 12px 0 20px;">
+                            <div style="font-size: 48px; font-weight: 800; color: var(--primary);">${unlocked}</div>
+                            <div style="font-size: 14px; color: var(--text-secondary);">of ${all.length} unlocked</div>
+                            <div style="background: var(--border); border-radius: 8px; height: 8px; margin: 12px 0; overflow: hidden;">
+                                <div style="background: var(--primary); width: ${Math.round(unlocked/all.length*100)}%; height: 100%; border-radius: 8px;"></div>
+                            </div>
+                        </div>
+                        <div class="achievement-grid">
+                            ${all.map(a => `
+                                <div class="achievement-badge ${a.unlocked ? 'unlocked' : 'locked'}">
+                                    <div class="achievement-icon">${a.icon}</div>
+                                    <div class="achievement-name">${a.name}</div>
+                                    <div class="achievement-desc">${a.desc}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
             },
 
             async syncGarmin() {
