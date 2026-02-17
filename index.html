@@ -2001,6 +2001,17 @@
             workoutSessions: [],
             currentSession: null,
             sessionStartTime: null,
+            workouts: [],
+            bodyMetrics: [],
+            personalRecords: {},
+            dailyLogs: {},
+            healthMetrics: [],
+            templates: [],
+            theme: 'light',
+            garminConnected: false,
+            garminAccessToken: null,
+            garminAccessSecret: null,
+            garminData: {},
 
             // Universal save helper - Supabase first, localStorage fallback
             save(key, data) {
@@ -2044,12 +2055,6 @@
                     return null;
                 }
             },
-            healthMetrics: [],
-            dailyLogs: {},
-            garminConnected: false,
-            garminAccessToken: null,
-            garminAccessSecret: null,
-            garminData: {},
 
             exerciseDetails: {
                 'Barbell Bench Press': {
