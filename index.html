@@ -51,8 +51,8 @@
             --surface: #1A1A18;
             --surface2: #222220;
             --text-primary: #F7F7F5;
-            --text-secondary: #7A7A78;
-            --text-tertiary: #444442;
+            --text-secondary: #A0A09E;
+            --text-tertiary: #6A6A68;
             --border: #2A2A28;
             --border-strong: #3A3A38;
             --shadow: rgba(0, 0, 0, 0.4);
@@ -6739,7 +6739,7 @@ Tracked with Gym Tracker
                 );
                 
                 let html = `
-                    <div class="card" style="background: var(--text-primary); color: white; margin-bottom: 16px;">
+                    <div class="card" style="background: var(--text-primary); color: var(--background); margin-bottom: 16px;">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
                             <div>
                                 <div style="font-size: 13px; opacity: 0.9;">Duration</div>
@@ -6760,14 +6760,10 @@ Tracked with Gym Tracker
                         </div>
                     </div>
 
-                    <button class="btn btn-primary" onclick="app.addExerciseToSession()" style="margin-bottom: 16px;">
-                        ➕ Add Exercise
-                    </button>
-
                     ${this.currentSession.exercises.length === 0 ? `
                         <div class="empty-state">
-                            <div class="empty-icon">💪</div>
-                            <div class="empty-text">No exercises yet<br>Add an exercise to begin!</div>
+                            <div class="empty-icon">+</div>
+                            <div class="empty-text">No exercises yet<br>Tap below to add one!</div>
                         </div>
                     ` : ''}
 
@@ -6790,7 +6786,7 @@ Tracked with Gym Tracker
                                 ` : ''}
 
                                 ${suggestion ? `
-                                    <div style="padding: 10px 12px; background: var(--accent); color: #141414; border-radius: 10px; margin-bottom: 12px;">
+                                    <div style="padding: 10px 12px; background: var(--accent); color: #141414; border-radius: 10px; margin-bottom: 16px;">
                                         <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3px;">💪 Progressive Overload</div>
                                         <div style="font-size: 14px; font-weight: 600; letter-spacing: -0.01em;">${suggestion.message}</div>
                                         ${suggestion.reason ? `<div style="font-size: 11px; opacity: 0.8; margin-top: 2px;">${suggestion.reason}</div>` : ''}
@@ -6798,41 +6794,43 @@ Tracked with Gym Tracker
                                 ` : ''}
 
                                 ${exercise.sets.map((set, setIndex) => `
-                                    <div class="set-item" style="margin-bottom: 8px;">
-                                        <div class="set-number">Set ${setIndex + 1}</div>
-                                        <div class="set-input">
-                                            <div class="input-group">
-                                                <label class="input-label">Weight</label>
+                                    <div style="margin-bottom: 16px;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                            <div style="font-size: 13px; font-weight: 700; color: var(--text-primary); font-family: 'DM Mono', monospace;">SET ${setIndex + 1}</div>
+                                            ${setIndex > 0 ? `<button onclick="app.removeSetFromSession(${exIndex}, ${setIndex})" style="background: var(--danger); color: white; border: none; width: 28px; height: 28px; border-radius: 50%; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center;">−</button>` : ''}
+                                        </div>
+                                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+                                            <div>
+                                                <label style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; display: block; margin-bottom: 4px;">Weight</label>
                                                 <input type="number" value="${set.weight || ''}" 
                                                     onchange="app.updateSessionSet(${exIndex}, ${setIndex}, 'weight', this.value)"
                                                     placeholder="${lastWorkout?.sets[setIndex]?.weight || '0'}" 
-                                                    style="width: 70px;">
+                                                    style="width: 100%; padding: 12px 8px; border: 1px solid var(--border); border-radius: 10px; font-size: 16px; background: var(--surface2); color: var(--text-primary); font-family: 'DM Mono', monospace; text-align: center;">
                                             </div>
-                                            <div class="input-group">
-                                                <label class="input-label">Reps</label>
+                                            <div>
+                                                <label style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; display: block; margin-bottom: 4px;">Reps</label>
                                                 <input type="number" value="${set.reps || ''}" 
                                                     onchange="app.updateSessionSet(${exIndex}, ${setIndex}, 'reps', this.value)"
                                                     placeholder="${lastWorkout?.sets[setIndex]?.reps || '0'}" 
-                                                    style="width: 70px;">
+                                                    style="width: 100%; padding: 12px 8px; border: 1px solid var(--border); border-radius: 10px; font-size: 16px; background: var(--surface2); color: var(--text-primary); font-family: 'DM Mono', monospace; text-align: center;">
                                             </div>
-                                            <div class="input-group" style="flex: 0.5;">
-                                                <label class="input-label">RPE</label>
+                                            <div>
+                                                <label style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; display: block; margin-bottom: 4px;">RPE</label>
                                                 <input type="number" min="1" max="10" value="${set.rpe || ''}" 
                                                     onchange="app.updateSessionSet(${exIndex}, ${setIndex}, 'rpe', this.value)"
-                                                    placeholder="1-10" 
-                                                    style="width: 50px; text-align: center;">
+                                                    placeholder="—" 
+                                                    style="width: 100%; padding: 12px 8px; border: 1px solid var(--border); border-radius: 10px; font-size: 16px; background: var(--surface2); color: var(--text-primary); font-family: 'DM Mono', monospace; text-align: center;">
                                             </div>
                                         </div>
-                                        ${setIndex > 0 ? `<button class="delete-set" onclick="app.removeSetFromSession(${exIndex}, ${setIndex})">−</button>` : ''}
                                     </div>
                                 `).join('')}
                                 
-                                <button class="btn btn-secondary" onclick="app.addSetToSessionExercise(${exIndex})" style="margin-top: 8px;">
+                                <button class="btn btn-secondary" onclick="app.addSetToSessionExercise(${exIndex})" style="margin-top: 4px;">
                                     + Add Set
                                 </button>
                                 ${exercise.sets[0]?.weight ? `
-                                    <button class="btn btn-secondary" onclick="app.showWarmupSets('${exercise.name}', ${exercise.sets[0].weight})" style="margin-top: 8px; background: rgba(0,212,170,0.1); border-color: var(--primary); color: var(--primary);">
-                                        🔥 Warm-up Sets
+                                    <button class="btn btn-secondary" onclick="app.showWarmupSets('${exercise.name}', ${exercise.sets[0].weight})" style="margin-top: 8px;">
+                                        Warm-up Sets
                                     </button>
                                 ` : ''}
                             </div>
@@ -6840,18 +6838,26 @@ Tracked with Gym Tracker
                     }).join('')}
 
                     ${this.currentSession.exercises.length > 0 ? `
-                        <div class="metric-input-group" style="margin-top: 20px;">
-                            <label class="metric-label">Workout Notes (Optional)</label>
-                            <textarea id="sessionNotes" class="metric-input" rows="3" placeholder="How was the workout? Any observations?">${this.currentSession.notes || ''}</textarea>
+                        <div class="metric-input-group" style="margin-top: 8px;">
+                            <label class="metric-label">Workout Notes</label>
+                            <textarea id="sessionNotes" class="metric-input" rows="2" placeholder="How was the workout?">${this.currentSession.notes || ''}</textarea>
                         </div>
 
-                        <button class="btn btn-success" onclick="app.finishWorkoutSession()" style="margin-top: 12px;">
-                            ✓ Finish Workout
+                        <button class="btn btn-primary" onclick="app.addExerciseToSession()" style="margin-top: 16px;">
+                            + Add Exercise
+                        </button>
+
+                        <button class="btn btn-success" onclick="app.finishWorkoutSession()" style="margin-top: 8px;">
+                            Finish Workout
                         </button>
                         <button class="btn btn-danger" onclick="app.cancelWorkoutSession()" style="margin-top: 8px;">
                             Cancel Workout
                         </button>
-                    ` : ''}
+                    ` : `
+                        <button class="btn btn-primary" onclick="app.addExerciseToSession()" style="margin-top: 16px;">
+                            + Add Exercise
+                        </button>
+                    `}
                 `;
                 
                 document.getElementById('activeWorkoutContent').innerHTML = html;
