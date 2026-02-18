@@ -2182,6 +2182,7 @@
     </script>
     <script>
         const app = {
+            userId: null, // Set during init
             currentTab: 'today',
             currentExercise: null,
             currentWorkout: {
@@ -2528,6 +2529,15 @@
             ],
 
             async init() {
+                // Check if user has set their ID (simple multi-user without auth)
+                let userId = localStorage.getItem('userId');
+                if (!userId) {
+                    userId = prompt('Enter your name (this keeps your data separate from others):');
+                    if (!userId) userId = 'user_' + Date.now(); // fallback
+                    localStorage.setItem('userId', userId.toLowerCase().replace(/\s+/g, '_'));
+                }
+                this.userId = localStorage.getItem('userId');
+
                 // Register service worker for offline + state persistence
                 if ('serviceWorker' in navigator) {
                     try {
@@ -2587,14 +2597,14 @@
 
                         // Load from Supabase
                         const [sessions, workouts, prs, logs, metrics, settings, achievements, goals] = await Promise.all([
-                            this.dbLoad('workout_sessions', { user_id: 'default_user' }),
-                            this.dbLoad('workouts', { user_id: 'default_user' }),
-                            this.dbLoad('personal_records', { user_id: 'default_user' }),
-                            this.dbLoad('daily_logs', { user_id: 'default_user' }),
-                            this.dbLoad('body_metrics', { user_id: 'default_user' }),
-                            this.dbLoad('settings', { user_id: 'default_user' }),
-                            this.dbLoad('achievements', { user_id: 'default_user' }),
-                            this.dbLoad('goals', { user_id: 'default_user' }),
+                            this.dbLoad('workout_sessions', { user_id: this.userId }),
+                            this.dbLoad('workouts', { user_id: this.userId }),
+                            this.dbLoad('personal_records', { user_id: this.userId }),
+                            this.dbLoad('daily_logs', { user_id: this.userId }),
+                            this.dbLoad('body_metrics', { user_id: this.userId }),
+                            this.dbLoad('settings', { user_id: this.userId }),
+                            this.dbLoad('achievements', { user_id: this.userId }),
+                            this.dbLoad('goals', { user_id: this.userId }),
                         ]);
 
                         console.log('📦 Raw Supabase data:', { 
@@ -2697,7 +2707,7 @@
                 try {
                     const rows = this.workouts.map(w => ({
                         id: w.id || w.exercise + '_' + w.date,
-                        user_id: 'default_user',
+                        user_id: this.userId,
                         exercise: w.exercise, date: w.date,
                         sets: w.sets, notes: w.notes || null
                     }));
@@ -2714,7 +2724,7 @@
                 if (!window.db) return;
                 try {
                     const rows = this.bodyMetrics.map(m => ({
-                        user_id: 'default_user', date: m.date,
+                        user_id: this.userId, date: m.date,
                         weight: m.weight, body_fat: m.bodyFat,
                         muscle_mass: m.muscleMass, notes: m.notes || null
                     }));
@@ -2727,14 +2737,14 @@
                 if (!window.db) return;
                 try {
                     const rows = Object.entries(this.personalRecords).map(([exercise, pr]) => ({
-                        user_id: 'default_user', exercise,
+                        user_id: this.userId, exercise,
                         weight: pr.weight, reps: pr.reps, date: pr.date
                     }));
                     if (rows.length > 0) {
                         const exercises = rows.map(r => r.exercise);
                         await window.db.from('personal_records')
                             .delete()
-                            .eq('user_id', 'default_user')
+                            .eq('user_id', this.userId)
                             .in('exercise', exercises);
                         const { error } = await window.db.from('personal_records').insert(rows);
                         if (error) throw error;
@@ -2756,7 +2766,7 @@
                 if (!window.db) return;
                 try {
                     await window.db.from('settings').upsert({
-                        user_id: 'default_user',
+                        user_id: this.userId,
                         rest_timer_duration: this.settings.restTimerDuration,
                         weight_increment: this.settings.weightIncrement,
                         units: this.settings.units,
@@ -2777,7 +2787,7 @@
                 localStorage.setItem('achievements', JSON.stringify(this.achievements));
                 if (!window.db) return;
                 try {
-                    const rows = this.achievements.map(id => ({ user_id: 'default_user', achievement_id: id }));
+                    const rows = this.achievements.map(id => ({ user_id: this.userId, achievement_id: id }));
                     if (rows.length > 0) await window.db.from('achievements').upsert(rows, { onConflict: 'user_id,achievement_id' });
                 } catch(e) { console.error('saveAchievements:', e); }
             },
@@ -2797,7 +2807,7 @@
                 try {
                     const rows = this.workoutSessions.map(s => ({
                         id: s.id?.toString(),
-                        user_id: 'default_user',
+                        user_id: this.userId,
                         date: s.date, start_time: s.startTime,
                         end_time: s.endTime, duration: s.duration,
                         notes: s.notes || null, exercises: s.exercises
@@ -2820,7 +2830,7 @@
                 if (!window.db) return;
                 try {
                     const rows = Object.entries(this.dailyLogs).map(([date, log]) => ({
-                        user_id: 'default_user', date,
+                        user_id: this.userId, date,
                         sleep: log.sleep, sleep_quality: log.sleepQuality,
                         rhr: log.rhr, hrv: log.hrv, energy: log.energy,
                         stress: log.stress, soreness: log.soreness,
@@ -2835,7 +2845,7 @@
                         const dates = rows.map(r => r.date);
                         await window.db.from('daily_logs')
                             .delete()
-                            .eq('user_id', 'default_user')
+                            .eq('user_id', this.userId)
                             .in('date', dates);
                         const { error } = await window.db.from('daily_logs').insert(rows);
                         if (error) throw error;
@@ -6763,17 +6773,27 @@ Tracked with Gym Tracker
 
                     ${this.currentSession.exercises.map((exercise, exIndex) => {
                         const lastWorkout = this.getLastWorkoutForExercise(exercise.name);
+                        const suggestion = lastWorkout ? this.calculateProgressionSuggestion(exercise.name, lastWorkout) : null;
+                        
                         return `
                             <div class="card" style="margin-bottom: 12px;">
                                 <div class="card-header">
                                     <div class="card-title">${exercise.name}</div>
-                                    <button class="icon-btn danger" onclick="app.removeExerciseFromSession(${exIndex})">🗑️</button>
+                                    <button class="icon-btn danger" onclick="app.removeExerciseFromSession(${exIndex})">×</button>
                                 </div>
                                 
                                 ${lastWorkout ? `
-                                    <div class="last-workout" style="margin-bottom: 12px;">
-                                        <div class="last-workout-title">Last Time</div>
-                                        <div class="last-workout-data">${lastWorkout.sets.map(s => `${s.weight}kg × ${s.reps}`).join(', ')}</div>
+                                    <div style="margin-bottom: 12px;">
+                                        <div style="font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px;">Last Workout</div>
+                                        <div style="font-size: 14px; color: var(--text-secondary);">${lastWorkout.sets.map(s => `${s.weight}kg × ${s.reps}`).join(', ')}</div>
+                                    </div>
+                                ` : ''}
+
+                                ${suggestion ? `
+                                    <div style="padding: 10px 12px; background: var(--accent); color: #141414; border-radius: 10px; margin-bottom: 12px;">
+                                        <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3px;">💪 Progressive Overload</div>
+                                        <div style="font-size: 14px; font-weight: 600; letter-spacing: -0.01em;">${suggestion.message}</div>
+                                        ${suggestion.reason ? `<div style="font-size: 11px; opacity: 0.8; margin-top: 2px;">${suggestion.reason}</div>` : ''}
                                     </div>
                                 ` : ''}
 
@@ -6936,6 +6956,79 @@ Tracked with Gym Tracker
                 if (!confirm('Remove this exercise from the workout?')) return;
                 this.currentSession.exercises.splice(exIndex, 1);
                 this.renderActiveWorkout();
+            },
+
+            calculateProgressionSuggestion(exerciseName, lastWorkout) {
+                if (!lastWorkout || !lastWorkout.sets || lastWorkout.sets.length === 0) return null;
+
+                // Get workout history for this exercise
+                const history = this.workouts
+                    .filter(w => w.exercise === exerciseName)
+                    .sort((a, b) => new Date(b.date) - new Date(a.date))
+                    .slice(0, 5); // Last 5 workouts
+
+                if (history.length < 2) {
+                    // First time doing this exercise recently - suggest same weight
+                    const topSet = lastWorkout.sets[0];
+                    return {
+                        message: `Try ${topSet.weight}kg × ${topSet.reps} reps`,
+                        reason: 'Match last workout first'
+                    };
+                }
+
+                const lastSets = lastWorkout.sets;
+                const topSet = lastSets[0]; // Heaviest set
+                const allRepsCompleted = lastSets.every(s => s.reps >= topSet.reps);
+                const avgRPE = lastSets.filter(s => s.rpe).reduce((sum, s, _, arr) => sum + s.rpe / arr.length, 0);
+
+                // Calculate progression rate from history
+                const firstWeight = history[history.length - 1].sets[0].weight;
+                const currentWeight = topSet.weight;
+                const workoutCount = history.length;
+                const avgIncrease = (currentWeight - firstWeight) / workoutCount;
+
+                // Decision logic
+                let newWeight = topSet.weight;
+                let newReps = topSet.reps;
+                let reason = '';
+
+                // Strong performance - increase weight
+                if (allRepsCompleted && (!avgRPE || avgRPE < 8)) {
+                    // Easy sets, RPE < 8
+                    newWeight = topSet.weight + (avgIncrease > 0 ? Math.round(avgIncrease) : 2.5);
+                    reason = 'You crushed it last time';
+                } else if (allRepsCompleted && avgRPE >= 8 && avgRPE <= 9) {
+                    // Hard but completed, RPE 8-9
+                    newWeight = topSet.weight + 2.5;
+                    reason = 'Solid progress, small jump';
+                } else if (allRepsCompleted && avgRPE > 9) {
+                    // Maxed out, RPE 10
+                    newWeight = topSet.weight;
+                    newReps = topSet.reps + 1;
+                    reason = 'Add reps before adding weight';
+                } else if (!allRepsCompleted) {
+                    // Failed reps - check if it's a pattern
+                    const previousWorkout = history[1];
+                    const previousFailed = previousWorkout && previousWorkout.sets.some(s => s.reps < topSet.reps);
+                    
+                    if (previousFailed) {
+                        // Failing repeatedly - deload
+                        newWeight = Math.max(topSet.weight * 0.9, topSet.weight - 5);
+                        reason = 'Deload to build back up';
+                    } else {
+                        // First failure - try same weight
+                        newWeight = topSet.weight;
+                        reason = 'Match last workout';
+                    }
+                }
+
+                // Round to nearest 2.5kg
+                newWeight = Math.round(newWeight / 2.5) * 2.5;
+
+                return {
+                    message: `Try ${newWeight}kg × ${newReps} reps`,
+                    reason
+                };
             },
 
             getLastWorkoutForExercise(exerciseName) {
