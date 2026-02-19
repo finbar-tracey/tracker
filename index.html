@@ -1084,10 +1084,20 @@
         }
 
         .section-action {
-            color: var(--primary);
-            font-size: 15px;
+            padding: 8px 14px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            color: var(--text-primary);
+            font-size: 13px;
             font-weight: 600;
             cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .section-action:hover {
+            background: var(--text-primary);
+            color: var(--background);
         }
 
         /* Quick Actions */
@@ -2167,7 +2177,7 @@
                 // The CDN exposes createClient directly
                 const { createClient } = window.supabase;
                 window.db = createClient(url, key);
-                console.log('✅ Supabase connected!', window.db);
+
                 return true;
             } catch (error) {
                 console.error('❌ Supabase init failed:', error);
@@ -2198,7 +2208,8 @@
                 restTimerDuration: 90,
                 weightIncrement: 2.5,
                 units: 'kg',
-                notificationsEnabled: true
+                notificationsEnabled: true,
+                monthlyCardioGoal: 50 // km per month
             },
             goals: [],
             cardioSessions: [],
@@ -2252,7 +2263,7 @@
                         ? await window.db.from(table).upsert(data, { onConflict: conflict })
                         : await window.db.from(table).upsert(data);
                     if (error) throw error;
-                    console.log(`💾 Saved to Supabase: ${table}`);
+
                 } catch (error) {
                     console.error(`❌ Supabase save failed for ${table}:`, error);
                     this.save(table, data);
@@ -2542,7 +2553,7 @@
                 if ('serviceWorker' in navigator) {
                     try {
                         await navigator.serviceWorker.register('/sw.js');
-                        console.log('✅ Service worker registered');
+
                     } catch (e) {
                         console.warn('Service worker failed:', e);
                     }
@@ -2569,7 +2580,7 @@
                 document.addEventListener('visibilitychange', () => {
                     if (document.hidden) {
                         this.saveAppState();
-                        console.log('💾 Saved state before backgrounding');
+
                     }
                 });
 
@@ -2582,13 +2593,11 @@
             },
 
             async loadData() {
-                console.log('🔄 Loading data... window.db =', !!window.db);
-                
+
                 if (window.db) {
                     try {
                         // Test connection first with a simple query
                         const testResult = await window.db.from('workout_sessions').select('count').limit(1);
-                        console.log('🔌 Connection test:', testResult);
 
                         // If we hit iframe/CORS issues, fall back to localStorage
                         if (testResult.error && testResult.error.message?.includes('postMessage')) {
@@ -2610,12 +2619,6 @@
                             this.dbLoad('goals', { user_id: this.userId }),
                         ]);
 
-                        console.log('📦 Raw Supabase data:', { 
-                            sessions: sessions?.length, 
-                            workouts: workouts?.length,
-                            logs: logs?.length,
-                            settings: settings?.length
-                        });
                         console.log('📦 Sessions raw:', JSON.stringify(sessions?.slice(0,2)));
                         console.log('📦 Workouts raw:', JSON.stringify(workouts?.slice(0,2)));
 
@@ -2672,7 +2675,6 @@
                         this.goals = (goals || []);
                         this.theme = this.settings.theme || 'light';
 
-                        console.log(`✅ Loaded from Supabase: ${this.workoutSessions.length} sessions, ${this.workouts.length} workouts`);
                     } catch (error) {
                         console.error('❌ Supabase load failed, using localStorage:', error);
                         this.loadFromLocalStorage();
@@ -2689,7 +2691,7 @@
             },
 
             loadFromLocalStorage() {
-                console.log('📦 Loading from localStorage...');
+
                 this.workouts = JSON.parse(localStorage.getItem('workouts') || '[]');
                 this.workoutSessions = JSON.parse(localStorage.getItem('workoutSessions') || '[]');
                 this.personalRecords = JSON.parse(localStorage.getItem('personalRecords') || '{}');
@@ -2701,7 +2703,7 @@
                 this.dailyLogs = JSON.parse(localStorage.getItem('dailyLogs') || '{}');
                 this.healthMetrics = JSON.parse(localStorage.getItem('healthMetrics') || '[]');
                 this.theme = localStorage.getItem('theme') || 'light';
-                console.log(`✅ Loaded from localStorage: ${this.workouts.length} workouts`);
+
             },
 
             async saveWorkouts() {
@@ -2751,7 +2753,7 @@
                             .in('exercise', exercises);
                         const { error } = await window.db.from('personal_records').insert(rows);
                         if (error) throw error;
-                        console.log(`✅ Saved ${rows.length} PRs to Supabase`);
+
                     }
                 } catch(e) { console.error('❌ savePersonalRecords failed:', e); }
             },
@@ -2805,7 +2807,7 @@
 
             async saveWorkoutSessions() {
                 localStorage.setItem('workoutSessions', JSON.stringify(this.workoutSessions));
-                console.log('💾 Saving sessions, window.db =', !!window.db, 'count =', this.workoutSessions.length);
+
                 if (!window.db) { console.warn('⚠️ No DB connection - saved to localStorage only'); return; }
                 try {
                     const rows = this.workoutSessions.map(s => ({
@@ -2819,7 +2821,7 @@
                     if (rows.length > 0) {
                         const { data, error } = await window.db.from('workout_sessions').upsert(rows).select();
                         if (error) throw error;
-                        console.log(`✅ Saved ${rows.length} sessions to Supabase`, data);
+
                     }
                 } catch(e) { console.error('❌ saveWorkoutSessions failed:', e); }
             },
@@ -2852,7 +2854,7 @@
                             .in('date', dates);
                         const { error } = await window.db.from('daily_logs').insert(rows);
                         if (error) throw error;
-                        console.log(`✅ Saved ${rows.length} daily logs to Supabase`);
+
                     }
                 } catch(e) { console.error('❌ saveDailyLogs failed:', e); }
             },
@@ -2903,6 +2905,11 @@
                 const today = new Date().toISOString().split('T')[0];
                 const todayWorkouts = this.workouts.filter(w => w.date === today);
                 
+                // Calculate days since last workout (5: rest day indicator)
+                const allDates = [...new Set([...this.workouts.map(w => w.date), ...this.workoutSessions.map(s => s.date)])].sort();
+                const lastWorkoutDate = allDates[allDates.length - 1];
+                const daysSinceWorkout = lastWorkoutDate ? Math.floor((new Date(today) - new Date(lastWorkoutDate)) / (1000 * 60 * 60 * 24)) : 0;
+                
                 // Calculate streak
                 const streak = this.calculateStreak();
                 
@@ -2913,6 +2920,30 @@
                 );
                 
                 let html = '';
+                
+                // Rest day indicator (5)
+                if (todayWorkouts.length === 0 && daysSinceWorkout >= 1 && this.workouts.length > 0) {
+                    let message = '';
+                    let bgColor = '';
+                    if (daysSinceWorkout === 1) {
+                        message = '💪 Back to training today?';
+                        bgColor = 'var(--accent)';
+                    } else if (daysSinceWorkout === 2) {
+                        message = '💤 Rest day - last workout 2 days ago';
+                        bgColor = 'var(--surface2)';
+                    } else if (daysSinceWorkout >= 3) {
+                        message = `⚠️ ${daysSinceWorkout} days since last workout`;
+                        bgColor = 'var(--warning)';
+                    }
+                    
+                    html += `
+                        <div class="card" style="background: ${bgColor}; border: none; margin-bottom: 16px; padding: 16px;">
+                            <div style="font-size: 15px; font-weight: 600; color: ${daysSinceWorkout >= 3 ? '#141414' : 'var(--text-primary)'}; text-align: center;">
+                                ${message}
+                            </div>
+                        </div>
+                    `;
+                }
                 
                 // Smart Recommendations
                 const recommendations = this.getSmartRecommendations();
@@ -5452,6 +5483,17 @@ Tracked with Gym Tracker
                         </div>
                     </div>
 
+                    <!-- Test Data Generator -->
+                    <div class="card" style="margin-bottom: 16px; border: 2px dashed var(--border);">
+                        <div class="card-title" style="margin-bottom: 8px;">🧪 Test Data</div>
+                        <button class="btn btn-secondary" onclick="app.generateTestCardio()" style="width: 100%;">
+                            Generate Test Cardio Sessions
+                        </button>
+                        <div style="font-size: 11px; color: var(--text-secondary); margin-top: 8px; text-align: center;">
+                            Creates 10 sample runs to test stats & achievements
+                        </div>
+                    </div>
+
                     <div class="card">
                         <div class="card-title" style="margin-bottom: 12px;">App Info</div>
                         <div class="history-item">
@@ -5601,34 +5643,8 @@ Tracked with Gym Tracker
                 const isActive = this._cardioActive;
                 const types = ['Run', 'Cycle', 'Walk'];
 
-                // Build history
-                const historyHtml = this.cardioSessions.length === 0 ? '' : `
-                    <div class="premium-stat-card" style="margin-top: 16px;">
-                        <div class="premium-stat-header">Recent Sessions</div>
-                        ${this.cardioSessions.slice(-10).reverse().map(s => {
-                            const dist = (s.distance / 1000).toFixed(2);
-                            const pace = s.distance > 0 ? this.formatPace((s.duration / 60) / (s.distance / 1000)) : '--';
-                            const mins = Math.floor(s.duration / 60);
-                            const secs = String(s.duration % 60).padStart(2, '0');
-                            return `
-                                <div class="cardio-history-item">
-                                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                                        <div style="font-size:15px; font-weight:600; letter-spacing:-0.01em;">${s.type} · ${s.date}</div>
-                                        <div style="font-size:12px; color:var(--text-secondary);">${mins}:${secs}</div>
-                                    </div>
-                                    <div style="display:flex; gap:16px;">
-                                        <div><div class="cardio-stat-label">Distance</div><div style="font-size:17px;font-weight:700;font-family:'DM Mono',monospace;">${dist} km</div></div>
-                                        <div><div class="cardio-stat-label">Avg Pace</div><div style="font-size:17px;font-weight:700;font-family:'DM Mono',monospace;">${pace}</div></div>
-                                        ${s.splits?.length ? `<div><div class="cardio-stat-label">Splits</div><div style="font-size:17px;font-weight:700;font-family:'DM Mono',monospace;">${s.splits.length}</div></div>` : ''}
-                                    </div>
-                                </div>
-                            `;
-                        }).join('')}
-                    </div>
-                `;
-
                 if (isActive) {
-                    // ACTIVE TRACKING UI
+                    // ACTIVE TRACKING UI (keep as-is)
                     const elapsed = this.getCardioElapsed();
                     const mins = Math.floor(elapsed / 60);
                     const secs = String(elapsed % 60).padStart(2, '0');
@@ -5718,58 +5734,420 @@ Tracked with Gym Tracker
                     this.startCardioTimer();
                     this.drawCardioMap();
                 } else {
-                    // IDLE UI
+                    // IDLE UI - Complete rebuild with stats
+                    const stats = this.calculateCardioStats();
+                    
+                    // Weekly summary
+                    const weekAgo = new Date();
+                    weekAgo.setDate(weekAgo.getDate() - 7);
+                    const thisWeekSessions = this.cardioSessions.filter(s => new Date(s.date) >= weekAgo);
+                    const thisWeekKm = thisWeekSessions.reduce((sum, s) => sum + (s.distance || 0), 0) / 1000;
+                    
                     el.innerHTML = `
                         <div class="content" style="padding-bottom: 100px;">
                             <div class="section-header">
                                 <div class="section-title">Cardio</div>
                             </div>
 
-                            <div style="padding: 0 20px;">
-                                <div class="cardio-type-selector">
-                                    ${types.map(t => `
-                                        <button class="cardio-type-btn ${this._cardioType === t ? 'active' : ''}" 
-                                            onclick="app.setCardioType('${t}')">
-                                            ${t === 'Run' ? '↑ Run' : t === 'Cycle' ? '◎ Cycle' : '→ Walk'}
-                                        </button>
-                                    `).join('')}
-                                </div>
+                            ${this.cardioSessions.length === 0 ? `
+                                <div style="padding: 0 20px;">
+                                    <div class="cardio-type-selector">
+                                        ${types.map(t => `
+                                            <button class="cardio-type-btn ${this._cardioType === t ? 'active' : ''}" 
+                                                onclick="app.setCardioType('${t}')">
+                                                ${t === 'Run' ? '↑ Run' : t === 'Cycle' ? '◎ Cycle' : '→ Walk'}
+                                            </button>
+                                        `).join('')}
+                                    </div>
 
-                                <!-- Map preview -->
-                                <div class="cardio-map" style="margin-bottom: 16px;">
-                                    <div class="cardio-map-placeholder">
-                                        <div style="font-size:40px; opacity:0.2;">◉</div>
-                                        <div>Route map will appear here</div>
-                                        <div style="font-size:11px; opacity:0.6;">GPS tracking requires location permission</div>
+                                    <div class="cardio-map" style="margin-bottom: 16px;">
+                                        <div class="cardio-map-placeholder">
+                                            <div style="font-size:40px; opacity:0.2;">◉</div>
+                                            <div>Route map will appear here</div>
+                                            <div style="font-size:11px; opacity:0.6;">GPS tracking requires location permission</div>
+                                        </div>
+                                    </div>
+
+                                    <button class="cardio-start-btn" onclick="app.startCardio()">
+                                        Start ${this._cardioType}
+                                    </button>
+
+                                    <div class="empty-state" style="margin-top: 24px;">
+                                        <div class="empty-icon">◉</div>
+                                        <div class="empty-text">No cardio sessions yet<br>Start your first ${this._cardioType.toLowerCase()}!</div>
                                     </div>
                                 </div>
-
-                                <button class="cardio-start-btn" onclick="app.startCardio()">
-                                    Start ${this._cardioType}
-                                </button>
-
-                                ${this.cardioSessions.length > 0 ? `
-                                    <div style="margin-top:8px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; text-align:center; padding: 16px 0;">
-                                        <div>
-                                            <div style="font-size:20px; font-weight:700; font-family:'DM Mono',monospace; letter-spacing:-0.03em;">${(this.cardioSessions.reduce((s,x) => s + x.distance, 0) / 1000).toFixed(1)}</div>
-                                            <div style="font-size:10px; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.06em;">Total km</div>
-                                        </div>
-                                        <div>
-                                            <div style="font-size:20px; font-weight:700; font-family:'DM Mono',monospace; letter-spacing:-0.03em;">${this.cardioSessions.length}</div>
-                                            <div style="font-size:10px; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.06em;">Sessions</div>
-                                        </div>
-                                        <div>
-                                            <div style="font-size:20px; font-weight:700; font-family:'DM Mono',monospace; letter-spacing:-0.03em;">${Math.round(this.cardioSessions.reduce((s,x) => s + x.duration, 0) / 60)}</div>
-                                            <div style="font-size:10px; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.06em;">Total mins</div>
+                            ` : `
+                                <!-- Week Summary -->
+                                ${thisWeekSessions.length > 0 ? `
+                                    <div style="padding: 0 20px; margin-bottom: 16px;">
+                                        <div class="premium-stat-card" style="padding: 12px 16px; background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%);">
+                                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                                <div>
+                                                    <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px;">This Week</div>
+                                                    <div style="font-size: 24px; font-weight: 700; font-family: 'DM Mono', monospace;">${thisWeekKm.toFixed(1)}km</div>
+                                                </div>
+                                                <div style="text-align: right;">
+                                                    <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px;">${thisWeekSessions.length} ${thisWeekSessions.length === 1 ? 'session' : 'sessions'}</div>
+                                                    <div style="font-size: 16px; font-weight: 600; color: var(--accent);">💪</div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 ` : ''}
-                            </div>
-                            ${historyHtml}
+
+                                <!-- Overall Stats -->
+                                <div style="padding: 0 20px; margin-bottom: 16px;">
+                                    <!-- Monthly Goal Progress -->
+                                    ${(() => {
+                                        const monthlyGoal = this.settings.monthlyCardioGoal || 50; // default 50km
+                                        const thisMonth = new Date().getMonth();
+                                        const thisYear = new Date().getFullYear();
+                                        const monthSessions = this.cardioSessions.filter(s => {
+                                            const d = new Date(s.date);
+                                            return d.getMonth() === thisMonth && d.getFullYear() === thisYear;
+                                        });
+                                        const monthKm = monthSessions.reduce((sum, s) => sum + (s.distance || 0), 0) / 1000;
+                                        const pct = Math.min(100, (monthKm / monthlyGoal * 100));
+                                        
+                                        return `
+                                            <div class="premium-stat-card" style="padding: 16px; margin-bottom: 16px;">
+                                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                                    <div style="font-size: 13px; font-weight: 600; color: var(--text-primary);">Monthly Goal</div>
+                                                    <div style="font-size: 13px; font-weight: 700; font-family: 'DM Mono', monospace; color: ${pct >= 100 ? 'var(--success)' : 'var(--text-primary)'};">${monthKm.toFixed(1)}/${monthlyGoal}km</div>
+                                                </div>
+                                                <div style="height: 8px; background: var(--border); border-radius: 10px; overflow: hidden;">
+                                                    <div style="height: 100%; width: ${pct}%; background: ${pct >= 100 ? 'var(--success)' : pct >= 75 ? 'var(--accent)' : 'var(--primary)'}; transition: width 0.3s;"></div>
+                                                </div>
+                                                <div style="font-size: 11px; color: var(--text-secondary); margin-top: 6px; text-align: center;">
+                                                    ${pct >= 100 ? '🎉 Goal reached!' : `${(monthlyGoal - monthKm).toFixed(1)}km to go`}
+                                                </div>
+                                            </div>
+                                        `;
+                                    })()}
+                                    
+                                    <div class="premium-stat-card" style="padding: 16px;">
+                                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                                            <div style="text-align: center;">
+                                                <div style="font-size: 32px; font-weight: 700; font-family: 'DM Mono', monospace; color: var(--text-primary);">${stats.totalDistance.toFixed(1)}</div>
+                                                <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 4px;">Total km</div>
+                                            </div>
+                                            <div style="text-align: center;">
+                                                <div style="font-size: 32px; font-weight: 700; font-family: 'DM Mono', monospace; color: var(--text-primary);">${stats.totalSessions}</div>
+                                                <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 4px;">Sessions</div>
+                                            </div>
+                                        </div>
+                                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);">
+                                            <div style="text-align: center;">
+                                                <div style="font-size: 18px; font-weight: 700; font-family: 'DM Mono', monospace;">${this.formatDuration(stats.totalTime)}</div>
+                                                <div style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase;">Time</div>
+                                            </div>
+                                            <div style="text-align: center;">
+                                                <div style="font-size: 18px; font-weight: 700; font-family: 'DM Mono', monospace;">${this.formatPace(stats.avgPace)}</div>
+                                                <div style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase;">Avg Pace</div>
+                                            </div>
+                                            <div style="text-align: center;">
+                                                <div style="font-size: 18px; font-weight: 700; font-family: 'DM Mono', monospace;">${stats.longestRun.toFixed(1)}km</div>
+                                                <div style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase;">Longest</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Personal Bests -->
+                                <div style="padding: 0 20px; margin-bottom: 16px;">
+                                    <div class="premium-stat-card">
+                                        <div class="premium-stat-header">Personal Bests</div>
+                                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                                            ${stats.pb5k ? `
+                                                <div style="padding: 12px; background: var(--surface2); border-radius: 10px;">
+                                                    <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px;">5K PB</div>
+                                                    <div style="font-size: 24px; font-weight: 700; font-family: 'DM Mono', monospace;">${this.formatDuration(stats.pb5k)}</div>
+                                                    <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">${this.formatPace(stats.pb5k / 5)} pace</div>
+                                                </div>
+                                            ` : '<div style="padding: 12px; background: var(--surface2); border-radius: 10px; opacity: 0.5; text-align: center;"><div style="font-size: 11px; color: var(--text-secondary);">5K PB</div><div style="font-size: 20px; opacity: 0.3;">—</div></div>'}
+                                            ${stats.pb10k ? `
+                                                <div style="padding: 12px; background: var(--surface2); border-radius: 10px;">
+                                                    <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px;">10K PB</div>
+                                                    <div style="font-size: 24px; font-weight: 700; font-family: 'DM Mono', monospace;">${this.formatDuration(stats.pb10k)}</div>
+                                                    <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">${this.formatPace(stats.pb10k / 10)} pace</div>
+                                                </div>
+                                            ` : '<div style="padding: 12px; background: var(--surface2); border-radius: 10px; opacity: 0.5; text-align: center;"><div style="font-size: 11px; color: var(--text-secondary);">10K PB</div><div style="font-size: 20px; opacity: 0.3;">—</div></div>'}
+                                        </div>
+                                        <div style="padding: 12px; background: var(--surface2); border-radius: 10px; margin-top: 12px;">
+                                            <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px;">Fastest Pace</div>
+                                            <div style="font-size: 24px; font-weight: 700; font-family: 'DM Mono', monospace;">${this.formatPace(stats.fastestPace)}</div>
+                                            <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">per km</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Start new session -->
+                                <div style="padding: 0 20px; margin-bottom: 16px;">
+                                    <div class="cardio-type-selector">
+                                        ${types.map(t => `
+                                            <button class="cardio-type-btn ${this._cardioType === t ? 'active' : ''}" 
+                                                onclick="app.setCardioType('${t}')">
+                                                ${t === 'Run' ? '↑ Run' : t === 'Cycle' ? '◎ Cycle' : '→ Walk'}
+                                            </button>
+                                        `).join('')}
+                                    </div>
+                                    <button class="cardio-start-btn" onclick="app.startCardio()">
+                                        Start ${this._cardioType}
+                                    </button>
+                                </div>
+
+                                <!-- Recent Sessions -->
+                                <div style="padding: 0 20px; margin-bottom: 80px;">
+                                    <div class="premium-stat-card">
+                                        <div class="premium-stat-header">Recent Sessions</div>
+                                        ${this.cardioSessions.slice(-10).reverse().map((s, idx) => {
+                                            const dist = (s.distance / 1000).toFixed(2);
+                                            const pace = s.distance > 0 ? (s.duration / 60) / (s.distance / 1000) : 0;
+                                            const paceStr = s.distance > 0 ? this.formatPace(pace) : '--';
+                                            const mins = Math.floor(s.duration / 60);
+                                            const secs = String(s.duration % 60).padStart(2, '0');
+                                            
+                                            // Pace zone (2: pace zones)
+                                            let zoneColor = 'var(--success)'; // easy (>6:00/km)
+                                            let zoneLabel = '🟢 Easy';
+                                            if (pace < 6 && pace >= 5) {
+                                                zoneColor = 'var(--warning)';
+                                                zoneLabel = '🟡 Tempo';
+                                            } else if (pace < 5) {
+                                                zoneColor = 'var(--danger)';
+                                                zoneLabel = '🔴 Hard';
+                                            }
+                                            
+                                            return `
+                                                <div style="padding: 12px 0; border-bottom: 1px solid var(--border); cursor: pointer;" onclick="app.showCardioSession(${this.cardioSessions.length - 1 - idx})">
+                                                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                                                        <div>
+                                                            <div style="font-size:15px; font-weight:600;">${s.type} · ${s.date}</div>
+                                                            <div style="font-size:11px; color: ${zoneColor}; margin-top: 2px;">${zoneLabel}</div>
+                                                        </div>
+                                                        <div style="font-size:12px; color:var(--text-secondary); font-family: 'DM Mono', monospace;">${mins}:${secs}</div>
+                                                    </div>
+                                                    <div style="display:flex; gap:16px;">
+                                                        <div><div style="font-size:10px;color:var(--text-secondary);text-transform:uppercase;">Distance</div><div style="font-size:16px;font-weight:700;font-family:'DM Mono',monospace;">${dist} km</div></div>
+                                                        <div><div style="font-size:10px;color:var(--text-secondary);text-transform:uppercase;">Pace</div><div style="font-size:16px;font-weight:700;font-family:'DM Mono',monospace;">${paceStr}</div></div>
+                                                        ${s.splits?.length ? `<div><div style="font-size:10px;color:var(--text-secondary);text-transform:uppercase;">Splits</div><div style="font-size:16px;font-weight:700;font-family:'DM Mono',monospace;">${s.splits.length}</div></div>` : ''}
+                                                    </div>
+                                                </div>
+                                            `;
+                                        }).join('')}
+                                    </div>
+                                </div>
+                            `}
                         </div>
                     `;
                 }
             },
+
+            editSessionNotes(sessionId, event) {
+                event?.stopPropagation();
+                
+                const session = this.workoutSessions.find(s => s.id == sessionId);
+                if (!session) return;
+                
+                const currentNote = session.notes || '';
+                const newNote = prompt('Add a note about this workout:', currentNote);
+                
+                if (newNote !== null) {
+                    session.notes = newNote.trim();
+                    this.saveWorkoutSessions();
+                    this.renderHistory();
+                }
+            },
+
+            duplicateLastWorkout() {
+                const lastSession = this.workoutSessions[this.workoutSessions.length - 1];
+                if (!lastSession) {
+                    alert('No previous workouts found');
+                    return;
+                }
+                
+                // Start new session with same exercises
+                this.currentSession = {
+                    id: Date.now(),
+                    exercises: lastSession.exercises.map(ex => ({
+                        name: ex.name,
+                        sets: [{ weight: '', reps: '', rpe: '' }]
+                    })),
+                    startTime: new Date().toISOString()
+                };
+                this.sessionStartTime = Date.now();
+                
+                this.switchTab('workout');
+                this.renderActiveWorkout();
+                this.showNotification('✅ Repeating last workout!');
+            },
+
+            showCardioSession(index) {
+                const session = this.cardioSessions[index];
+                if (!session) return;
+                
+                const dist = (session.distance / 1000).toFixed(2);
+                const pace = session.distance > 0 ? this.formatPace((session.duration / 60) / (session.distance / 1000)) : '--';
+                const mins = Math.floor(session.duration / 60);
+                const secs = String(session.duration % 60).padStart(2, '0');
+                
+                document.body.insertAdjacentHTML('beforeend', `
+                    <div class="modal active" id="cardioSessionModal" style="display: flex;">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h2 class="modal-title">${session.type} - ${session.date}</h2>
+                                <button class="close-btn" onclick="document.getElementById('cardioSessionModal').remove()">×</button>
+                            </div>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+                                <div style="text-align: center; padding: 12px; background: var(--surface2); border-radius: 10px;">
+                                    <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 4px;">Distance</div>
+                                    <div style="font-size: 24px; font-weight: 700; font-family: 'DM Mono', monospace;">${dist}km</div>
+                                </div>
+                                <div style="text-align: center; padding: 12px; background: var(--surface2); border-radius: 10px;">
+                                    <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 4px;">Time</div>
+                                    <div style="font-size: 24px; font-weight: 700; font-family: 'DM Mono', monospace;">${mins}:${secs}</div>
+                                </div>
+                                <div style="text-align: center; padding: 12px; background: var(--surface2); border-radius: 10px;">
+                                    <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 4px;">Pace</div>
+                                    <div style="font-size: 24px; font-weight: 700; font-family: 'DM Mono', monospace;">${pace}</div>
+                                </div>
+                            </div>
+                            
+                            ${session.route && session.route.length > 0 ? `
+                                <div style="margin-bottom: 16px;">
+                                    <div style="font-size: 13px; font-weight: 600; margin-bottom: 8px;">Route Map</div>
+                                    <div style="width: 100%; height: 300px; background: var(--surface2); border-radius: 12px; position: relative;" id="sessionMapContainer">
+                                        <canvas id="sessionMapCanvas" style="width: 100%; height: 100%; border-radius: 12px;"></canvas>
+                                    </div>
+                                </div>
+                            ` : `
+                                <div style="text-align: center; padding: 40px; background: var(--surface2); border-radius: 12px;">
+                                    <div style="font-size: 32px; opacity: 0.3; margin-bottom: 8px;">◉</div>
+                                    <div style="font-size: 13px; color: var(--text-secondary);">No route data recorded</div>
+                                </div>
+                            `}
+                            
+                            ${session.splits && session.splits.length > 0 ? `
+                                <div style="margin-top: 16px;">
+                                    <div style="font-size: 13px; font-weight: 600; margin-bottom: 8px;">Splits</div>
+                                    ${session.splits.map((s, i) => `
+                                        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border);">
+                                            <span style="font-weight: 600;">Km ${i + 1}</span>
+                                            <span style="font-family: 'DM Mono', monospace;">${this.formatPace(s.pace)}</span>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            ` : ''}
+                            
+                            <button class="btn btn-secondary" onclick="document.getElementById('cardioSessionModal').remove()" style="margin-top: 16px; width: 100%;">Close</button>
+                        </div>
+                    </div>
+                `);
+                
+                // Draw route if available
+                if (session.route && session.route.length > 0) {
+                    setTimeout(() => this.drawSessionMap(session.route), 100);
+                }
+            },
+
+            drawSessionMap(route) {
+                const canvas = document.getElementById('sessionMapCanvas');
+                if (!canvas || !route || route.length === 0) return;
+                
+                const ctx = canvas.getContext('2d');
+                const container = canvas.parentElement;
+                canvas.width = container.offsetWidth;
+                canvas.height = container.offsetHeight;
+                
+                // Calculate bounds
+                const lats = route.map(p => p.lat);
+                const lngs = route.map(p => p.lng);
+                const minLat = Math.min(...lats);
+                const maxLat = Math.max(...lats);
+                const minLng = Math.min(...lngs);
+                const maxLng = Math.max(...lngs);
+                
+                const latRange = maxLat - minLat || 0.001;
+                const lngRange = maxLng - minLng || 0.001;
+                
+                // Draw route
+                ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent');
+                ctx.lineWidth = 3;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                
+                ctx.beginPath();
+                route.forEach((point, i) => {
+                    const x = ((point.lng - minLng) / lngRange) * (canvas.width - 40) + 20;
+                    const y = canvas.height - (((point.lat - minLat) / latRange) * (canvas.height - 40) + 20);
+                    
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                });
+                ctx.stroke();
+                
+                // Start marker
+                const startX = ((route[0].lng - minLng) / lngRange) * (canvas.width - 40) + 20;
+                const startY = canvas.height - (((route[0].lat - minLat) / latRange) * (canvas.height - 40) + 20);
+                ctx.fillStyle = '#4ade80';
+                ctx.beginPath();
+                ctx.arc(startX, startY, 6, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // End marker
+                const endX = ((route[route.length - 1].lng - minLng) / lngRange) * (canvas.width - 40) + 20;
+                const endY = canvas.height - (((route[route.length - 1].lat - minLat) / latRange) * (canvas.height - 40) + 20);
+                ctx.fillStyle = '#ef4444';
+                ctx.beginPath();
+                ctx.arc(endX, endY, 6, 0, Math.PI * 2);
+                ctx.fill();
+            },
+
+            calculateCardioStats() {
+                const sessions = this.cardioSessions;
+                
+                const totalDistance = sessions.reduce((sum, s) => sum + (s.distance || 0), 0) / 1000; // in km
+                const totalTime = sessions.reduce((sum, s) => sum + (s.duration || 0), 0); // in seconds
+                const totalSessions = sessions.length;
+                
+                // Average pace (min/km)
+                const avgPace = totalDistance > 0 ? (totalTime / 60) / totalDistance : 0;
+                
+                // Longest run
+                const longestRun = Math.max(...sessions.map(s => (s.distance || 0) / 1000), 0);
+                
+                // Fastest pace ever (min/km)
+                const paces = sessions.map(s => {
+                    if (!s.distance || !s.duration) return Infinity;
+                    return (s.duration / 60) / (s.distance / 1000);
+                }).filter(p => p < Infinity);
+                const fastestPace = paces.length > 0 ? Math.min(...paces) : 0;
+                
+                // Personal bests for standard distances
+                const pb5k = sessions
+                    .filter(s => (s.distance / 1000) >= 4.8 && (s.distance / 1000) <= 5.2)
+                    .map(s => s.duration)
+                    .sort((a, b) => a - b)[0] || null;
+                    
+                const pb10k = sessions
+                    .filter(s => (s.distance / 1000) >= 9.8 && (s.distance / 1000) <= 10.2)
+                    .map(s => s.duration)
+                    .sort((a, b) => a - b)[0] || null;
+                
+                return {
+                    totalDistance,
+                    totalTime,
+                    totalSessions,
+                    avgPace,
+                    longestRun,
+                    fastestPace,
+                    pb5k,
+                    pb10k
+                };
+            },
+
 
             setCardioType(type) {
                 this._cardioType = type;
@@ -6036,6 +6414,27 @@ Tracked with Gym Tracker
                 const m = Math.floor(minPerKm);
                 const s = String(Math.round((minPerKm - m) * 60)).padStart(2, '0');
                 return `${m}:${s}`;
+            },
+
+            generateTestCardio() {
+                // Generate 10 test cardio sessions with realistic data
+                const testSessions = [
+                    { type: 'Run', date: '2024-02-10', distance: 3200, duration: 18 * 60 + 30, splits: [] }, // 3.2km easy
+                    { type: 'Run', date: '2024-02-12', distance: 5100, duration: 28 * 60 + 45, splits: [] }, // 5K PB attempt
+                    { type: 'Run', date: '2024-02-14', distance: 4500, duration: 24 * 60 + 20, splits: [] }, // 4.5km tempo
+                    { type: 'Walk', date: '2024-02-15', distance: 2800, duration: 35 * 60, splits: [] }, // recovery walk
+                    { type: 'Run', date: '2024-02-17', distance: 7200, duration: 42 * 60 + 10, splits: [] }, // long run
+                    { type: 'Run', date: '2024-02-19', distance: 5000, duration: 26 * 60 + 15, splits: [] }, // 5K
+                    { type: 'Cycle', date: '2024-02-20', distance: 15000, duration: 45 * 60, splits: [] }, // bike ride
+                    { type: 'Run', date: '2024-02-22', distance: 10200, duration: 58 * 60 + 30, splits: [] }, // 10K PB
+                    { type: 'Run', date: '2024-02-24', distance: 3800, duration: 20 * 60, splits: [] }, // easy 3.8K
+                    { type: 'Run', date: '2024-02-26', distance: 6000, duration: 34 * 60, splits: [] }, // 6K steady
+                ];
+                
+                this.cardioSessions = [...this.cardioSessions, ...testSessions];
+                this.saveCardioSessions();
+                this.renderCardio();
+                this.showNotification('✅ Generated 10 test cardio sessions!');
             },
 
             showSection(section) {
@@ -6778,7 +7177,14 @@ Tracked with Gym Tracker
                             <div class="card" style="margin-bottom: 12px;">
                                 <div class="card-header">
                                     <div class="card-title">${exercise.name}</div>
-                                    <button class="icon-btn danger" onclick="app.removeExerciseFromSession(${exIndex})">×</button>
+                                    <div style="display: flex; gap: 8px;">
+                                        <button onclick="app.startVoiceInput(${exIndex}, -1); event.stopPropagation();" 
+                                            style="background: var(--surface2); border: 1px solid var(--border); width: 36px; height: 36px; border-radius: 50%; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center;"
+                                            id="voiceBtn-${exIndex}" title="Voice input">
+                                            🎤
+                                        </button>
+                                        <button class="icon-btn danger" onclick="app.removeExerciseFromSession(${exIndex})">×</button>
+                                    </div>
                                 </div>
                                 
                                 ${lastWorkout ? `
@@ -6825,38 +7231,31 @@ Tracked with Gym Tracker
                                             </div>
                                         ` : ''}
                                         
-                                        <div style="display: flex; gap: 8px; align-items: flex-end;">
-                                            <div style="flex: 1; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
-                                                <div>
-                                                    <label style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; display: block; margin-bottom: 4px;">Weight</label>
-                                                    <input type="number" id="weight-${exIndex}-${setIndex}" value="${set.weight || ''}" 
-                                                        onchange="app.updateSessionSet(${exIndex}, ${setIndex}, 'weight', this.value); app.updateLiveVolume();"
-                                                        onclick="event.stopPropagation()"
-                                                        placeholder="BW" 
-                                                        style="width: 100%; padding: 12px 8px; border: 1px solid var(--border); border-radius: 10px; font-size: 16px; background: var(--surface2); color: var(--text-primary); font-family: 'DM Mono', monospace; text-align: center;">
-                                                </div>
-                                                <div>
-                                                    <label style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; display: block; margin-bottom: 4px;">Reps</label>
-                                                    <input type="number" id="reps-${exIndex}-${setIndex}" value="${set.reps || ''}" 
-                                                        onchange="app.updateSessionSet(${exIndex}, ${setIndex}, 'reps', this.value); app.maybeStartRestTimer(); app.checkForPR(${exIndex}, ${setIndex}); app.updateLiveVolume();"
-                                                        onclick="event.stopPropagation()"
-                                                        placeholder="${lastWorkout?.sets[setIndex]?.reps || '0'}" 
-                                                        style="width: 100%; padding: 12px 8px; border: 1px solid var(--border); border-radius: 10px; font-size: 16px; background: var(--surface2); color: var(--text-primary); font-family: 'DM Mono', monospace; text-align: center;">
-                                                </div>
-                                                <div>
-                                                    <label style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; display: block; margin-bottom: 4px;">RPE</label>
-                                                    <input type="number" min="1" max="10" id="rpe-${exIndex}-${setIndex}" value="${set.rpe || ''}" 
-                                                        onchange="app.updateSessionSet(${exIndex}, ${setIndex}, 'rpe', this.value)"
-                                                        onclick="event.stopPropagation()"
-                                                        placeholder="—" 
-                                                        style="width: 100%; padding: 12px 8px; border: 1px solid var(--border); border-radius: 10px; font-size: 16px; background: var(--surface2); color: var(--text-primary); font-family: 'DM Mono', monospace; text-align: center;">
-                                                </div>
+                                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+                                            <div>
+                                                <label style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; display: block; margin-bottom: 4px;">Weight</label>
+                                                <input type="number" id="weight-${exIndex}-${setIndex}" value="${set.weight || ''}" 
+                                                    onchange="app.updateSessionSet(${exIndex}, ${setIndex}, 'weight', this.value); app.updateLiveVolume();"
+                                                    onclick="event.stopPropagation()"
+                                                    placeholder="BW" 
+                                                    style="width: 100%; padding: 12px 8px; border: 1px solid var(--border); border-radius: 10px; font-size: 16px; background: var(--surface2); color: var(--text-primary); font-family: 'DM Mono', monospace; text-align: center;">
                                             </div>
-                                            <button onclick="app.startVoiceInput(${exIndex}, ${setIndex}); event.stopPropagation();" 
-                                                style="width: 48px; height: 48px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface2); color: var(--text-primary); font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"
-                                                id="voiceBtn-${exIndex}-${setIndex}">
-                                                🎤
-                                            </button>
+                                            <div>
+                                                <label style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; display: block; margin-bottom: 4px;">Reps</label>
+                                                <input type="number" id="reps-${exIndex}-${setIndex}" value="${set.reps || ''}" 
+                                                    onchange="app.updateSessionSet(${exIndex}, ${setIndex}, 'reps', this.value); app.maybeStartRestTimer(); app.checkForPR(${exIndex}, ${setIndex}); app.updateLiveVolume();"
+                                                    onclick="event.stopPropagation()"
+                                                    placeholder="${lastWorkout?.sets[setIndex]?.reps || '0'}" 
+                                                    style="width: 100%; padding: 12px 8px; border: 1px solid var(--border); border-radius: 10px; font-size: 16px; background: var(--surface2); color: var(--text-primary); font-family: 'DM Mono', monospace; text-align: center;">
+                                            </div>
+                                            <div>
+                                                <label style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; display: block; margin-bottom: 4px;">RPE</label>
+                                                <input type="number" min="1" max="10" id="rpe-${exIndex}-${setIndex}" value="${set.rpe || ''}" 
+                                                    onchange="app.updateSessionSet(${exIndex}, ${setIndex}, 'rpe', this.value)"
+                                                    onclick="event.stopPropagation()"
+                                                    placeholder="—" 
+                                                    style="width: 100%; padding: 12px 8px; border: 1px solid var(--border); border-radius: 10px; font-size: 16px; background: var(--surface2); color: var(--text-primary); font-family: 'DM Mono', monospace; text-align: center;">
+                                            </div>
                                         </div>
                                     </div>
                                 `}).join('')}
@@ -6871,11 +7270,6 @@ Tracked with Gym Tracker
                                         </button>
                                     ` : ''}
                                 </div>
-                                ${exercise.sets[0]?.weight ? `
-                                    <button class="btn btn-secondary" onclick="app.showWarmupSets('${exercise.name}', ${exercise.sets[0].weight})" style="margin-top: 8px;">
-                                        Warm-up Sets
-                                    </button>
-                                ` : ''}
                             </div>
                         `;
                     }).join('')}
@@ -7000,34 +7394,48 @@ Tracked with Gym Tracker
                 recognition.continuous = false;
                 recognition.interimResults = false;
 
-                const btn = document.getElementById(`voiceBtn-${exIndex}-${setIndex}`);
+                // Find next empty set if setIndex is -1 (exercise-level button)
+                let targetSetIndex = setIndex;
+                if (setIndex === -1) {
+                    const exercise = this.currentSession.exercises[exIndex];
+                    targetSetIndex = exercise.sets.findIndex(s => !s.weight || !s.reps);
+                    if (targetSetIndex === -1) targetSetIndex = exercise.sets.length - 1; // Use last set if all filled
+                }
+
+                const btn = document.getElementById(setIndex === -1 ? `voiceBtn-${exIndex}` : `voiceBtn-${exIndex}-${setIndex}`);
                 btn.style.background = 'var(--danger)';
                 btn.textContent = '🔴';
                 this.triggerHaptic();
 
                 recognition.onresult = (event) => {
                     const transcript = event.results[0][0].transcript.toLowerCase();
-                    console.log('Voice input:', transcript);
-                    
-                    // Parse various formats:
-                    // "100kg 8 reps", "100 8", "hundred kilograms 8 reps", "one hundred eight"
+
                     const parsed = this.parseVoiceInput(transcript);
                     
                     if (parsed.weight !== null) {
-                        document.getElementById(`weight-${exIndex}-${setIndex}`).value = parsed.weight;
-                        this.updateSessionSet(exIndex, setIndex, 'weight', parsed.weight);
+                        const input = document.getElementById(`weight-${exIndex}-${targetSetIndex}`);
+                        if (input) {
+                            input.value = parsed.weight;
+                            this.updateSessionSet(exIndex, targetSetIndex, 'weight', parsed.weight);
+                        }
                     }
                     
                     if (parsed.reps !== null) {
-                        document.getElementById(`reps-${exIndex}-${setIndex}`).value = parsed.reps;
-                        this.updateSessionSet(exIndex, setIndex, 'reps', parsed.reps);
-                        this.maybeStartRestTimer();
-                        this.checkForPR(exIndex, setIndex);
+                        const input = document.getElementById(`reps-${exIndex}-${targetSetIndex}`);
+                        if (input) {
+                            input.value = parsed.reps;
+                            this.updateSessionSet(exIndex, targetSetIndex, 'reps', parsed.reps);
+                            this.maybeStartRestTimer();
+                            this.checkForPR(exIndex, targetSetIndex);
+                        }
                     }
                     
                     if (parsed.rpe !== null) {
-                        document.getElementById(`rpe-${exIndex}-${setIndex}`).value = parsed.rpe;
-                        this.updateSessionSet(exIndex, setIndex, 'rpe', parsed.rpe);
+                        const input = document.getElementById(`rpe-${exIndex}-${targetSetIndex}`);
+                        if (input) {
+                            input.value = parsed.rpe;
+                            this.updateSessionSet(exIndex, targetSetIndex, 'rpe', parsed.rpe);
+                        }
                     }
 
                     this.updateLiveVolume();
@@ -7658,46 +8066,13 @@ Tracked with Gym Tracker
                 
                 let html = `
                     <div class="section-header">
-                        <div class="section-title">Health <span style="font-size: 10px; color: var(--text-secondary);">v3.1</span></div>
-                        <div style="display: flex; gap: 12px;">
-                            <div class="section-action" onclick="app.showWeeklyReport()">Weekly Report</div>
-                            <div class="section-action" onclick="app.logDailyHealth()">+ Log</div>
-                        </div>
+                        <div class="section-title">Health</div>
+                        <div class="section-action" onclick="app.logDailyHealth()">+ Log</div>
                     </div>
-
-                    ${!this.garminConnected ? `
-                        <div class="premium-stat-card" style="background: linear-gradient(135deg, #0080FF 0%, #0057B3 100%); color: white; margin-bottom: 16px;">
-                            <div style="text-align: center; padding: 20px 0;">
-                                <div style="font-size: 40px; margin-bottom: 12px;">⌚</div>
-                                <div style="font-size: 16px; font-weight: 600; margin-bottom: 8px;">Connect Garmin</div>
-                                <div style="font-size: 13px; opacity: 0.9; margin-bottom: 20px; line-height: 1.5;">
-                                    Auto-sync your sleep, heart rate, stress, and Body Battery
-                                </div>
-                                <button onclick="app.connectGarmin()" style="background: white; color: #0080FF; border: none; padding: 12px 32px; border-radius: 24px; font-size: 15px; font-weight: 600; cursor: pointer;">
-                                    Connect Garmin
-                                </button>
-                            </div>
-                        </div>
-                    ` : `
-                        <div class="premium-stat-card" style="background: var(--surface); margin-bottom: 16px; border: 1px solid var(--success);">
-                            <div style="display: flex; align-items: center; justify-content: space-between;">
-                                <div style="display: flex; align-items: center; gap: 12px;">
-                                    <div style="font-size: 24px;">✓</div>
-                                    <div>
-                                        <div style="font-size: 14px; font-weight: 600; color: var(--text-primary);">Garmin Connected</div>
-                                        <div style="font-size: 12px; color: var(--text-secondary);">Last synced: ${this.garminData.lastSync || 'Never'}</div>
-                                    </div>
-                                </div>
-                                <button onclick="app.syncGarmin()" style="background: var(--accent); color: #141414; color: white; border: none; padding: 8px 16px; border-radius: 16px; font-size: 13px; font-weight: 600; cursor: pointer;">
-                                    Sync Now
-                                </button>
-                            </div>
-                        </div>
-                    `}
                 `;
                 
-                // Readiness Ring (Whoop-style)
-                if (todayLog && readiness) {
+                // Readiness Ring (always show, even if empty)
+                if (readiness) {
                     const circumference = 2 * Math.PI * 90;
                     const offset = circumference - (readiness.score / 100) * circumference;
                     
@@ -7706,7 +8081,7 @@ Tracked with Gym Tracker
                     else if (readiness.score < 70) ringColor = 'var(--warning)';
                     
                     html += `
-                        <div class="premium-stat-card" style="background: var(--surface); margin-bottom: 12px;">
+                        <div class="premium-stat-card" style="background: var(--surface); margin-bottom: 16px;">
                             <div class="readiness-ring">
                                 <svg width="200" height="200">
                                     <circle class="readiness-ring-bg" cx="100" cy="100" r="90"/>
@@ -7721,11 +8096,11 @@ Tracked with Gym Tracker
                                     <div class="readiness-score-label">READINESS</div>
                                 </div>
                             </div>
-                            <div style="text-align: center; margin-top: 16px; margin-bottom: 20px;">
-                                <div style="font-size: 17px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; letter-spacing: -0.02em;">
+                            <div style="text-align: center; margin-top: 16px;">
+                                <div style="font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">
                                     ${readiness.status}
                                 </div>
-                                <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">
+                                <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.5; max-width: 280px; margin: 0 auto;">
                                     ${readiness.recommendation}
                                 </div>
                             </div>
@@ -7733,391 +8108,177 @@ Tracked with Gym Tracker
                     `;
                 } else {
                     html += `
-                        <div class="premium-stat-card" style="text-align: center; padding: 48px 20px;">
+                        <div class="premium-stat-card" style="text-align: center; padding: 40px 20px; margin-bottom: 16px;">
+                            <div style="font-size: 48px; margin-bottom: 12px; opacity: 0.3;">📊</div>
                             <div style="font-size: 15px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">
                                 No data logged today
                             </div>
                             <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 20px;">
-                                Log your health metrics to see your readiness score
+                                Log your metrics to see your readiness score
                             </div>
                             <button class="btn btn-primary" onclick="app.logDailyHealth()">Log Today's Data</button>
                         </div>
                     `;
                 }
                 
-                // Today's Metrics (Clean rows)
-                if (todayLog) {
-                    html += `
-                        <div class="premium-stat-card">
-                            <div class="premium-stat-header">Today's Metrics</div>
-                            ${todayLog.sleep ? `
-                                <div class="metric-row">
-                                    <div>
-                                        <div class="metric-label-small">Sleep</div>
-                                        <div class="metric-value-large">${todayLog.sleep}h</div>
-                                    </div>
-                                    ${todayLog.sleepQuality ? `<div class="metric-value-small">${todayLog.sleepQuality}/10 quality</div>` : ''}
-                                </div>
-                            ` : ''}
-                            ${todayLog.rhr ? `
-                                <div class="metric-row">
-                                    <div class="metric-label-small">Resting Heart Rate</div>
-                                    <div class="metric-value-large">${todayLog.rhr} <span style="font-size: 16px; font-weight: 500;">bpm</span></div>
-                                </div>
-                            ` : ''}
-                            ${todayLog.hrv ? `
-                                <div class="metric-row">
-                                    <div class="metric-label-small">HRV</div>
-                                    <div class="metric-value-large">${todayLog.hrv} <span style="font-size: 16px; font-weight: 500;">ms</span></div>
-                                </div>
-                            ` : ''}
-                            ${todayLog.energy ? `
-                                <div class="metric-row">
-                                    <div class="metric-label-small">Energy Level</div>
-                                    <div style="display: flex; align-items: center; gap: 12px;">
-                                        <div class="metric-value-small">${todayLog.energy}/10</div>
-                                        <div class="mini-chart" style="width: 100px;">
-                                            ${Array.from({length: 10}, (_, i) => `
-                                                <div class="mini-chart-bar ${i < todayLog.energy ? 'active' : ''}" style="height: ${(i + 1) * 4}px;"></div>
-                                            `).join('')}
-                                        </div>
-                                    </div>
-                                </div>
-                            ` : ''}
-                            ${todayLog.soreness ? `
-                                <div class="metric-row">
-                                    <div class="metric-label-small">Muscle Soreness</div>
-                                    <div class="metric-value-small">${todayLog.soreness}/10</div>
-                                </div>
-                            ` : ''}
-                        </div>
-                    `;
-                }
-                
-                // Nutrition (Premium cards with progress bars)
-                if (todayLog && (todayLog.caloriesIn || todayLog.protein)) {
-                    const calTarget = this.settings.calTarget || 2500;
-                    const proteinTarget = this.settings.proteinTarget || 160;
-                    const carbTarget = this.settings.carbTarget || 250;
-                    const fatTarget = this.settings.fatTarget || 80;
-
-                    const calPct = Math.min(100, Math.round((todayLog.caloriesIn / calTarget) * 100));
-                    const proteinPct = Math.min(100, Math.round((todayLog.protein / proteinTarget) * 100));
-                    const carbPct = Math.min(100, Math.round((todayLog.carbs / carbTarget) * 100));
-                    const fatPct = Math.min(100, Math.round((todayLog.fats / fatTarget) * 100));
-
-                    html += `
-                        <div class="premium-stat-card">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                                <div class="premium-stat-header" style="margin: 0;">Nutrition</div>
-                                <div style="font-size: 12px; color: var(--text-secondary);" onclick="app.showNutritionTargets()" style="cursor: pointer;">Set Targets ›</div>
-                            </div>
-
-                            ${todayLog.caloriesIn ? `
-                                <div class="nutrition-bar-row">
-                                    <div class="nutrition-bar-header">
-                                        <div class="nutrition-bar-name">Calories</div>
-                                        <div class="nutrition-bar-amounts">${todayLog.caloriesIn} / ${calTarget} kcal</div>
-                                    </div>
-                                    <div class="nutrition-bar-track">
-                                        <div class="nutrition-bar-fill" style="width: ${calPct}%; background: ${calPct > 110 ? 'var(--danger)' : calPct > 90 ? 'var(--success)' : 'var(--primary)'};"></div>
-                                    </div>
-                                </div>
-                            ` : ''}
-                            ${todayLog.protein ? `
-                                <div class="nutrition-bar-row">
-                                    <div class="nutrition-bar-header">
-                                        <div class="nutrition-bar-name">Protein</div>
-                                        <div class="nutrition-bar-amounts">${todayLog.protein}g / ${proteinTarget}g</div>
-                                    </div>
-                                    <div class="nutrition-bar-track">
-                                        <div class="nutrition-bar-fill" style="width: ${proteinPct}%; background: #FF6B35;"></div>
-                                    </div>
-                                </div>
-                            ` : ''}
-                            ${todayLog.carbs ? `
-                                <div class="nutrition-bar-row">
-                                    <div class="nutrition-bar-header">
-                                        <div class="nutrition-bar-name">Carbs</div>
-                                        <div class="nutrition-bar-amounts">${todayLog.carbs}g / ${carbTarget}g</div>
-                                    </div>
-                                    <div class="nutrition-bar-track">
-                                        <div class="nutrition-bar-fill" style="width: ${carbPct}%; background: #FFB800;"></div>
-                                    </div>
-                                </div>
-                            ` : ''}
-                            ${todayLog.fats ? `
-                                <div class="nutrition-bar-row">
-                                    <div class="nutrition-bar-header">
-                                        <div class="nutrition-bar-name">Fats</div>
-                                        <div class="nutrition-bar-amounts">${todayLog.fats}g / ${fatTarget}g</div>
-                                    </div>
-                                    <div class="nutrition-bar-track">
-                                        <div class="nutrition-bar-fill" style="width: ${fatPct}%; background: #9B59B6;"></div>
-                                    </div>
-                                </div>
-                            ` : ''}
-                        </div>
-                    `;
-                } else if (!todayLog) {
-                    html += `
-                        <div class="premium-stat-card" style="opacity: 0.6;">
-                            <div class="premium-stat-header">Nutrition</div>
-                            <div style="font-size: 13px; color: var(--text-secondary);">Log today's data to track nutrition</div>
-                        </div>
-                    `;
-                }
-                
-                // Weekly Trends
+                // 2x2 Dashboard Grid
+                // Calculate weekly averages for comparison
                 const weeklyData = this.getWeeklyHealthData();
-                if (weeklyData.length > 1) {
-                    const avgSleep = this.calculateAverage(weeklyData.map(d => d.sleep).filter(Boolean));
-                    const avgRHR = this.calculateAverage(weeklyData.map(d => d.rhr).filter(Boolean));
-                    const avgProtein = this.calculateAverage(weeklyData.map(d => d.protein).filter(Boolean));
-                    
-                    // Calculate trends
-                    const last3Days = weeklyData.slice(-3);
-                    const first3Days = weeklyData.slice(0, 3);
-                    const recentSleep = this.calculateAverage(last3Days.map(d => d.sleep).filter(Boolean));
-                    const earlierSleep = this.calculateAverage(first3Days.map(d => d.sleep).filter(Boolean));
-                    const sleepTrend = earlierSleep ? ((recentSleep - earlierSleep) / earlierSleep * 100).toFixed(0) : 0;
-                    
-                    html += `
-                        <div class="premium-stat-card">
-                            <div class="premium-stat-header">7-Day Trends</div>
-                            ${avgSleep ? `
-                                <div class="metric-row">
-                                    <div>
-                                        <div class="metric-label-small">Average Sleep</div>
-                                        <div class="metric-value-large">${avgSleep.toFixed(1)}h</div>
+                const avgSleep = weeklyData.length > 0 ? this.calculateAverage(weeklyData.map(d => d.sleep).filter(Boolean)) : null;
+                const avgEnergy = weeklyData.length > 0 ? this.calculateAverage(weeklyData.map(d => d.energy).filter(Boolean)) : null;
+                const avgHRV = weeklyData.length > 0 ? this.calculateAverage(weeklyData.map(d => d.hrv).filter(Boolean)) : null;
+                const avgRHR = weeklyData.length > 0 ? this.calculateAverage(weeklyData.map(d => d.rhr).filter(Boolean)) : null;
+
+                html += `
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+                        <!-- Sleep Card -->
+                        <div class="premium-stat-card" onclick="app.quickLogMetric('recovery')" style="cursor: pointer; padding: 16px;">
+                            <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px;">Sleep</div>
+                            ${todayLog?.sleep ? `
+                                <div style="font-size: 32px; font-weight: 700; font-family: 'DM Mono', monospace; color: var(--text-primary); margin-bottom: 4px;">${todayLog.sleep}<span style="font-size: 18px;">h</span></div>
+                                ${avgSleep && Math.abs(todayLog.sleep - avgSleep) >= 0.5 ? `
+                                    <div style="font-size: 12px; color: ${todayLog.sleep > avgSleep ? 'var(--success)' : 'var(--danger)'}; margin-bottom: 6px;">
+                                        ${todayLog.sleep > avgSleep ? '+' : ''}${(todayLog.sleep - avgSleep).toFixed(1)}h vs avg
                                     </div>
-                                    ${sleepTrend != 0 ? `<div class="metric-change ${sleepTrend > 0 ? 'positive' : 'negative'}">${sleepTrend > 0 ? '+' : ''}${sleepTrend}%</div>` : ''}
-                                </div>
-                            ` : ''}
-                            ${avgRHR ? `
-                                <div class="metric-row">
-                                    <div class="metric-label-small">Average RHR</div>
-                                    <div class="metric-value-large">${Math.round(avgRHR)} <span style="font-size: 16px; font-weight: 500;">bpm</span></div>
-                                </div>
-                            ` : ''}
-                            ${avgProtein ? `
-                                <div class="metric-row">
-                                    <div class="metric-label-small">Average Protein</div>
-                                    <div class="metric-value-large">${Math.round(avgProtein)}g</div>
-                                </div>
-                            ` : ''}
+                                ` : avgSleep ? `<div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 6px;">On target</div>` : ''}
+                                ${this.renderMiniSparkline(weeklyData.map(d => d.sleep || 0))}
+                            ` : `
+                                <div style="font-size: 32px; font-weight: 700; color: var(--text-secondary); opacity: 0.3; margin-bottom: 4px;">—</div>
+                                <div style="font-size: 12px; color: var(--text-secondary);">Tap to log</div>
+                            `}
                         </div>
-                    `;
-                }
+
+                        <!-- Energy Card -->
+                        <div class="premium-stat-card" onclick="app.quickLogMetric('recovery')" style="cursor: pointer; padding: 16px;">
+                            <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px;">Energy</div>
+                            ${todayLog?.energy ? `
+                                <div style="font-size: 32px; font-weight: 700; font-family: 'DM Mono', monospace; color: var(--text-primary); margin-bottom: 4px;">${todayLog.energy}<span style="font-size: 18px;">/10</span></div>
+                                ${avgEnergy && Math.abs(todayLog.energy - avgEnergy) >= 1 ? `
+                                    <div style="font-size: 12px; color: ${todayLog.energy > avgEnergy ? 'var(--success)' : 'var(--danger)'}; margin-bottom: 6px;">
+                                        ${todayLog.energy > avgEnergy ? '+' : ''}${(todayLog.energy - avgEnergy).toFixed(1)} vs avg
+                                    </div>
+                                ` : avgEnergy ? `<div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 6px;">Normal</div>` : ''}
+                                <div style="display: flex; gap: 2px; margin-top: 8px;">
+                                    ${Array.from({length: 10}, (_, i) => `
+                                        <div style="flex: 1; height: 4px; background: ${i < todayLog.energy ? 'var(--accent)' : 'var(--border)'}; border-radius: 2px;"></div>
+                                    `).join('')}
+                                </div>
+                            ` : `
+                                <div style="font-size: 32px; font-weight: 700; color: var(--text-secondary); opacity: 0.3; margin-bottom: 4px;">—</div>
+                                <div style="font-size: 12px; color: var(--text-secondary);">Tap to log</div>
+                            `}
+                        </div>
+
+                        <!-- Nutrition Card -->
+                        <div class="premium-stat-card" onclick="app.quickLogMetric('nutrition')" style="cursor: pointer; padding: 16px;">
+                            <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px;">Nutrition</div>
+                            ${todayLog?.caloriesIn ? `
+                                <div style="font-size: 32px; font-weight: 700; font-family: 'DM Mono', monospace; color: var(--text-primary); margin-bottom: 4px;">${todayLog.caloriesIn}<span style="font-size: 14px;">kcal</span></div>
+                                ${todayLog.protein ? `
+                                    <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 6px;">Protein: ${todayLog.protein}g</div>
+                                ` : ''}
+                                ${this.renderMiniSparkline(weeklyData.map(d => d.caloriesIn || 0))}
+                            ` : `
+                                <div style="font-size: 32px; font-weight: 700; color: var(--text-secondary); opacity: 0.3; margin-bottom: 4px;">—</div>
+                                <div style="font-size: 12px; color: var(--text-secondary);">Tap to log</div>
+                            `}
+                        </div>
+
+                        <!-- Recovery Card -->
+                        <div class="premium-stat-card" onclick="app.quickLogMetric('recovery')" style="cursor: pointer; padding: 16px;">
+                            <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px;">Recovery</div>
+                            ${todayLog?.hrv ? `
+                                <div style="font-size: 32px; font-weight: 700; font-family: 'DM Mono', monospace; color: var(--text-primary); margin-bottom: 4px;">${todayLog.hrv}<span style="font-size: 14px;">ms</span></div>
+                                ${avgHRV && Math.abs(todayLog.hrv - avgHRV) >= 5 ? `
+                                    <div style="font-size: 12px; color: ${todayLog.hrv > avgHRV ? 'var(--success)' : 'var(--danger)'}; margin-bottom: 6px;">
+                                        ${todayLog.hrv > avgHRV ? '+' : ''}${Math.round(todayLog.hrv - avgHRV)}ms vs avg
+                                    </div>
+                                ` : avgHRV ? `<div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 6px;">Normal</div>` : ''}
+                                ${this.renderMiniSparkline(weeklyData.map(d => d.hrv || 0))}
+                            ` : todayLog?.rhr ? `
+                                <div style="font-size: 32px; font-weight: 700; font-family: 'DM Mono', monospace; color: var(--text-primary); margin-bottom: 4px;">${todayLog.rhr}<span style="font-size: 14px;">bpm</span></div>
+                                ${avgRHR && Math.abs(todayLog.rhr - avgRHR) >= 3 ? `
+                                    <div style="font-size: 12px; color: ${todayLog.rhr < avgRHR ? 'var(--success)' : 'var(--danger)'}; margin-bottom: 6px;">
+                                        ${todayLog.rhr < avgRHR ? '' : '+'}${Math.round(todayLog.rhr - avgRHR)}bpm vs avg
+                                    </div>
+                                ` : avgRHR ? `<div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 6px;">Normal</div>` : ''}
+                                ${this.renderMiniSparkline(weeklyData.map(d => d.rhr || 0))}
+                            ` : `
+                                <div style="font-size: 32px; font-weight: 700; color: var(--text-secondary); opacity: 0.3; margin-bottom: 4px;">—</div>
+                                <div style="font-size: 12px; color: var(--text-secondary);">Tap to log</div>
+                            `}
+                        </div>
+                    </div>
+                `;
+
+                // Quick Actions
+                html += `
+                    <div style="display: flex; gap: 8px; margin-bottom: 80px;">
+                        <button class="btn btn-secondary" onclick="app.showWeeklyReport()" style="flex: 1;">
+                            Weekly Report
+                        </button>
+                        ${this.garminConnected ? `
+                            <button class="btn btn-secondary" onclick="app.syncGarmin()" style="flex: 1;">
+                                Sync Garmin
+                            </button>
+                        ` : ''}
+                    </div>
+                `;
                 
-                // Insights & Correlations
-                html += this.renderHealthCorrelations();
-                
-                document.getElementById('healthContent').innerHTML = html;
+                document.getElementById('health').innerHTML = html;
             },
 
-            showHealthDashboard() {
-                const today = new Date().toISOString().split('T')[0];
-                const todayLog = this.dailyLogs[today] || null;
-                const readiness = todayLog ? this.calculateReadinessScore(todayLog) : null;
+            renderMiniSparkline(data) {
+                // Show last 7 days as tiny line chart
+                if (!data || data.length < 2) return '';
                 
-                let html = `
-                    <div class="section-header">
-                        <div class="section-title">Health Dashboard</div>
-                        <div class="section-action" onclick="app.logDailyHealth()">+ Log Today</div>
-                    </div>
+                const last7 = data.slice(-7);
+                const max = Math.max(...last7.filter(Boolean));
+                const min = Math.min(...last7.filter(Boolean));
+                const range = max - min || 1;
+                
+                const points = last7.map((val, i) => {
+                    if (!val) return '';
+                    const x = (i / (last7.length - 1)) * 100;
+                    const y = 100 - ((val - min) / range * 100);
+                    return `${x},${y}`;
+                }).filter(Boolean).join(' ');
+                
+                if (!points) return '';
+                
+                return `
+                    <svg width="100%" height="24" style="margin-top: 6px;">
+                        <polyline 
+                            points="${points}" 
+                            fill="none" 
+                            stroke="var(--text-secondary)" 
+                            stroke-width="2" 
+                            opacity="0.4"
+                            vector-effect="non-scaling-stroke"
+                        />
+                    </svg>
                 `;
-                
-                // Today's Stats
-                if (todayLog) {
-                    html += `
-                        <div class="card" style="background: var(--text-primary); color: white; margin-bottom: 16px;">
-                            <div style="text-align: center; margin-bottom: 16px;">
-                                <div style="font-size: 64px; font-weight: 700;">${readiness.score}</div>
-                                <div style="font-size: 18px; font-weight: 600; margin-bottom: 4px;">Readiness Score</div>
-                                <div style="font-size: 14px; opacity: 0.9;">${readiness.status}</div>
-                            </div>
-                            <div style="padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.2);">
-                                <div style="font-size: 13px; opacity: 0.9; margin-bottom: 8px;">${readiness.recommendation}</div>
-                            </div>
-                        </div>
+            },
 
-                        <div class="stats-grid">
-                            ${todayLog.sleep ? `
-                                <div class="stat-card">
-                                    <div class="stat-value">${todayLog.sleep}h</div>
-                                    <div class="stat-label">Sleep</div>
-                                </div>
-                            ` : ''}
-                            ${todayLog.rhr ? `
-                                <div class="stat-card">
-                                    <div class="stat-value">${todayLog.rhr}</div>
-                                    <div class="stat-label">RHR (bpm)</div>
-                                </div>
-                            ` : ''}
-                            ${todayLog.energy ? `
-                                <div class="stat-card">
-                                    <div class="stat-value">${todayLog.energy}/10</div>
-                                    <div class="stat-label">Energy</div>
-                                </div>
-                            ` : ''}
-                            ${todayLog.soreness ? `
-                                <div class="stat-card">
-                                    <div class="stat-value">${todayLog.soreness}/10</div>
-                                    <div class="stat-label">Soreness</div>
-                                </div>
-                            ` : ''}
-                        </div>
+            quickLogMetric(tab) {
+                // Open log modal with specific tab pre-selected
+                this._preSelectedTab = tab;
+                this.logDailyHealth();
+            },
 
-                        ${todayLog.caloriesIn || todayLog.protein ? `
-                            <div class="card" style="margin-top: 16px;">
-                                <div class="card-title" style="margin-bottom: 12px;">🍎 Today's Nutrition</div>
-                                <div class="stats-grid">
-                                    ${todayLog.caloriesIn ? `
-                                        <div class="stat-card">
-                                            <div class="stat-value">${todayLog.caloriesIn}</div>
-                                            <div class="stat-label">Calories</div>
-                                        </div>
-                                    ` : ''}
-                                    ${todayLog.protein ? `
-                                        <div class="stat-card">
-                                            <div class="stat-value">${todayLog.protein}g</div>
-                                            <div class="stat-label">Protein</div>
-                                        </div>
-                                    ` : ''}
-                                    ${todayLog.carbs ? `
-                                        <div class="stat-card">
-                                            <div class="stat-value">${todayLog.carbs}g</div>
-                                            <div class="stat-label">Carbs</div>
-                                        </div>
-                                    ` : ''}
-                                    ${todayLog.fats ? `
-                                        <div class="stat-card">
-                                            <div class="stat-value">${todayLog.fats}g</div>
-                                            <div class="stat-label">Fats</div>
-                                        </div>
-                                    ` : ''}
-                                </div>
-                                ${todayLog.eatingQuality ? `
-                                    <div style="margin-top: 12px; padding: 12px; background: var(--background); border-radius: 8px;">
-                                        <div style="font-size: 13px; color: var(--text-secondary);">Eating Quality</div>
-                                        <div style="font-size: 20px; font-weight: 600;">${todayLog.eatingQuality}/10</div>
-                                    </div>
-                                ` : ''}
-                            </div>
-                        ` : ''}
-                    `;
-                } else {
-                    html += `
-                        <div class="empty-state">
-                            <div class="empty-icon">❤️</div>
-                            <div class="empty-text">No health data logged today<br>Tap "+ Log Today" to track your health</div>
-                        </div>
-                    `;
-                }
-                
-                // Weekly Trends
-                const weeklyData = this.getWeeklyHealthData();
-                if (weeklyData.length > 0) {
-                    const avgSleep = this.calculateAverage(weeklyData.map(d => d.sleep).filter(Boolean));
-                    const avgRHR = this.calculateAverage(weeklyData.map(d => d.rhr).filter(Boolean));
-                    const avgEnergy = this.calculateAverage(weeklyData.map(d => d.energy).filter(Boolean));
-                    const avgCalories = this.calculateAverage(weeklyData.map(d => d.caloriesIn).filter(Boolean));
-                    const avgProtein = this.calculateAverage(weeklyData.map(d => d.protein).filter(Boolean));
-                    
-                    html += `
-                        <div class="card">
-                            <div class="card-title" style="margin-bottom: 12px;">📊 7-Day Averages</div>
-                            <div class="stats-grid">
-                                ${avgSleep ? `
-                                    <div class="stat-card">
-                                        <div class="stat-value">${avgSleep.toFixed(1)}h</div>
-                                        <div class="stat-label">Avg Sleep</div>
-                                    </div>
-                                ` : ''}
-                                ${avgRHR ? `
-                                    <div class="stat-card">
-                                        <div class="stat-value">${Math.round(avgRHR)}</div>
-                                        <div class="stat-label">Avg RHR</div>
-                                    </div>
-                                ` : ''}
-                                ${avgEnergy ? `
-                                    <div class="stat-card">
-                                        <div class="stat-value">${avgEnergy.toFixed(1)}/10</div>
-                                        <div class="stat-label">Avg Energy</div>
-                                    </div>
-                                ` : ''}
-                                ${avgCalories ? `
-                                    <div class="stat-card">
-                                        <div class="stat-value">${Math.round(avgCalories)}</div>
-                                        <div class="stat-label">Avg Calories</div>
-                                    </div>
-                                ` : ''}
-                            </div>
-                            ${avgProtein ? `
-                                <div style="margin-top: 12px; padding: 12px; background: var(--background); border-radius: 8px;">
-                                    <div style="font-size: 13px; color: var(--text-secondary);">Average Protein</div>
-                                    <div style="font-size: 20px; font-weight: 600;">${Math.round(avgProtein)}g/day</div>
-                                </div>
-                            ` : ''}
-                        </div>
-                    `;
-                    
-                    // Sleep trend chart
-                    html += this.renderHealthChart(weeklyData, 'sleep', 'Sleep (hours)');
-                    
-                    // Protein chart if available
-                    if (avgProtein) {
-                        html += this.renderHealthChart(weeklyData, 'protein', 'Protein (grams)');
-                    }
-                    
-                    // Correlations
-                    html += this.renderHealthCorrelations();
-                }
-                
-                // Recent logs
-                const recentLogs = Object.entries(this.dailyLogs)
-                    .sort((a, b) => new Date(b[0]) - new Date(a[0]))
-                    .slice(0, 7);
-                
-                if (recentLogs.length > 0) {
-                    html += `
-                        <div class="card">
-                            <div class="card-title" style="margin-bottom: 12px;">Recent Logs</div>
-                            ${recentLogs.map(([date, log]) => `
-                                <div class="history-item">
-                                    <div>
-                                        <div class="history-date">${this.formatDate(date)}</div>
-                                        <div class="history-sets">
-                                            ${log.sleep ? `😴 ${log.sleep}h` : ''} 
-                                            ${log.rhr ? `❤️ ${log.rhr}bpm` : ''} 
-                                            ${log.energy ? `⚡ ${log.energy}/10` : ''}
-                                        </div>
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    `;
-                }
-                
-                const modalContent = `
-                    <div class="modal active" id="healthModal" style="display: flex;">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h2 class="modal-title">Health Dashboard</h2>
-                                <button class="close-btn" onclick="document.getElementById('healthModal').remove()">×</button>
-                            </div>
-                            ${html}
-                        </div>
-                    </div>
-                `;
-
-                document.body.insertAdjacentHTML('beforeend', modalContent);
+            expandMetric(type) {
+                // Open log modal with specific tab pre-selected
+                this.logDailyHealth();
+                // Could add logic to auto-focus the relevant tab
             },
 
             logDailyHealth() {
                 const today = new Date().toISOString().split('T')[0];
                 const existing = this.dailyLogs[today] || {};
+                
+                // Determine initial tab (from quickLogMetric or default to recovery)
+                const initialTab = this._preSelectedTab || 'recovery';
+                this._preSelectedTab = null; // Reset after use
 
                 document.body.insertAdjacentHTML('beforeend', `
                     <div class="modal active" id="logHealthModal" style="display: flex;">
@@ -8129,13 +8290,13 @@ Tracked with Gym Tracker
 
                             <!-- Tab switcher -->
                             <div style="display: flex; gap: 4px; background: var(--surface2); border-radius: 12px; padding: 4px; margin-bottom: 24px;">
-                                <button onclick="app.switchLogTab('recovery')" id="logTab-recovery" style="flex:1; padding: 8px; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; background: var(--surface); color: var(--text-primary); font-family: 'DM Sans', sans-serif;">Recovery</button>
-                                <button onclick="app.switchLogTab('nutrition')" id="logTab-nutrition" style="flex:1; padding: 8px; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; background: transparent; color: var(--text-secondary); font-family: 'DM Sans', sans-serif;">Nutrition</button>
-                                <button onclick="app.switchLogTab('body')" id="logTab-body" style="flex:1; padding: 8px; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; background: transparent; color: var(--text-secondary); font-family: 'DM Sans', sans-serif;">Body</button>
+                                <button onclick="app.switchLogTab('recovery')" id="logTab-recovery" style="flex:1; padding: 8px; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; background: ${initialTab === 'recovery' ? 'var(--surface)' : 'transparent'}; color: ${initialTab === 'recovery' ? 'var(--text-primary)' : 'var(--text-secondary)'}; font-family: 'DM Sans', sans-serif;">Recovery</button>
+                                <button onclick="app.switchLogTab('nutrition')" id="logTab-nutrition" style="flex:1; padding: 8px; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; background: ${initialTab === 'nutrition' ? 'var(--surface)' : 'transparent'}; color: ${initialTab === 'nutrition' ? 'var(--text-primary)' : 'var(--text-secondary)'}; font-family: 'DM Sans', sans-serif;">Nutrition</button>
+                                <button onclick="app.switchLogTab('body')" id="logTab-body" style="flex:1; padding: 8px; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; background: ${initialTab === 'body' ? 'var(--surface)' : 'transparent'}; color: ${initialTab === 'body' ? 'var(--text-primary)' : 'var(--text-secondary)'}; font-family: 'DM Sans', sans-serif;">Body</button>
                             </div>
 
                             <!-- RECOVERY TAB -->
-                            <div id="logSection-recovery">
+                            <div id="logSection-recovery" style="display:${initialTab === 'recovery' ? 'block' : 'none'};"
                                 <div class="metric-input-group">
                                     <label class="metric-label">Hours Slept</label>
                                     <div style="display: flex; align-items: center; gap: 12px;">
@@ -8219,7 +8380,7 @@ Tracked with Gym Tracker
                             </div>
 
                             <!-- NUTRITION TAB -->
-                            <div id="logSection-nutrition" style="display:none;">
+                            <div id="logSection-nutrition" style="display:${initialTab === 'nutrition' ? 'block' : 'none'};">
                                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
                                     <div>
                                         <label class="metric-label">Calories</label>
@@ -8283,7 +8444,7 @@ Tracked with Gym Tracker
                             </div>
 
                             <!-- BODY TAB -->
-                            <div id="logSection-body" style="display:none;">
+                            <div id="logSection-body" style="display:${initialTab === 'body' ? 'block' : 'none'};">
                                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                                     <div>
                                         <label class="metric-label">Weight (kg)</label>
@@ -8571,312 +8732,7 @@ Tracked with Gym Tracker
                 return filtered.reduce((sum, val) => sum + val, 0) / filtered.length;
             },
 
-            renderHealthChart(data, metric, label) {
-                const values = data.map(d => d[metric]).filter(Boolean);
-                if (values.length === 0) return '';
-                
-                const maxValue = Math.max(...values);
-                const minValue = Math.min(...values);
-                const range = maxValue - minValue || 1;
-                
-                return `
-                    <div class="chart-container">
-                        <div class="chart-title">${label}</div>
-                        <div class="simple-chart">
-                            ${data.map(d => {
-                                if (!d[metric]) return '';
-                                const height = ((d[metric] - minValue) / range) * 100 || 50;
-                                const dateObj = new Date(d.date);
-                                return `
-                                    <div class="chart-bar" style="height: ${height}%">
-                                        <div class="chart-bar-value">${d[metric]}</div>
-                                        <div class="chart-bar-label">${dateObj.getDate()}/${dateObj.getMonth() + 1}</div>
-                                    </div>
-                                `;
-                            }).join('')}
-                        </div>
-                    </div>
-                `;
-            },
 
-            renderHealthCorrelations() {
-                // Find correlations between health metrics and workout performance
-                const workoutsWithHealth = this.workouts.filter(w => {
-                    return this.dailyLogs[w.date];
-                }).map(w => ({
-                    ...w,
-                    health: this.dailyLogs[w.date],
-                    volume: w.sets.reduce((sum, s) => sum + (s.weight * s.reps), 0)
-                }));
-                
-                if (workoutsWithHealth.length < 3) return '';
-                
-                // Calculate correlations
-                const insights = [];
-                
-                // Sleep vs Performance
-                const goodSleep = workoutsWithHealth.filter(w => w.health.sleep >= 7.5);
-                const badSleep = workoutsWithHealth.filter(w => w.health.sleep < 6.5);
-                
-                if (goodSleep.length > 0 && badSleep.length > 0) {
-                    const avgVolumeGoodSleep = this.calculateAverage(goodSleep.map(w => w.volume));
-                    const avgVolumeBadSleep = this.calculateAverage(badSleep.map(w => w.volume));
-                    const diff = ((avgVolumeGoodSleep - avgVolumeBadSleep) / avgVolumeBadSleep * 100);
-                    
-                    if (Math.abs(diff) > 10) {
-                        insights.push({
-                            icon: '😴',
-                            title: `Sleep Impact: ${diff > 0 ? '+' : ''}${diff.toFixed(0)}%`,
-                            description: `You lift ${Math.abs(diff).toFixed(0)}% ${diff > 0 ? 'more' : 'less'} volume on 7.5+ hours sleep`
-                        });
-                    }
-                }
-                
-                // Protein vs Performance
-                const highProtein = workoutsWithHealth.filter(w => w.health.protein >= 140);
-                const lowProtein = workoutsWithHealth.filter(w => w.health.protein > 0 && w.health.protein < 100);
-                
-                if (highProtein.length > 0 && lowProtein.length > 0) {
-                    const avgVolumeHighProtein = this.calculateAverage(highProtein.map(w => w.volume));
-                    const avgVolumeLowProtein = this.calculateAverage(lowProtein.map(w => w.volume));
-                    const diff = ((avgVolumeHighProtein - avgVolumeLowProtein) / avgVolumeLowProtein * 100);
-                    
-                    if (Math.abs(diff) > 8) {
-                        insights.push({
-                            icon: '🥩',
-                            title: `Protein Impact: ${diff > 0 ? '+' : ''}${diff.toFixed(0)}%`,
-                            description: `You lift ${Math.abs(diff).toFixed(0)}% ${diff > 0 ? 'more' : 'less'} volume on 140g+ protein days`
-                        });
-                    }
-                }
-                
-                // Calories vs Performance
-                const highCal = workoutsWithHealth.filter(w => w.health.caloriesIn >= 2500);
-                const lowCal = workoutsWithHealth.filter(w => w.health.caloriesIn > 0 && w.health.caloriesIn < 2000);
-                
-                if (highCal.length > 0 && lowCal.length > 0) {
-                    const avgVolumeHighCal = this.calculateAverage(highCal.map(w => w.volume));
-                    const avgVolumeLowCal = this.calculateAverage(lowCal.map(w => w.volume));
-                    const diff = ((avgVolumeHighCal - avgVolumeLowCal) / avgVolumeLowCal * 100);
-                    
-                    if (Math.abs(diff) > 10) {
-                        insights.push({
-                            icon: '🔥',
-                            title: `Calorie Impact: ${diff > 0 ? '+' : ''}${diff.toFixed(0)}%`,
-                            description: `You lift ${Math.abs(diff).toFixed(0)}% ${diff > 0 ? 'more' : 'less'} volume on 2500+ calorie days`
-                        });
-                    }
-                }
-                
-                // Energy vs Performance
-                const highEnergy = workoutsWithHealth.filter(w => w.health.energy >= 8);
-                const lowEnergy = workoutsWithHealth.filter(w => w.health.energy <= 5);
-                
-                if (highEnergy.length > 0 && lowEnergy.length > 0) {
-                    const avgVolumeHighEnergy = this.calculateAverage(highEnergy.map(w => w.volume));
-                    const avgVolumeLowEnergy = this.calculateAverage(lowEnergy.map(w => w.volume));
-                    const diff = ((avgVolumeHighEnergy - avgVolumeLowEnergy) / avgVolumeLowEnergy * 100);
-                    
-                    if (Math.abs(diff) > 12) {
-                        insights.push({
-                            icon: '⚡',
-                            title: `Energy Level Impact: ${diff > 0 ? '+' : ''}${diff.toFixed(0)}%`,
-                            description: `You lift ${Math.abs(diff).toFixed(0)}% ${diff > 0 ? 'more' : 'less'} volume when energy is 8+/10`
-                        });
-                    }
-                }
-                
-                // Nutrition quality analysis
-                const avgProteinIntake = this.calculateAverage(
-                    Object.values(this.dailyLogs).map(l => l.protein).filter(Boolean)
-                );
-                
-                if (avgProteinIntake && avgProteinIntake < 120) {
-                    insights.push({
-                        icon: '⚠️',
-                        title: 'Low Protein Intake',
-                        description: `Average ${Math.round(avgProteinIntake)}g/day. Consider targeting 140-180g for muscle growth.`
-                    });
-                }
-                
-                if (insights.length === 0) return '';
-                
-                return `
-                    <div class="card">
-                        <div class="card-title" style="margin-bottom: 12px;">🔬 Insights & Correlations</div>
-                        ${insights.map(insight => `
-                            <div style="padding: 12px; background: var(--background); border-radius: 8px; margin-bottom: 8px;">
-                                <div style="font-weight: 600; margin-bottom: 4px;">${insight.icon} ${insight.title}</div>
-                                <div style="font-size: 13px; color: var(--text-secondary);">${insight.description}</div>
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
-            },
-
-            // Garmin API Integration
-            connectGarmin() {
-                alert(`
-🔧 Garmin Integration Ready!
-
-To connect Garmin, you need:
-
-1. Go to developer.garmin.com
-2. Create developer account (free)
-3. Register your app
-4. Get Consumer Key & Secret
-
-Once you have those:
-- Tap "Connect Garmin" again
-- Enter your credentials
-- Auto-sync your data!
-
-NOTE: Garmin uses OAuth 1.0a which requires
-a backend server for full security.
-
-For now: Continue manual logging
-Later: I'll build the secure backend!
-                `);
-            },
-
-            // Weekly Health Report
-            showWeeklyReport() {
-                const weekWorkouts = this.getWorkoutsInDays(7);
-                const weekSessions = this.workoutSessions.filter(s => {
-                    const d = new Date(s.startTime);
-                    return (Date.now() - d.getTime()) < 7 * 24 * 60 * 60 * 1000;
-                });
-                const weekLogs = this.getWeeklyHealthData();
-
-                const totalVolume = weekWorkouts.reduce((sum, w) =>
-                    sum + w.sets.reduce((s, set) => s + (set.weight * set.reps), 0), 0
-                );
-                const avgSleep = this.calculateAverage(weekLogs.map(d => d.sleep).filter(Boolean));
-                const avgEnergy = this.calculateAverage(weekLogs.map(d => d.energy).filter(Boolean));
-                const avgProtein = this.calculateAverage(weekLogs.map(d => d.protein).filter(Boolean));
-                const workoutDays = weekSessions.length || [...new Set(weekWorkouts.map(w => w.date))].length;
-
-                // Grade calculation
-                let score = 0;
-                if (workoutDays >= 4) score += 30;
-                else if (workoutDays >= 3) score += 20;
-                else if (workoutDays >= 2) score += 10;
-                if (avgSleep >= 7.5) score += 25;
-                else if (avgSleep >= 6.5) score += 15;
-                if (avgProtein >= 150) score += 25;
-                else if (avgProtein >= 100) score += 15;
-                if (avgEnergy >= 7) score += 20;
-                else if (avgEnergy >= 5) score += 10;
-
-                const grade = score >= 85 ? 'A' : score >= 70 ? 'B' : score >= 55 ? 'C' : score >= 40 ? 'D' : 'F';
-                const gradeColor = grade === 'A' ? 'var(--success)' : grade === 'B' ? '#0080FF' : grade === 'C' ? 'var(--warning)' : 'var(--danger)';
-                const gradeMsg = {
-                    'A': 'Exceptional week! 🔥',
-                    'B': 'Solid performance 💪',
-                    'C': 'Room to improve 📈',
-                    'D': 'Tough week, keep going 🙏',
-                    'F': 'Let\'s reset and go again 🔄'
-                }[grade];
-
-                const html = `
-                    <div class="report-grade" style="color: ${gradeColor};">${grade}</div>
-                    <div class="report-grade-label">${gradeMsg}</div>
-
-                    <div class="premium-stat-card" style="margin-bottom: 12px;">
-                        <div class="premium-stat-header">Training</div>
-                        <div class="report-stat">
-                            <div class="report-stat-label">Workout Days</div>
-                            <div class="report-stat-value">${workoutDays} / 7</div>
-                        </div>
-                        <div class="report-stat">
-                            <div class="report-stat-label">Total Volume</div>
-                            <div class="report-stat-value">${this.formatNumber(totalVolume)}kg</div>
-                        </div>
-                    </div>
-
-                    <div class="premium-stat-card" style="margin-bottom: 12px;">
-                        <div class="premium-stat-header">Recovery</div>
-                        <div class="report-stat">
-                            <div class="report-stat-label">Avg Sleep</div>
-                            <div class="report-stat-value">${avgSleep ? avgSleep.toFixed(1) + 'h' : '—'}</div>
-                        </div>
-                        <div class="report-stat">
-                            <div class="report-stat-label">Avg Energy</div>
-                            <div class="report-stat-value">${avgEnergy ? avgEnergy.toFixed(1) + '/10' : '—'}</div>
-                        </div>
-                    </div>
-
-                    <div class="premium-stat-card" style="margin-bottom: 12px;">
-                        <div class="premium-stat-header">Nutrition</div>
-                        <div class="report-stat">
-                            <div class="report-stat-label">Avg Protein</div>
-                            <div class="report-stat-value">${avgProtein ? Math.round(avgProtein) + 'g/day' : '—'}</div>
-                        </div>
-                        <div class="report-stat">
-                            <div class="report-stat-label">Days Logged</div>
-                            <div class="report-stat-value">${weekLogs.length} / 7</div>
-                        </div>
-                    </div>
-
-                    <button class="btn btn-secondary" onclick="document.getElementById('weeklyReportModal').remove()">Close</button>
-                `;
-
-                document.body.insertAdjacentHTML('beforeend', `
-                    <div class="modal active" id="weeklyReportModal" style="display: flex;">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h2 class="modal-title">Weekly Report</h2>
-                                <button class="close-btn" onclick="document.getElementById('weeklyReportModal').remove()">×</button>
-                            </div>
-                            ${html}
-                        </div>
-                    </div>
-                `);
-            },
-
-            // Warmup Set Calculator
-            getWarmupSets(workingWeight) {
-                if (!workingWeight || workingWeight < 20) return [];
-                const barWeight = 20;
-                return [
-                    { pct: '50%', weight: Math.round((workingWeight * 0.5) / 2.5) * 2.5, reps: 10 },
-                    { pct: '65%', weight: Math.round((workingWeight * 0.65) / 2.5) * 2.5, reps: 5 },
-                    { pct: '80%', weight: Math.round((workingWeight * 0.8) / 2.5) * 2.5, reps: 3 },
-                    { pct: '90%', weight: Math.round((workingWeight * 0.9) / 2.5) * 2.5, reps: 1 },
-                ];
-            },
-
-            showWarmupSets(exerciseName, workingWeight) {
-                const sets = this.getWarmupSets(workingWeight);
-                if (sets.length === 0) return;
-
-                document.body.insertAdjacentHTML('beforeend', `
-                    <div class="modal active" id="warmupModal" style="display: flex;">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h2 class="modal-title">Warm-up Sets</h2>
-                                <button class="close-btn" onclick="document.getElementById('warmupModal').remove()">×</button>
-                            </div>
-                            <div class="warmup-card">
-                                <div class="warmup-header">🔥 ${exerciseName} — Working: ${workingWeight}kg</div>
-                                ${sets.map((s, i) => `
-                                    <div class="warmup-set-row">
-                                        <div>Set ${i + 1} <span class="warmup-pct">(${s.pct})</span></div>
-                                        <div>${s.reps} reps</div>
-                                        <div class="warmup-weight">${s.weight}kg</div>
-                                    </div>
-                                `).join('')}
-                            </div>
-                            <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px;">
-                                Rest 60-90s between warm-up sets. Take full rest before your working sets.
-                            </div>
-                            <button class="btn btn-primary" onclick="document.getElementById('warmupModal').remove()">Got it!</button>
-                        </div>
-                    </div>
-                `);
-            },
-
-            // Nutrition Targets Settings
             showNutritionTargets() {
                 document.body.insertAdjacentHTML('beforeend', `
                     <div class="modal active" id="nutritionTargetsModal" style="display: flex;">
@@ -8934,6 +8790,11 @@ Later: I'll build the secure backend!
                 const streak = this.calculateStreak();
                 const prs = Object.keys(this.personalRecords).length;
 
+                // Cardio stats
+                const cardioStats = this.calculateCardioStats();
+                const totalCardioKm = cardioStats.totalDistance;
+                const totalCardioSessions = cardioStats.totalSessions;
+
                 return [
                     // Workout count
                     { id: 'first_workout', icon: '🏋️', name: 'First Step', desc: 'Complete 1 workout', unlocked: totalWorkouts >= 1 },
@@ -8952,6 +8813,20 @@ Later: I'll build the secure backend!
                     { id: 'first_pr', icon: '🏆', name: 'Personal Best', desc: 'Set your first PR', unlocked: prs >= 1 },
                     { id: 'pr_5', icon: '🥇', name: 'Record Breaker', desc: 'Set 5 PRs', unlocked: prs >= 5 },
                     { id: 'pr_20', icon: '👑', name: 'PR Machine', desc: 'Set 20 PRs', unlocked: prs >= 20 },
+                    // Cardio - Distance
+                    { id: 'first_run', icon: '👟', name: 'First Run', desc: 'Complete your first cardio session', unlocked: totalCardioSessions >= 1 },
+                    { id: 'cardio_10k', icon: '🏃', name: '10K Total', desc: 'Run 10km total distance', unlocked: totalCardioKm >= 10 },
+                    { id: 'cardio_50k', icon: '🎽', name: '50K Runner', desc: 'Run 50km total distance', unlocked: totalCardioKm >= 50 },
+                    { id: 'cardio_100k', icon: '🏅', name: 'Centurion', desc: 'Run 100km total distance', unlocked: totalCardioKm >= 100 },
+                    { id: 'cardio_500k', icon: '🌟', name: '500K Legend', desc: 'Run 500km total distance', unlocked: totalCardioKm >= 500 },
+                    // Cardio - Speed
+                    { id: 'sub30_5k', icon: '⚡', name: 'Sub-30 5K', desc: 'Run 5K in under 30 minutes', unlocked: cardioStats.pb5k && cardioStats.pb5k < 30 * 60 },
+                    { id: 'sub25_5k', icon: '🔥', name: 'Sub-25 5K', desc: 'Run 5K in under 25 minutes', unlocked: cardioStats.pb5k && cardioStats.pb5k < 25 * 60 },
+                    { id: 'sub60_10k', icon: '💨', name: 'Sub-60 10K', desc: 'Run 10K in under 60 minutes', unlocked: cardioStats.pb10k && cardioStats.pb10k < 60 * 60 },
+                    { id: 'sub50_10k', icon: '🚀', name: 'Sub-50 10K', desc: 'Run 10K in under 50 minutes', unlocked: cardioStats.pb10k && cardioStats.pb10k < 50 * 60 },
+                    // Cardio - Consistency
+                    { id: 'cardio_week', icon: '📆', name: 'Cardio Week', desc: 'Run 3 times in one week', unlocked: this.achievements.includes('cardio_week') },
+                    { id: 'cardio_streak', icon: '🔥', name: 'Cardio Streak', desc: 'Run 5 days in a row', unlocked: this.achievements.includes('cardio_streak') },
                     // Special
                     { id: 'early_bird', icon: '🌅', name: 'Early Bird', desc: 'Log a workout before 7am', unlocked: this.achievements.includes('early_bird') },
                     { id: 'night_owl', icon: '🦉', name: 'Night Owl', desc: 'Log a workout after 9pm', unlocked: this.achievements.includes('night_owl') },
@@ -9105,7 +8980,17 @@ Later: I'll build the secure backend!
                                             <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Volume</div>
                                             <div style="font-size: 16px; font-weight: 600; color: var(--text-primary);">${this.formatNumber(totalVolume)}kg</div>
                                         </div>
+                                        <div style="margin-left: auto;">
+                                            <button onclick="app.editSessionNotes('${session.id}', event)" style="background: var(--surface2); border: 1px solid var(--border); padding: 6px 12px; border-radius: 8px; font-size: 12px; cursor: pointer; color: var(--text-primary);">
+                                                📝 ${session.notes ? 'Edit' : 'Note'}
+                                            </button>
+                                        </div>
                                     </div>
+                                    ${session.notes ? `
+                                        <div style="margin-top: 12px; padding: 10px; background: var(--surface2); border-radius: 8px; border-left: 3px solid var(--accent);">
+                                            <div style="font-size: 13px; color: var(--text-primary); font-style: italic;">"${session.notes}"</div>
+                                        </div>
+                                    ` : ''}
                                 </div>
                             `;
                         });
