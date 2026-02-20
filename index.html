@@ -42,8 +42,8 @@
         [data-theme="dark"] {
             --primary: #F7F7F5;
             --primary-dark: #FFFFFF;
-            --accent: #C8F55A;
-            --accent-dark: #b3e04a;
+            --accent: #10b981;
+            --accent-dark: #059669;
             --success: #4ade80;
             --warning: #fbbf24;
             --danger: #f87171;
@@ -1041,8 +1041,8 @@
 
         /* Streak Badge */
         .streak-badge {
-            background: var(--text-primary);
-            color: white;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
             padding: 12px 16px;
             border-radius: 12px;
             display: flex;
@@ -1063,11 +1063,13 @@
         .streak-number {
             font-size: 24px;
             font-weight: 700;
+            color: #ffffff;
         }
 
         .streak-label {
             font-size: 13px;
-            opacity: 0.9;
+            opacity: 0.95;
+            color: #ffffff;
         }
 
         /* Section Headers */
@@ -1956,6 +1958,11 @@
             <div id="cardioContent"></div>
         </div>
 
+        <!-- Social View -->
+        <div id="social" class="content view">
+            <div id="socialContent"></div>
+        </div>
+
         <!-- More View -->
         <div id="more" class="content view">
             <div id="moreContent"></div>
@@ -1981,9 +1988,9 @@
                 <span class="tab-icon">◎</span>
                 <span>Health</span>
             </button>
-            <button class="tab" onclick="app.switchTab('cardio')">
-                <span class="tab-icon">◉</span>
-                <span>Cardio</span>
+            <button class="tab" onclick="app.switchTab('social')">
+                <span class="tab-icon">◈</span>
+                <span>Social</span>
             </button>
             <button class="tab" onclick="app.switchTab('history')">
                 <span class="tab-icon">▤</span>
@@ -2653,6 +2660,11 @@
                 // Always load data from Supabase/localStorage
                 await this.loadData();
                 
+                // Load social data
+                this.friends = JSON.parse(localStorage.getItem('friends') || '[]');
+                this.challenges = JSON.parse(localStorage.getItem('challenges') || '[]');
+                this.workoutFeed = JSON.parse(localStorage.getItem('workoutFeed') || '[]');
+                
                 // Request notification permission for rest timer (10)
                 if ('Notification' in window && Notification.permission === 'default') {
                     Notification.requestPermission();
@@ -2998,12 +3010,301 @@
                 
                 if (tab === 'today') this.renderToday();
                 if (tab === 'health') this.renderHealth();
+                if (tab === 'social') this.renderSocial();
                 if (tab === 'history') this.renderHistory();
                 if (tab === 'analytics') this.renderAnalytics();
                 if (tab === 'cardio') this.renderCardio();
                 if (tab === 'templates') this.renderTemplates();
                 if (tab === 'library') this.renderLibrary();
                 if (tab === 'more') this.renderMore();
+            },
+
+            renderSocial() {
+                if (!this.friends) this.friends = [];
+                if (!this.workoutFeed) this.workoutFeed = [];
+                if (!this.challenges) this.challenges = [];
+                
+                let html = `
+                    <div class="section-header">
+                        <div class="section-title">Social</div>
+                        <button class="btn btn-primary" onclick="app.showAddFriend()" style="padding: 6px 12px; font-size: 13px;">+ Add Friend</button>
+                    </div>
+                    
+                    <!-- My Profile Card -->
+                    <div class="premium-stat-card" style="margin-bottom: 16px; background: linear-gradient(135deg, var(--accent) 0%, var(--primary) 100%); color: white;">
+                        <div style="display: flex; align-items: center; gap: 16px;">
+                            <div style="width: 60px; height: 60px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 700;">
+                                ${this.userId.charAt(0).toUpperCase()}
+                            </div>
+                            <div style="flex: 1;">
+                                <div style="font-size: 20px; font-weight: 700;">${this.userId}</div>
+                                <div style="font-size: 13px; opacity: 0.9;">${this.workoutSessions.length} workouts • ${this.friends.length} friends</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Tabs -->
+                    <div style="display: flex; gap: 8px; margin-bottom: 16px; border-bottom: 2px solid var(--border);">
+                        <button class="btn btn-secondary" onclick="app.showSocialTab('feed')" id="socialTabFeed" style="flex: 1; border-radius: 8px 8px 0 0;">
+                            Feed
+                        </button>
+                        <button class="btn btn-secondary" onclick="app.showSocialTab('friends')" id="socialTabFriends" style="flex: 1; border-radius: 8px 8px 0 0;">
+                            Friends
+                        </button>
+                        <button class="btn btn-secondary" onclick="app.showSocialTab('challenges')" id="socialTabChallenges" style="flex: 1; border-radius: 8px 8px 0 0;">
+                            Challenges
+                        </button>
+                    </div>
+                    
+                    <div id="socialTabContent"></div>
+                `;
+                
+                document.getElementById('socialContent').innerHTML = html;
+                this.showSocialTab(this.currentSocialTab || 'feed');
+            },
+
+            showSocialTab(tab) {
+                this.currentSocialTab = tab;
+                
+                // Update button styles
+                ['feed', 'friends', 'challenges'].forEach(t => {
+                    const btn = document.getElementById(`socialTab${t.charAt(0).toUpperCase() + t.slice(1)}`);
+                    if (btn) {
+                        if (t === tab) {
+                            btn.style.background = 'var(--primary)';
+                            btn.style.color = 'white';
+                        } else {
+                            btn.style.background = 'var(--surface2)';
+                            btn.style.color = 'var(--text-primary)';
+                        }
+                    }
+                });
+                
+                if (tab === 'feed') this.renderWorkoutFeed();
+                if (tab === 'friends') this.renderFriends();
+                if (tab === 'challenges') this.renderChallenges();
+            },
+
+            renderWorkoutFeed() {
+                // Combine own workouts + friends' workouts
+                const myWorkouts = this.workoutSessions.map(s => ({
+                    ...s,
+                    userId: this.userId,
+                    userName: this.userId
+                }));
+                
+                const allWorkouts = [...myWorkouts, ...this.workoutFeed]
+                    .sort((a, b) => new Date(b.date) - new Date(a.date))
+                    .slice(0, 20);
+                
+                let html = '';
+                
+                if (allWorkouts.length === 0) {
+                    html = `
+                        <div class="empty-state">
+                            <div style="font-size: 48px; margin-bottom: 16px;">👥</div>
+                            <div class="empty-text">No workouts yet<br>Add friends to see their activity!</div>
+                        </div>
+                    `;
+                } else {
+                    html = allWorkouts.map(workout => {
+                        const totalVolume = workout.exercises?.reduce((sum, ex) => 
+                            sum + ex.sets.reduce((s, set) => s + (set.weight * set.reps), 0), 0
+                        ) || 0;
+                        const totalSets = workout.exercises?.reduce((sum, ex) => sum + ex.sets.length, 0) || 0;
+                        const duration = workout.duration ? this.formatDuration(workout.duration) : 'N/A';
+                        const isMe = workout.userId === this.userId;
+                        
+                        return `
+                            <div class="premium-stat-card" style="margin-bottom: 16px;">
+                                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                                    <div style="width: 40px; height: 40px; border-radius: 50%; background: ${isMe ? 'var(--accent)' : 'var(--primary)'}; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; color: white;">
+                                        ${workout.userName.charAt(0).toUpperCase()}
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <div style="font-weight: 600;">${workout.userName} ${isMe ? '(You)' : ''}</div>
+                                        <div style="font-size: 12px; color: var(--text-secondary);">${new Date(workout.date).toLocaleDateString()}</div>
+                                    </div>
+                                    ${!isMe ? `<button onclick="app.likeWorkout('${workout.id}')" style="background: none; border: none; font-size: 20px; cursor: pointer;">❤️</button>` : ''}
+                                </div>
+                                
+                                <div style="margin-bottom: 12px;">
+                                    <div style="font-size: 14px; color: var(--text-secondary);">
+                                        ${workout.exercises?.map(e => e.name).slice(0, 3).join(', ')}${workout.exercises?.length > 3 ? '...' : ''}
+                                    </div>
+                                </div>
+                                
+                                <div style="display: flex; gap: 16px; padding-top: 12px; border-top: 1px solid var(--border);">
+                                    <div>
+                                        <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase;">Volume</div>
+                                        <div style="font-size: 16px; font-weight: 700;">${this.formatNumber(totalVolume)}kg</div>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase;">Sets</div>
+                                        <div style="font-size: 16px; font-weight: 700;">${totalSets}</div>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase;">Duration</div>
+                                        <div style="font-size: 16px; font-weight: 700;">${duration}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+                
+                document.getElementById('socialTabContent').innerHTML = html;
+            },
+
+            renderFriends() {
+                let html = '';
+                
+                if (this.friends.length === 0) {
+                    html = `
+                        <div class="empty-state">
+                            <div style="font-size: 48px; margin-bottom: 16px;">👤</div>
+                            <div class="empty-text">No friends yet<br>Add friends to compare workouts!</div>
+                            <button class="btn btn-primary" onclick="app.showAddFriend()" style="margin-top: 16px;">Add Friend</button>
+                        </div>
+                    `;
+                } else {
+                    html = this.friends.map(friend => `
+                        <div class="premium-stat-card" style="margin-bottom: 12px;">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <div style="width: 50px; height: 50px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 700; color: white;">
+                                    ${friend.name.charAt(0).toUpperCase()}
+                                </div>
+                                <div style="flex: 1;">
+                                    <div style="font-weight: 600; font-size: 16px;">${friend.name}</div>
+                                    <div style="font-size: 12px; color: var(--text-secondary);">${friend.workouts || 0} workouts this month</div>
+                                </div>
+                                <button onclick="app.removeFriend('${friend.id}')" style="background: var(--danger); color: white; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 12px;">Remove</button>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+                
+                document.getElementById('socialTabContent').innerHTML = html;
+            },
+
+            renderChallenges() {
+                let html = `
+                    <button class="btn btn-primary" onclick="app.createChallenge()" style="width: 100%; margin-bottom: 16px;">
+                        + Create Challenge
+                    </button>
+                `;
+                
+                if (this.challenges.length === 0) {
+                    html += `
+                        <div class="empty-state">
+                            <div style="font-size: 48px; margin-bottom: 16px;">🏆</div>
+                            <div class="empty-text">No active challenges<br>Create one to compete with friends!</div>
+                        </div>
+                    `;
+                } else {
+                    html += this.challenges.map(challenge => {
+                        const progress = challenge.type === 'volume' 
+                            ? this.getWeeklyVolume() 
+                            : this.workoutSessions.filter(s => {
+                                const weekAgo = new Date();
+                                weekAgo.setDate(weekAgo.getDate() - 7);
+                                return new Date(s.date) >= weekAgo;
+                            }).length;
+                        
+                        const pct = Math.min(100, (progress / challenge.goal) * 100);
+                        
+                        return `
+                            <div class="premium-stat-card" style="margin-bottom: 16px;">
+                                <div style="font-weight: 700; font-size: 16px; margin-bottom: 8px;">${challenge.name}</div>
+                                <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">${challenge.description}</div>
+                                
+                                <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-secondary); margin-bottom: 6px;">
+                                    <span>Progress</span>
+                                    <span>${Math.round(progress)} / ${challenge.goal}</span>
+                                </div>
+                                
+                                <div style="height: 8px; background: var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 12px;">
+                                    <div style="height: 100%; width: ${pct}%; background: ${pct >= 100 ? 'var(--success)' : 'var(--accent)'}; transition: width 0.3s;"></div>
+                                </div>
+                                
+                                <div style="display: flex; gap: 8px;">
+                                    ${pct >= 100 ? `
+                                        <div style="padding: 8px; background: var(--success); color: white; border-radius: 8px; text-align: center; flex: 1; font-weight: 600;">
+                                            ✅ Completed!
+                                        </div>
+                                    ` : `
+                                        <div style="padding: 8px; background: var(--surface2); border-radius: 8px; text-align: center; flex: 1; font-size: 12px; color: var(--text-secondary);">
+                                            ${Math.round(challenge.goal - progress)} to go
+                                        </div>
+                                    `}
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+                
+                document.getElementById('socialTabContent').innerHTML = html;
+            },
+
+            showAddFriend() {
+                const username = prompt('Enter friend\'s username:');
+                if (!username) return;
+                
+                // Simulate friend lookup
+                this.friends.push({
+                    id: Date.now().toString(),
+                    name: username,
+                    workouts: Math.floor(Math.random() * 20)
+                });
+                
+                localStorage.setItem('friends', JSON.stringify(this.friends));
+                this.showNotification(`✅ Added ${username}!`);
+                this.renderFriends();
+            },
+
+            removeFriend(friendId) {
+                if (!confirm('Remove this friend?')) return;
+                
+                this.friends = this.friends.filter(f => f.id !== friendId);
+                localStorage.setItem('friends', JSON.stringify(this.friends));
+                this.showNotification('Friend removed');
+                this.renderFriends();
+            },
+
+            createChallenge() {
+                const name = prompt('Challenge name:', '100K Volume This Week');
+                if (!name) return;
+                
+                const type = prompt('Type: volume or workouts', 'volume');
+                const goal = prompt('Goal amount:', type === 'volume' ? '100000' : '5');
+                
+                this.challenges.push({
+                    id: Date.now().toString(),
+                    name,
+                    description: `Reach ${goal}${type === 'volume' ? 'kg' : ' workouts'} this week`,
+                    type,
+                    goal: parseInt(goal),
+                    startDate: new Date().toISOString()
+                });
+                
+                localStorage.setItem('challenges', JSON.stringify(this.challenges));
+                this.showNotification('🏆 Challenge created!');
+                this.renderChallenges();
+            },
+
+            getWeeklyVolume() {
+                const weekAgo = new Date();
+                weekAgo.setDate(weekAgo.getDate() - 7);
+                
+                return this.workoutSessions
+                    .filter(s => new Date(s.date) >= weekAgo)
+                    .reduce((sum, s) => sum + s.exercises.reduce((esum, ex) => 
+                        esum + ex.sets.reduce((ssum, set) => ssum + (set.weight * set.reps), 0), 0
+                    ), 0);
+            },
+
+            likeWorkout(workoutId) {
+                this.showNotification('❤️ Liked!');
             },
 
             renderLibrary() {
@@ -3129,6 +3430,49 @@
                     `;
                 }
                 
+                // Volume landmarks (15)
+                const weekVolume = this.getWorkoutsInDays(7).reduce((sum, w) => 
+                    sum + w.sets.reduce((s, set) => s + (set.weight * set.reps), 0), 0
+                );
+                const allWeekVolumes = [];
+                for (let i = 0; i < 52; i++) {
+                    const weekStart = new Date();
+                    weekStart.setDate(weekStart.getDate() - (i * 7 + 7));
+                    const weekEnd = new Date();
+                    weekEnd.setDate(weekEnd.getDate() - (i * 7));
+                    
+                    const weekWorkouts = this.workouts.filter(w => {
+                        const d = new Date(w.date);
+                        return d >= weekStart && d <= weekEnd;
+                    });
+                    
+                    const vol = weekWorkouts.reduce((sum, w) =>
+                        sum + w.sets.reduce((s, set) => s + (set.weight * set.reps), 0), 0
+                    );
+                    allWeekVolumes.push(vol);
+                }
+                
+                const maxWeekVolume = Math.max(...allWeekVolumes);
+                const avgWeekVolume = allWeekVolumes.reduce((a, b) => a + b, 0) / allWeekVolumes.length;
+                
+                if (weekVolume > maxWeekVolume && weekVolume > 1000) {
+                    html += `
+                        <div class="card" style="background: var(--success); border: none; margin-bottom: 16px; padding: 16px;">
+                            <div style="font-size: 15px; font-weight: 600; color: #ffffff; text-align: center;">
+                                🏆 NEW RECORD: Highest volume week ever! (${this.formatNumber(weekVolume)}kg)
+                            </div>
+                        </div>
+                    `;
+                } else if (weekVolume > avgWeekVolume * 1.5 && weekVolume > 1000) {
+                    html += `
+                        <div class="card" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border: none; margin-bottom: 16px; padding: 16px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">
+                            <div style="font-size: 15px; font-weight: 600; color: #ffffff; text-align: center;">
+                                💪 Strong week! ${((weekVolume / avgWeekVolume - 1) * 100).toFixed(0)}% above your average
+                            </div>
+                        </div>
+                    `;
+                }
+                
                 // Smart Recommendations
                 const recommendations = this.getSmartRecommendations();
                 if (recommendations.length > 0 && todayWorkouts.length === 0) {
@@ -3169,7 +3513,7 @@
                             <div class="card-title" style="margin-bottom: 12px;">Training Calendar</div>
                             <div style="display: grid; grid-template-columns: repeat(14, 1fr); gap: 3px;">
                                 ${last12Weeks.map(day => `
-                                    <div style="aspect-ratio: 1; background: ${day.hasWorkout ? 'var(--accent)' : 'var(--border)'}; border-radius: 3px;" title="${day.date}"></div>
+                                    <div style="aspect-ratio: 1; background: ${day.hasWorkout ? 'var(--success)' : 'rgba(255, 255, 255, 0.1)'}; border-radius: 3px; ${day.hasWorkout ? 'box-shadow: 0 0 8px rgba(74, 222, 128, 0.3);' : ''}" title="${day.date}"></div>
                                 `).join('')}
                             </div>
                             <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-secondary); margin-top: 8px;">
@@ -3187,6 +3531,10 @@
                             <div class="quick-action-icon">⚡</div>
                             <div class="quick-action-label">Quick Start</div>
                         </div>
+                        <div class="quick-action-btn" onclick="app.switchTab('cardio')">
+                            <div class="quick-action-icon">🏃</div>
+                            <div class="quick-action-label">Cardio</div>
+                        </div>
                         <div class="quick-action-btn" onclick="app.switchTab('templates')">
                             <div class="quick-action-icon">≡</div>
                             <div class="quick-action-label">Programs</div>
@@ -3201,11 +3549,11 @@
                 // Show program shortcuts (5)
                 if (this.programs.length > 0) {
                     html += `
-                        <div class="card" style="margin-bottom: 16px;">
+                        <div class="card" style="margin-bottom: 16px; background: var(--surface);">
                             <div class="card-title" style="margin-bottom: 12px;">Quick Programs</div>
                             ${this.programs.slice(0, 3).map(program => `
-                                <div style="padding: 10px; background: var(--surface2); border-radius: 8px; margin-bottom: 8px; cursor: pointer;" onclick="app.showProgramDetails('${program.id}')">
-                                    <div style="font-weight: 600; margin-bottom: 2px;">${program.name}</div>
+                                <div style="padding: 10px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; cursor: pointer;" onclick="app.showProgramDetails('${program.id}')">
+                                    <div style="font-weight: 600; margin-bottom: 2px; color: var(--text-primary);">${program.name}</div>
                                     <div style="font-size: 12px; color: var(--text-secondary);">${program.schedule}</div>
                                 </div>
                             `).join('')}
@@ -6156,6 +6504,19 @@ Tracked with Gym Tracker
                         </div>
                     </div>
 
+                    <!-- Cardio Quick Access -->
+                    <div class="premium-stat-card" style="margin-bottom: 16px; background: linear-gradient(135deg, var(--accent) 0%, var(--primary) 100%); cursor: pointer;" onclick="app.switchTab('cardio')">
+                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 4px 0;">
+                            <div>
+                                <div style="font-size: 20px; font-weight: 700; color: white; margin-bottom: 4px;">🏃 Cardio Tracker</div>
+                                <div style="font-size: 13px; color: rgba(255,255,255,0.9);">
+                                    ${this.cardioSessions.length} sessions • ${(this.cardioSessions.reduce((sum, s) => sum + (s.distance || 0), 0) / 1000).toFixed(1)}km total
+                                </div>
+                            </div>
+                            <div style="font-size: 32px; color: rgba(255,255,255,0.3);">›</div>
+                        </div>
+                    </div>
+
                     <div class="quick-actions" style="margin-bottom: 20px;">
                         <div class="quick-action-btn" onclick="app.switchTab('templates')">
                             <div class="quick-action-icon">≡</div>
@@ -6223,6 +6584,22 @@ Tracked with Gym Tracker
                         </div>
                         <div style="font-size: 11px; color: var(--text-secondary); text-align: center;">
                             Load plates • Estimate max
+                        </div>
+                    </div>
+
+                    <!-- AI Features (6 & 8) -->
+                    <div class="card" style="margin-bottom: 16px; border: 2px solid var(--accent);">
+                        <div class="card-title" style="margin-bottom: 12px;">🤖 AI-Powered</div>
+                        <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                            <button class="btn btn-primary" onclick="app.generateAIWorkout()" style="flex: 1;">
+                                Generate Workout
+                            </button>
+                            <button class="btn btn-primary" onclick="app.analyzeNutrition()" style="flex: 1;">
+                                Scan Meal
+                            </button>
+                        </div>
+                        <div style="font-size: 11px; color: var(--text-secondary); text-align: center;">
+                            AI creates programs • Photo → macros
                         </div>
                     </div>
 
@@ -8737,6 +9114,158 @@ Tracked with Gym Tracker
                         this.saveWorkoutAsTemplate(sessionRef);
                     }
                 }, 2500);
+                
+                // Offer to share (3)
+                setTimeout(() => {
+                    if (confirm('📤 Share this workout on social media?')) {
+                        this.shareWorkout(sessionRef);
+                    }
+                }, 4000);
+            },
+
+            async generateAIWorkout() {
+                const goal = prompt('What\'s your goal?', 'Build muscle in chest and back');
+                if (!goal) return;
+                
+                const days = prompt('How many days per week?', '3');
+                if (!days) return;
+                
+                const experience = prompt('Experience level? (beginner/intermediate/advanced)', 'intermediate');
+                if (!experience) return;
+                
+                this.showNotification('🤖 AI generating workout...');
+                
+                try {
+                    const response = await fetch("https://api.anthropic.com/v1/messages", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            model: "claude-sonnet-4-20250514",
+                            max_tokens: 1000,
+                            messages: [{
+                                role: "user",
+                                content: `Create a ${days}-day per week workout program for a ${experience} lifter.
+Goal: ${goal}
+
+Return ONLY valid JSON (no markdown, no explanation) in this exact format:
+{
+  "name": "Program Name",
+  "workouts": [
+    {
+      "name": "Day 1 Name",
+      "exercises": [
+        {"name": "Exercise Name", "sets": 3, "reps": "8-10"}
+      ]
+    }
+  ]
+}
+
+Use proper exercise names from: Bench Press, Squat, Deadlift, Overhead Press, Barbell Row, Pull-ups, Dips, etc.`
+                            }]
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    const text = data.content[0].text;
+                    const program = JSON.parse(text);
+                    
+                    // Save as program
+                    program.id = Date.now().toString();
+                    program.schedule = `${days}x per week`;
+                    program.description = `AI-generated for: ${goal}`;
+                    this.programs.push(program);
+                    
+                    this.showNotification('✅ AI workout created!');
+                    this.switchTab('templates');
+                    this.renderTemplates();
+                    
+                } catch (err) {
+                    console.error('AI generation failed:', err);
+                    alert('AI generation failed. Please try again.');
+                }
+            },
+
+            async analyzeNutrition() {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'image/*';
+                input.capture = 'environment';
+                
+                input.onchange = async (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    
+                    this.showNotification('🤖 AI analyzing meal...');
+                    
+                    // Convert to base64
+                    const reader = new FileReader();
+                    reader.onload = async (event) => {
+                        const base64 = event.target.result.split(',')[1];
+                        
+                        try {
+                            const response = await fetch("https://api.anthropic.com/v1/messages", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({
+                                    model: "claude-sonnet-4-20250514",
+                                    max_tokens: 500,
+                                    messages: [{
+                                        role: "user",
+                                        content: [
+                                            {
+                                                type: "image",
+                                                source: {
+                                                    type: "base64",
+                                                    media_type: file.type,
+                                                    data: base64
+                                                }
+                                            },
+                                            {
+                                                type: "text",
+                                                text: `Analyze this meal and estimate macros. Return ONLY valid JSON (no markdown):
+{
+  "food": "Brief description",
+  "calories": number,
+  "protein": number,
+  "carbs": number,
+  "fat": number,
+  "confidence": "high/medium/low"
+}`
+                                            }
+                                        ]
+                                    }]
+                                })
+                            });
+                            
+                            const data = await response.json();
+                            const text = data.content[0].text;
+                            const nutrition = JSON.parse(text);
+                            
+                            // Show results and offer to log
+                            const log = confirm(`${nutrition.food}\n\nCalories: ${nutrition.calories}\nProtein: ${nutrition.protein}g\nCarbs: ${nutrition.carbs}g\nFat: ${nutrition.fat}g\n\nConfidence: ${nutrition.confidence}\n\nLog to nutrition tracker?`);
+                            
+                            if (log) {
+                                const today = new Date().toISOString().split('T')[0];
+                                if (!this.dailyLogs[today]) this.dailyLogs[today] = {};
+                                
+                                this.dailyLogs[today].caloriesIn = (this.dailyLogs[today].caloriesIn || 0) + nutrition.calories;
+                                this.dailyLogs[today].protein = (this.dailyLogs[today].protein || 0) + nutrition.protein;
+                                this.dailyLogs[today].carbs = (this.dailyLogs[today].carbs || 0) + nutrition.carbs;
+                                this.dailyLogs[today].fat = (this.dailyLogs[today].fat || 0) + nutrition.fat;
+                                
+                                this.saveDailyLogs();
+                                this.showNotification('✅ Nutrition logged!');
+                            }
+                            
+                        } catch (err) {
+                            console.error('AI analysis failed:', err);
+                            alert('AI analysis failed. Please try again.');
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                };
+                
+                input.click();
             },
 
             showPlateCalculator() {
@@ -8783,6 +9312,116 @@ Tracked with Gym Tracker
                 const avg = (epley + brzycki) / 2;
                 
                 alert(`1RM Estimate for ${w}kg × ${r}:\n\nEpley: ${epley.toFixed(1)}kg\nBrzycki: ${brzycki.toFixed(1)}kg\nAverage: ${avg.toFixed(1)}kg\n\nTraining percentages:\n60%: ${(avg * 0.6).toFixed(1)}kg\n70%: ${(avg * 0.7).toFixed(1)}kg\n80%: ${(avg * 0.8).toFixed(1)}kg\n90%: ${(avg * 0.9).toFixed(1)}kg`);
+            },
+
+            shareWorkout(session) {
+                // Generate shareable image card
+                const canvas = document.createElement('canvas');
+                canvas.width = 1080;
+                canvas.height = 1080;
+                const ctx = canvas.getContext('2d');
+                
+                // Background gradient
+                const gradient = ctx.createLinearGradient(0, 0, 0, 1080);
+                gradient.addColorStop(0, '#1a1a1a');
+                gradient.addColorStop(1, '#0a0a0a');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, 1080, 1080);
+                
+                // Stats
+                const totalVolume = session.exercises.reduce((sum, ex) => 
+                    sum + ex.sets.reduce((s, set) => s + (set.weight * set.reps), 0), 0
+                );
+                const totalSets = session.exercises.reduce((sum, ex) => sum + ex.sets.length, 0);
+                const duration = this.formatDuration(session.duration);
+                
+                // Title
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 60px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('💪 WORKOUT COMPLETE', 540, 120);
+                
+                // Date
+                ctx.font = '32px Arial';
+                ctx.fillStyle = '#888888';
+                ctx.fillText(new Date(session.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }), 540, 180);
+                
+                // Stats box
+                ctx.fillStyle = '#222222';
+                ctx.fillRect(90, 240, 900, 200);
+                
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 72px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(this.formatNumber(totalVolume) + 'kg', 540, 330);
+                ctx.font = '28px Arial';
+                ctx.fillStyle = '#888888';
+                ctx.fillText('TOTAL VOLUME', 540, 380);
+                
+                // Secondary stats
+                ctx.fillStyle = '#333333';
+                ctx.fillRect(90, 470, 420, 120);
+                ctx.fillRect(570, 470, 420, 120);
+                
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 48px Arial';
+                ctx.fillText(totalSets, 300, 530);
+                ctx.fillText(duration, 780, 530);
+                
+                ctx.font = '20px Arial';
+                ctx.fillStyle = '#888888';
+                ctx.fillText('SETS', 300, 565);
+                ctx.fillText('DURATION', 780, 565);
+                
+                // Exercises
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 32px Arial';
+                ctx.textAlign = 'left';
+                ctx.fillText('EXERCISES', 90, 660);
+                
+                ctx.font = '28px Arial';
+                let y = 720;
+                session.exercises.slice(0, 8).forEach(ex => {
+                    ctx.fillText(`• ${ex.name}`, 110, y);
+                    ctx.fillStyle = '#666666';
+                    ctx.fillText(`${ex.sets.length} sets`, 850, y);
+                    ctx.fillStyle = '#ffffff';
+                    y += 50;
+                });
+                
+                if (session.exercises.length > 8) {
+                    ctx.fillStyle = '#666666';
+                    ctx.fillText(`+ ${session.exercises.length - 8} more...`, 110, y);
+                }
+                
+                // Footer
+                ctx.fillStyle = '#888888';
+                ctx.font = '24px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('Gym Tracker', 540, 1030);
+                
+                // Convert to blob and share
+                canvas.toBlob(blob => {
+                    const file = new File([blob], 'workout.png', { type: 'image/png' });
+                    
+                    if (navigator.share) {
+                        navigator.share({
+                            title: 'My Workout',
+                            text: `Just completed a workout!\n${this.formatNumber(totalVolume)}kg total volume • ${totalSets} sets • ${duration}`,
+                            files: [file]
+                        }).catch(() => this.downloadWorkoutImage(canvas));
+                    } else {
+                        this.downloadWorkoutImage(canvas);
+                    }
+                });
+            },
+
+            downloadWorkoutImage(canvas) {
+                const link = document.createElement('a');
+                link.download = `workout-${new Date().toISOString().split('T')[0]}.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+                this.showNotification('📥 Workout image downloaded!');
             },
 
             saveWorkoutAsTemplate(session) {
@@ -9075,12 +9714,314 @@ Tracked with Gym Tracker
                             🔄 Sync Health Data
                         </button>
                     </div>
+                    
+                    <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+                        <button class="btn btn-primary" onclick="app.scanBarcode()" style="flex: 1;">
+                            📷 Scan Barcode
+                        </button>
+                        <button class="btn btn-primary" onclick="app.generateMealPlan()" style="flex: 1;">
+                            🍽️ Meal Plan
+                        </button>
+                    </div>
+                    
                     <div style="font-size: 11px; color: var(--text-secondary); text-align: center; margin-bottom: 80px;">
-                        Imports sleep, steps, heart rate from Apple Health / Google Fit
+                        Scan food labels • AI generates meal plans with macros
                     </div>
                 `;
                 
                 document.getElementById('health').innerHTML = html;
+            },
+
+            async scanBarcode() {
+                // Check if device supports camera
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    alert('Camera not available on this device');
+                    return;
+                }
+                
+                // Create barcode scanner UI
+                const modal = document.createElement('div');
+                modal.className = 'modal active';
+                modal.style.display = 'flex';
+                modal.innerHTML = `
+                    <div class="modal-content" style="max-width: 500px;">
+                        <div class="modal-header">
+                            <h2 class="modal-title">Scan Barcode</h2>
+                            <button class="close-btn" onclick="this.closest('.modal').remove(); app.stopBarcodeScanner();">×</button>
+                        </div>
+                        
+                        <div style="position: relative; background: #000; border-radius: 12px; overflow: hidden; margin-bottom: 16px;">
+                            <video id="barcodeVideo" style="width: 100%; height: 300px; object-fit: cover;" autoplay playsinline></video>
+                            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; height: 40%; border: 2px solid var(--success); border-radius: 8px; pointer-events: none;"></div>
+                        </div>
+                        
+                        <div id="barcodeResult" style="margin-bottom: 16px;"></div>
+                        
+                        <div style="font-size: 12px; color: var(--text-secondary); text-align: center; margin-bottom: 16px;">
+                            Point camera at barcode on food packaging
+                        </div>
+                        
+                        <button class="btn btn-secondary" onclick="this.closest('.modal').remove(); app.stopBarcodeScanner();">Cancel</button>
+                    </div>
+                `;
+                
+                document.body.appendChild(modal);
+                
+                // Start camera
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ 
+                        video: { facingMode: 'environment' }
+                    });
+                    
+                    const video = document.getElementById('barcodeVideo');
+                    video.srcObject = stream;
+                    this.barcodeStream = stream;
+                    
+                    // Start scanning loop
+                    this.startBarcodeDetection(video);
+                    
+                } catch (err) {
+                    alert('Camera access denied. Please enable camera permissions.');
+                    modal.remove();
+                }
+            },
+
+            async startBarcodeDetection(video) {
+                // Use browser BarcodeDetector API if available
+                if ('BarcodeDetector' in window) {
+                    const barcodeDetector = new BarcodeDetector();
+                    
+                    const detectBarcode = async () => {
+                        if (!this.barcodeStream) return;
+                        
+                        try {
+                            const barcodes = await barcodeDetector.detect(video);
+                            if (barcodes.length > 0) {
+                                const barcode = barcodes[0].rawValue;
+                                this.lookupBarcode(barcode);
+                                return;
+                            }
+                        } catch (err) {
+                            console.error('Barcode detection error:', err);
+                        }
+                        
+                        requestAnimationFrame(detectBarcode);
+                    };
+                    
+                    detectBarcode();
+                } else {
+                    // Fallback: manual entry
+                    document.getElementById('barcodeResult').innerHTML = `
+                        <div style="text-align: center; padding: 20px;">
+                            <div style="margin-bottom: 12px; color: var(--text-secondary);">Barcode scanner not supported on this device</div>
+                            <input type="text" id="manualBarcode" placeholder="Enter barcode manually" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface2); color: var(--text-primary); margin-bottom: 8px;">
+                            <button class="btn btn-primary" onclick="app.lookupBarcode(document.getElementById('manualBarcode').value)" style="width: 100%;">Look Up</button>
+                        </div>
+                    `;
+                }
+            },
+
+            stopBarcodeScanner() {
+                if (this.barcodeStream) {
+                    this.barcodeStream.getTracks().forEach(track => track.stop());
+                    this.barcodeStream = null;
+                }
+            },
+
+            async lookupBarcode(barcode) {
+                this.stopBarcodeScanner();
+                
+                const resultDiv = document.getElementById('barcodeResult');
+                resultDiv.innerHTML = '<div style="text-align: center; padding: 20px;">🔍 Looking up product...</div>';
+                
+                try {
+                    // Use Open Food Facts API
+                    const response = await fetch(`https://world.openfoodfacts.org/api/v0/product/${barcode}.json`);
+                    const data = await response.json();
+                    
+                    if (data.status === 1) {
+                        const product = data.product;
+                        const nutriments = product.nutriments;
+                        
+                        const servingSize = product.serving_size || '100g';
+                        const calories = Math.round(nutriments.energy_value || nutriments['energy-kcal'] || 0);
+                        const protein = Math.round(nutriments.proteins || 0);
+                        const carbs = Math.round(nutriments.carbohydrates || 0);
+                        const fat = Math.round(nutriments.fat || 0);
+                        
+                        resultDiv.innerHTML = `
+                            <div class="premium-stat-card">
+                                <div style="font-weight: 700; font-size: 16px; margin-bottom: 8px;">${product.product_name || 'Unknown Product'}</div>
+                                <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">${product.brands || ''} • ${servingSize}</div>
+                                
+                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 12px;">
+                                    <div>
+                                        <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase;">Calories</div>
+                                        <div style="font-size: 24px; font-weight: 700;">${calories}</div>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase;">Protein</div>
+                                        <div style="font-size: 24px; font-weight: 700; color: var(--success);">${protein}g</div>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase;">Carbs</div>
+                                        <div style="font-size: 24px; font-weight: 700;">${carbs}g</div>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase;">Fat</div>
+                                        <div style="font-size: 24px; font-weight: 700;">${fat}g</div>
+                                    </div>
+                                </div>
+                                
+                                <button class="btn btn-primary" onclick="app.logScannedFood('${product.product_name}', ${calories}, ${protein}, ${carbs}, ${fat})" style="width: 100%;">
+                                    Log to Nutrition
+                                </button>
+                            </div>
+                        `;
+                        
+                    } else {
+                        resultDiv.innerHTML = `
+                            <div style="text-align: center; padding: 20px; color: var(--text-secondary);">
+                                Product not found. Try scanning again or enter manually.
+                            </div>
+                        `;
+                    }
+                    
+                } catch (err) {
+                    console.error('Barcode lookup failed:', err);
+                    resultDiv.innerHTML = `
+                        <div style="text-align: center; padding: 20px; color: var(--danger);">
+                            Lookup failed. Check internet connection.
+                        </div>
+                    `;
+                }
+            },
+
+            logScannedFood(name, calories, protein, carbs, fat) {
+                const today = new Date().toISOString().split('T')[0];
+                if (!this.dailyLogs[today]) this.dailyLogs[today] = {};
+                
+                this.dailyLogs[today].caloriesIn = (this.dailyLogs[today].caloriesIn || 0) + calories;
+                this.dailyLogs[today].protein = (this.dailyLogs[today].protein || 0) + protein;
+                this.dailyLogs[today].carbs = (this.dailyLogs[today].carbs || 0) + carbs;
+                this.dailyLogs[today].fat = (this.dailyLogs[today].fat || 0) + fat;
+                
+                // Add to meal log
+                if (!this.dailyLogs[today].meals) this.dailyLogs[today].meals = [];
+                this.dailyLogs[today].meals.push({ name, calories, protein, carbs, fat, time: new Date().toLocaleTimeString() });
+                
+                this.saveDailyLogs();
+                document.querySelector('.modal')?.remove();
+                this.renderHealth();
+                this.showNotification(`✅ Logged: ${name}`);
+            },
+
+            async generateMealPlan() {
+                const days = prompt('How many days?', '7');
+                if (!days) return;
+                
+                const calories = prompt('Target calories per day?', '2000');
+                if (!calories) return;
+                
+                const protein = prompt('Target protein (g)?', '150');
+                if (!protein) return;
+                
+                const preferences = prompt('Any preferences? (e.g., vegetarian, high carb, low fat)', 'balanced');
+                
+                this.showNotification('🤖 AI generating meal plan...');
+                
+                try {
+                    const response = await fetch("https://api.anthropic.com/v1/messages", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            model: "claude-sonnet-4-20250514",
+                            max_tokens: 2000,
+                            messages: [{
+                                role: "user",
+                                content: `Create a ${days}-day meal plan with ${calories} calories and ${protein}g protein per day.
+Preferences: ${preferences}
+
+Return ONLY valid JSON (no markdown):
+{
+  "days": [
+    {
+      "day": 1,
+      "meals": [
+        {
+          "name": "Meal name",
+          "calories": number,
+          "protein": number,
+          "carbs": number,
+          "fat": number,
+          "ingredients": ["item1", "item2"]
+        }
+      ]
+    }
+  ]
+}`
+                            }]
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    const text = data.content[0].text;
+                    const mealPlan = JSON.parse(text);
+                    
+                    this.showMealPlanModal(mealPlan);
+                    
+                } catch (err) {
+                    console.error('Meal plan generation failed:', err);
+                    alert('Failed to generate meal plan. Try again.');
+                }
+            },
+
+            showMealPlanModal(mealPlan) {
+                const html = `
+                    <div class="modal active" id="mealPlanModal" style="display: flex;">
+                        <div class="modal-content" style="max-width: 600px;">
+                            <div class="modal-header">
+                                <h2 class="modal-title">${mealPlan.days.length}-Day Meal Plan</h2>
+                                <button class="close-btn" onclick="document.getElementById('mealPlanModal').remove()">×</button>
+                            </div>
+                            
+                            <div style="max-height: 500px; overflow-y: auto;">
+                                ${mealPlan.days.map(day => `
+                                    <div class="premium-stat-card" style="margin-bottom: 16px;">
+                                        <div class="premium-stat-header">Day ${day.day}</div>
+                                        ${day.meals.map(meal => `
+                                            <div style="padding: 12px 0; border-bottom: 1px solid var(--border);">
+                                                <div style="font-weight: 600; margin-bottom: 4px;">${meal.name}</div>
+                                                <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 6px;">
+                                                    ${meal.calories} cal • ${meal.protein}g protein • ${meal.carbs}g carbs • ${meal.fat}g fat
+                                                </div>
+                                                <div style="font-size: 11px; color: var(--text-secondary);">
+                                                    ${meal.ingredients.join(', ')}
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                `).join('')}
+                            </div>
+                            
+                            <button class="btn btn-primary" onclick="app.saveMealPlan(${JSON.stringify(mealPlan).replace(/"/g, '&quot;')})" style="width: 100%; margin-top: 16px;">
+                                Save Meal Plan
+                            </button>
+                            <button class="btn btn-secondary" onclick="document.getElementById('mealPlanModal').remove()" style="width: 100%; margin-top: 8px;">
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.insertAdjacentHTML('beforeend', html);
+            },
+
+            saveMealPlan(mealPlan) {
+                this.currentMealPlan = mealPlan;
+                localStorage.setItem('mealPlan', JSON.stringify(mealPlan));
+                document.getElementById('mealPlanModal')?.remove();
+                this.showNotification('✅ Meal plan saved!');
             },
 
             async syncHealthData() {
